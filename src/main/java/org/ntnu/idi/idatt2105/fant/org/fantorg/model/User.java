@@ -3,6 +3,8 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.*;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Role;
 import org.springframework.security.core.GrantedAuthority;
@@ -89,6 +91,21 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
+    @OneToMany(mappedBy = "seller")
+    private List<Item> items;
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_bookmarked_items",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "item_id")
+    )
+    private Set<Item> bookmarkedItems = new HashSet<>();
+
+
+    @OneToMany(mappedBy = "author")
+    private List<Review> writtenReviews;
+
 
     @Override
     public boolean isAccountNonExpired() {
