@@ -9,13 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificationExecutor<Item> {
-  Page<Item> findItemByTitle(String itemName);
+  Page<Item> findItemByTitle(String itemName, Pageable pageable);
 
-  Page<Item> findItemBySeller(User seller);
-
-  Page<Item> findByCategory(Category category);
+  Page<Item> findItemBySeller(User seller,Pageable pageable);
 
   Page<Item> findByTitleContainingIgnoreCaseAndCategory(String keyword, Category category, Pageable pageable);
 

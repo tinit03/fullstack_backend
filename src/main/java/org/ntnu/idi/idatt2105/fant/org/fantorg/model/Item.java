@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,15 +32,14 @@ public class Item {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Setter(AccessLevel.NONE)
+  @Column(name = "item_id")
   private Long itemId;
 
   private String title;
   private String briefDescription;
   @Column(length = 2048)
   private String fullDescription;
-  private double latitude;
-  private double longitude;
-  private double price;
+  private BigDecimal price;
 
   @ManyToOne
   @JoinColumn(name = "category_id")

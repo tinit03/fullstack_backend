@@ -1,5 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ public class ItemDto {
   private Long id;
   private String name;
   private String description;
-  private double price;
+  private BigDecimal price;
   private List<String> tags;
   private String city;
   private String postalCode;
