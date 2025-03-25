@@ -106,7 +106,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "author")
     private List<Review> writtenReviews;
 
-
+    @Override
+    public String getUsername() {
+        return this.email; //We would rather
+    }
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -125,5 +128,10 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public String getPassword(){
+        return password;
     }
 }

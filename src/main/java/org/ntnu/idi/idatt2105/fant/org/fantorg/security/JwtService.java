@@ -2,6 +2,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +29,9 @@ public class JwtService {
     /**
      * Constructs an instance of the class that creates the key for signing tokens
      */
-    public JwtService() {
-        byte[] keyBytes = Base64.getDecoder().decode(System.getenv("SECRET_KEY"));
-        this.key = new SecretKeySpec(keyBytes, "HmacSHA256");
+    public JwtService(@Value("${jwt.secret}") String secret) {
+        byte[] keyBytes = Base64.getDecoder().decode(secret);
+        this.key = new SecretKeySpec(keyBytes, "HmacSHA512");
     }
 
     /**
