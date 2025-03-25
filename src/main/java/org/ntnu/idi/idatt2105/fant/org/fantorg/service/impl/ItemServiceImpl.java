@@ -2,6 +2,8 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.ItemCreateDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
@@ -10,7 +12,10 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.specification.ItemSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ItemServiceImpl implements ItemService {
 
   private final ItemRepository itemRepository;
@@ -20,7 +25,8 @@ public class ItemServiceImpl implements ItemService {
   }
 
   @Override
-  public Item createItem(Item item, User seller) {
+  public Item createItem(ItemCreateDto dto, User seller) {
+    Item item = ItemMapper.toItem(dto);
     item.setSeller(seller);
     item.setPublishedAt(LocalDateTime.now());
     return itemRepository.save(item);
@@ -80,7 +86,7 @@ public class ItemServiceImpl implements ItemService {
   }
 
   @Override
-  public Page<Item> getItemsBySeller(User seller) {
-    return itemRepository.findItemBySeller(seller);
+  public Page<Item> getItemsBySeller(User seller, Pageable pageable) {
+    return itemRepository.findItemBySeller(seller, pageable);
   }
 }
