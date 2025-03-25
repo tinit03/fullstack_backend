@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: Fant.org
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop # or update, depending on your test style
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: embedded
+
+  docker:
+    compose:
+      enabled: false
+
+
+jwt:
+    secret: Z6Yn1dWRZ3HzkR9MbqZ0MoevtpdXnFLnCp+O8gYTGO59tTAPdOY79lqo02gtKoDDDioZ6p6nu7BjvxUEERkNUw==
+
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
