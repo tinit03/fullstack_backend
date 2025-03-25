@@ -12,9 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Embeddable
 public class Location {
-  private String addressLine;
   private String postalCode;
   private String city;
-  private double latitude;
-  private double longitude;
+//  private double latitude;
+//  private double longitude;
 }
