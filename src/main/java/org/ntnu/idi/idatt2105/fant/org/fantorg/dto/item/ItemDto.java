@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 
 
 @Setter
@@ -24,5 +25,5 @@ public class ItemDto {
   private LocalDateTime publishedAt;
   private Long sellerId;         // om vi ønsker å henvise bruker til selgerens brukerside
   private String sellerFullName; // om vi ønsker å vise selger sin brukernavn
-
+  private ListingType listingType;
 }

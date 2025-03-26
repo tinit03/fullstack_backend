@@ -53,11 +53,11 @@ public class ItemServiceImpl implements ItemService {
 
 
     existing.setTitle(updatedItem.getItemName());
-    existing.setBriefDescription(updatedItem.getBriefDescription());
-    existing.setFullDescription(updatedItem.getFullDescription());
+    existing.setDescription(updatedItem.getDescription());
     existing.setPrice(updatedItem.getPrice());
     existing.setSubCategory(subCategory);
     existing.setLocation(new Location(updatedItem.getPostalCode(),updatedItem.getCity()));
+    existing.setListingType(updatedItem.getListingType());
     return itemRepository.save(existing);
   }
 

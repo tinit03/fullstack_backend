@@ -92,8 +92,7 @@ public class LoadData implements CommandLineRunner {
     // 4. Create test item in subcategory
     Item item = new Item();
     item.setTitle("Winter Jacket");
-    item.setBriefDescription("Warm and comfy jacket");
-    item.setFullDescription("Insulated winter jacket in great condition");
+    item.setDescription("Insulated winter jacket in great condition");
     item.setSubCategory(subCategory); // Set to subcategory
     item.setPrice(new BigDecimal("499.99"));
     item.setPublishedAt(LocalDateTime.now());

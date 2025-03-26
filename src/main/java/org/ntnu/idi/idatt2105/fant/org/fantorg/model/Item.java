@@ -39,9 +39,7 @@ public class Item {
   private Long itemId;
 
   private String title;
-  private String briefDescription;
-  @Column(length = 2048)
-  private String fullDescription;
+  private String description;
   private BigDecimal price;
 
   @ManyToOne

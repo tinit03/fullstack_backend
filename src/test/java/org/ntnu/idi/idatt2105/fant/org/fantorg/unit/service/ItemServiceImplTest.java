@@ -45,8 +45,7 @@ public class ItemServiceImplTest {
     // Arrange
     ItemCreateDto dto = new ItemCreateDto();
     dto.setItemName("Test Item");
-    dto.setBriefDescription("Brief");
-    dto.setFullDescription("Full");
+    dto.setDescription("Full");
     dto.setPrice(BigDecimal.valueOf(100));
     dto.setCity("Oslo");
     dto.setPostalCode("0123");
@@ -55,8 +54,7 @@ public class ItemServiceImplTest {
     // Mocked entity returned from the mapper
     Item mappedItem = new Item();
     mappedItem.setTitle(dto.getItemName());
-    mappedItem.setBriefDescription(dto.getBriefDescription());
-    mappedItem.setFullDescription(dto.getFullDescription());
+    mappedItem.setDescription(dto.getDescription());
     mappedItem.setPrice(dto.getPrice());
     mappedItem.setLocation(new Location(dto.getCity(), dto.getPostalCode()));
     mappedItem.setTags(dto.getTags());

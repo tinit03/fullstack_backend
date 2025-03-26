@@ -11,5 +11,5 @@ public class UserRegisterDto {
   private String lastName;
   private String password;
   private String address;
-  private String phoneNumber; //Maybe we should make it optional for the user...
+  // private String phoneNumber; //Maybe we should make it optional for the user...
 }
