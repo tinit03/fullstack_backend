@@ -28,8 +28,8 @@ spring:
 jwt:
     secret: Z6Yn1dWRZ3HzkR9MbqZ0MoevtpdXnFLnCp+O8gYTGO59tTAPdOY79lqo02gtKoDDDioZ6p6nu7BjvxUEERkNUw==
 
-
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+#
+#logging:
+#  level:
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

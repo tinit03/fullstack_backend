@@ -15,12 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.ItemCreateDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.factory.TestUserFactory;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
@@ -63,7 +61,6 @@ public class ItemServiceImplTest {
     mappedItem.setLocation(new Location(dto.getCity(), dto.getPostalCode()));
     mappedItem.setTags(dto.getTags());
 
-    // ⚠️ Mock the static method
     mockStatic(ItemMapper.class);
     when(ItemMapper.toItem(dto)).thenReturn(mappedItem);
 
