@@ -11,7 +11,6 @@ public class TestUserFactory {
     user.setPassword("password");
     user.setFirstName("test");
     user.setLastName("User");
-    user.setUsername("use");
     user.setRole(Role.USER);
 
     if (id != null) {
