@@ -52,7 +52,7 @@ public class BidServiceImpl implements BidService {
   public OrderDto acceptBid(Long bidId, User seller) {
     Bid bid = bidRepository.findById(bidId)
         .orElseThrow(() -> new EntityNotFoundException("Bid is not found"));
-    if(!bid.getItem().getSeller().equals(seller)) {
+    if(!bid.getItem().getSeller().getId().equals(seller.getId())) {
       throw new IllegalArgumentException("User is not authorized to accept this bid");
     }
     bid.setStatus(BidStatus.ACCEPTED);
