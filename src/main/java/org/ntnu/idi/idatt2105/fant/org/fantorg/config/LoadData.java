@@ -34,35 +34,72 @@ public class LoadData implements CommandLineRunner {
   @Override
   public void run(String... args) throws Exception {
 
-    // Create test user
+    // 1. Create test user
     User user = new User();
     user.setEmail("test@fant.org");
     user.setPassword(passwordEncoder.encode("password"));
     user.setFirstName("Test");
     user.setLastName("User");
-    //TODO: Fjerne brukernavn, vi ønsker heller å bruke email som identifikator
-    user.setUsername("username");
     user.setRole(Role.USER);
     userRepository.save(user);
 
+    // 2. Create parent category
+    Category parentCategory = new Category();
+    parentCategory.setCategoryName("Clothes");
+    categoryRepository.save(parentCategory);
 
-    // add category
-    Category category = new Category(null, "SPORT");
-    category = categoryRepository.save(category);
+    // 3. Create subcategory (e.g. Jackets)
+    Category subCategory = new Category();
+    subCategory.setCategoryName("Jackets");
+    subCategory.setParentCategory(parentCategory);
+    categoryRepository.save(subCategory);
 
-    // Create test item
+    Category shoes = new Category();
+    shoes.setCategoryName("Shoes");
+    shoes.setParentCategory(parentCategory);
+    categoryRepository.save(shoes);
 
+    // === PARENT CATEGORY: Electronics ===
+    Category electronics = new Category();
+    electronics.setCategoryName("Electronics");
+    categoryRepository.save(electronics);
+
+    Category phones = new Category();
+    phones.setCategoryName("Phones");
+    phones.setParentCategory(electronics);
+    categoryRepository.save(phones);
+
+    Category laptops = new Category();
+    laptops.setCategoryName("Laptops");
+    laptops.setParentCategory(electronics);
+    categoryRepository.save(laptops);
+
+    // === PARENT CATEGORY: Sports ===
+    Category sports = new Category();
+    sports.setCategoryName("Sports");
+    categoryRepository.save(sports);
+
+    Category bikes = new Category();
+    bikes.setCategoryName("Bikes");
+    bikes.setParentCategory(sports);
+    categoryRepository.save(bikes);
+
+    Category balls = new Category();
+    balls.setCategoryName("Balls");
+    balls.setParentCategory(sports);
+    categoryRepository.save(balls);
+
+    // 4. Create test item in subcategory
     Item item = new Item();
-    item.setTitle("Test Bike from Trondheim");
-    item.setBriefDescription("A fast and stylish test bike.");
-    item.setFullDescription("A great test bike, slightly used.");
-    item.setCategory(category); // if category is an entity
-    item.setPrice(new BigDecimal("199.99"));
+    item.setTitle("Winter Jacket");
+    item.setBriefDescription("Warm and comfy jacket");
+    item.setFullDescription("Insulated winter jacket in great condition");
+    item.setSubCategory(subCategory); // Set to subcategory
+    item.setPrice(new BigDecimal("499.99"));
     item.setPublishedAt(LocalDateTime.now());
-    item.setTags(List.of("bike", "test", "sport"));
+    item.setTags(List.of("jacket", "winter", "clothes"));
     item.setSeller(user);
-    item.setLocation(new Location("Trondheim", "7010"));
-
+    item.setLocation(new Location("Oslo", "0170"));
     itemRepository.save(item);
 
     System.out.println("Inserted test data.");
