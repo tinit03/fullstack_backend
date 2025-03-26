@@ -53,12 +53,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String lastName;
 
-    /**
-     * Unique username for the user; cannot be null.
-     */
-    @NotNull
-    @Column(nullable = false, unique = true)
-    private String username;
 
     /**
      * Encrypted password for user authentication; cannot be null.
@@ -74,6 +68,10 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     @Email
     private String email;
+
+    private String address;
+
+    private String number;
 
     /**
      * A user's role. See {@link Role}
@@ -105,7 +103,7 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "author")
     private List<Review> writtenReviews;
-
+    // Let email behave like username
     @Override
     public String getUsername() {
         return this.email; //We would rather

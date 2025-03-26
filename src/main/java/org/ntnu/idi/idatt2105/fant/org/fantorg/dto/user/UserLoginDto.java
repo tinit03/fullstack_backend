@@ -1,4 +1,4 @@
-package org.ntnu.idi.idatt2105.fant.org.fantorg.dto;
+package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +12,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 public class UserLoginDto {
   @Email(message = "Invalid email format")
   @NotBlank(message = "Email is required")
