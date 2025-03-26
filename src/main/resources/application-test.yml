@@ -12,10 +12,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop # or update, depending on your test style
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
   sql:
     init:
       mode: embedded
