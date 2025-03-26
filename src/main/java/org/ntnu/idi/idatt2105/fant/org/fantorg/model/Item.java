@@ -5,6 +5,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 
 @NoArgsConstructor
 @Entity
@@ -42,8 +45,8 @@ public class Item {
   private BigDecimal price;
 
   @ManyToOne
-  @JoinColumn(name = "category_id")
-  private Category category;
+  @JoinColumn(name = "subcategory_id")
+  private Category subCategory;
   private LocalDateTime publishedAt;
 
   @ManyToOne
@@ -53,9 +56,9 @@ public class Item {
   @ElementCollection
   private List<String> tags;
 
-  @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Review> reviews = new ArrayList<>();
-
   @Embedded
   private Location location;
+
+  @Enumerated(EnumType.STRING)
+  private ListingType listingType;
 }

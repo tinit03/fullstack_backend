@@ -1,4 +1,4 @@
-package org.ntnu.idi.idatt2105.fant.org.fantorg.dto;
+package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item;
 
 import java.util.List;
 import lombok.Getter;
@@ -9,8 +9,6 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Review;
 public class ItemDetailDto extends ItemDto {
   private String fullDescription;
   private List<Review> reviews;
-  private double latitude;
-  private double longitude;
   private double averageRating;
   private int reviewCount;
   private boolean isBookmarked;

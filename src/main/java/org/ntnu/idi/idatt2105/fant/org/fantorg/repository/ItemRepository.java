@@ -17,10 +17,10 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
 
   Page<Item> findItemBySeller(User seller,Pageable pageable);
 
-  Page<Item> findByTitleContainingIgnoreCaseAndCategory(String keyword, Category category, Pageable pageable);
+  Page<Item> findByTitleContainingIgnoreCaseAndSubCategory(String keyword, Category category, Pageable pageable);
 
   Page<Item> findByTitleContainingIgnoreCase(String keyword, Pageable pagable);
 
-  Page<Item> findByCategory(Category category, Pageable pageable);
+  Page<Item> findBySubCategory(Category category, Pageable pageable);
 
 }

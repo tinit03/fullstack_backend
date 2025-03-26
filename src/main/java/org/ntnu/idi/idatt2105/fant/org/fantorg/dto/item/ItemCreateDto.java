@@ -1,4 +1,4 @@
-package org.ntnu.idi.idatt2105.fant.org.fantorg.dto;
+package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -40,4 +40,6 @@ public class ItemCreateDto {
   @NotBlank(message = "Postal code is required")
   private String postalCode;
 
+  @NotNull(message = "Subcategory ID is required")
+  private Long subcategoryId;
 }

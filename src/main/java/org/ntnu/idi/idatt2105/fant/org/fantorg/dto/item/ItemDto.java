@@ -1,4 +1,4 @@
-package org.ntnu.idi.idatt2105.fant.org.fantorg.dto;
+package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,6 +23,6 @@ public class ItemDto {
   private String postalCode;
   private LocalDateTime publishedAt;
   private Long sellerId;         // om vi ønsker å henvise bruker til selgerens brukerside
-  private String sellerUsername; // om vi ønsker å vise selger sin brukernavn
+  private String sellerFullName; // om vi ønsker å vise selger sin brukernavn
 
 }

@@ -2,9 +2,10 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.mapper;
 
 import java.util.List;
 import java.util.Optional;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.ItemCreateDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.ItemDetailDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.ItemDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDetailDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 
@@ -24,10 +25,14 @@ public class ItemMapper {
           dto.setCity(location.getCity());
           dto.setPostalCode(location.getPostalCode());
         });
-    Optional.ofNullable(item.getSeller()).ifPresent(seller -> {
-      dto.setSellerId(seller.getId());
-      dto.setSellerUsername(seller.getUsername()); //Ønskelig å bruke hele navnet enn brukernavnet.
-    });
+
+    Optional.ofNullable(item.getSeller())
+        .map(UserMapper::toDto)
+        .ifPresent(userDto -> {
+          dto.setSellerFullName(userDto.getFullName());
+          dto.setSellerId(userDto.getId());
+        });
+
     return dto;
   }
 
@@ -47,11 +52,12 @@ public class ItemMapper {
 //      dto.setLongitude(location.getLongitude());
     });
 
-    Optional.ofNullable(item.getSeller()).ifPresent(seller -> {
-      dto.setSellerId(seller.getId());
-      dto.setSellerUsername(seller.getUsername());
-    });
-
+    Optional.ofNullable(item.getSeller())
+        .map(UserMapper::toDto)
+        .ifPresent(userDto -> {
+          dto.setSellerFullName(userDto.getFullName());
+          dto.setSellerId(userDto.getId());
+        });
     dto.setFullDescription(item.getFullDescription());
     // legge til logikk senere
     //dto.setImageUrls(List.of());
