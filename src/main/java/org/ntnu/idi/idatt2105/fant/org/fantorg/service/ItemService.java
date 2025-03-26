@@ -11,6 +11,8 @@ public interface ItemService {
   Item createItem(ItemCreateDto dto, User seller);
   Item updateItem(Long id, ItemCreateDto dto, User seller);
   void deleteItem(Long id, User seller);
+
+  //TODO: Endre alle Item til ItemDto, burde ikke sende entitet til klient.
   Optional<Item> getItemById(Long id);
   Page<Item> getAllItems(Pageable pageable);
   Page<Item> searchItems(String keyword, Pageable pageable);
