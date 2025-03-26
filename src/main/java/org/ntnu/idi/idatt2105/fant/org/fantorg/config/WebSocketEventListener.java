@@ -18,7 +18,6 @@ public class WebSocketEventListener {
   private final SimpMessageSendingOperations messagingTemplate;
   @EventListener
   public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-d
     StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
     String mail = headerAccessor.getSessionAttributes().get("mail").toString();
 
