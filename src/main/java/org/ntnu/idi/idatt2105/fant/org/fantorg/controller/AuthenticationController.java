@@ -3,7 +3,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.JwtTokenDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.UserLoginDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserLoginDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.security.JwtService;
 import org.springframework.http.ResponseEntity;
