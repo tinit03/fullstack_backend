@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.CategoryDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.SubCategoryDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.CategoryMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.CategoryService;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +28,15 @@ public class CategoryController {
   }
 
   @PostMapping
-  public ResponseEntity<Category> createCategory(@Valid @RequestBody CategoryDto dto) {
-    return ResponseEntity.ok(categoryService.createCategory(dto));
+  public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto dto) {
+    Category saved = categoryService.createCategory(dto);
+    return ResponseEntity.ok(CategoryMapper.toCategoryDto(saved));
   }
 
   @PostMapping("/sub")
-  public ResponseEntity<Category> createSubCategory(@Valid @RequestBody SubCategoryDto dto) {
-    return ResponseEntity.ok(categoryService.createSubCategory(dto));
+  public ResponseEntity<CategoryDto> createSubCategory(@Valid @RequestBody SubCategoryDto dto) {
+    Category saved = categoryService.createSubCategory(dto);
+    return ResponseEntity.ok(CategoryMapper.toCategoryDto(saved));
   }
 
   @PutMapping("/{id}")
