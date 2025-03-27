@@ -17,7 +17,10 @@ public class ItemMapper {
     dto.setPrice(item.getPrice());
     dto.setTags(item.getTags());
     dto.setPublishedAt(item.getPublishedAt());
-
+    dto.setListingType(item.getListingType());
+    dto.setCondition(item.getCondition());
+    dto.setStatus(item.getStatus());
+    dto.setForSale(item.isForSale());
     Optional.ofNullable(item.getLocation())
         .ifPresent(location -> {
           dto.setCity(location.getCity());
@@ -39,18 +42,15 @@ public class ItemMapper {
     item.setTitle(dto.getItemName());
     item.setDescription(dto.getDescription());
     item.setPrice(dto.getPrice());
-
+    item.setListingType(dto.getListingType());
+    item.setCondition(dto.getCondition());
+    item.setStatus(Status.ACTIVE);
     if (dto.getTags() != null && !dto.getTags().isEmpty()) {
       item.setTags(dto.getTags());
     } else {
       item.setTags(List.of()); // Default to empty list if no tags are added
     }
-    Location location = new Location();
-    location.setCity(dto.getCity());
-    location.setPostalCode(dto.getPostalCode());
 
-    item.setLocation(location);
-    item.setListingType(dto.getListingType());
     List<Image> images = ImageMapper.fromCreateDtoList(dto.getImages());
     if (images != null) {
       images.forEach(image -> image.setItem(item)); // set the item reference on each image

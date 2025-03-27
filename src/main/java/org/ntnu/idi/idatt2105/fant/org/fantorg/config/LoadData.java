@@ -8,6 +8,9 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Role;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
@@ -98,7 +101,10 @@ public class LoadData implements CommandLineRunner {
     item.setPublishedAt(LocalDateTime.now());
     item.setTags(List.of("jacket", "winter", "clothes"));
     item.setSeller(user);
-    item.setLocation(new Location("Oslo", "0170"));
+    item.setListingType(ListingType.BID);
+    item.setStatus(Status.ACTIVE);
+    item.setCondition(Condition.ACCEPTABLE);
+    item.setForSale(false);
     itemRepository.save(item);
 
     System.out.println("Inserted test data.");

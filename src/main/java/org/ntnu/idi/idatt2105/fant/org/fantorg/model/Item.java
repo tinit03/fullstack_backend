@@ -23,6 +23,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 
 @NoArgsConstructor
@@ -60,6 +62,13 @@ public class Item {
   @Enumerated(EnumType.STRING)
   private ListingType listingType;
 
+  @Enumerated(EnumType.STRING)
+  private Status status;
+
+  @Enumerated(EnumType.STRING)
+  private Condition condition;
+
+  private boolean forSale;
   @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Image> images = new ArrayList<>();
 }

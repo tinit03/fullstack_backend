@@ -1,5 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +12,9 @@ import lombok.Setter;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Review;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 
 
 @Setter
@@ -27,12 +30,13 @@ public class ItemDto {
   private LocalDateTime publishedAt;
   private Long sellerId;         // om vi ønsker å henvise bruker til selgerens brukerside
   private String sellerFullName; // om vi ønsker å vise selger sin brukernavn
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
   private ListingType listingType;
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private Condition condition;
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private Status status;
+  private boolean forSale;
   private List<ImageDto> images;
-
-  // These were from ItemDetailDto:
-  private List<Review> reviews;        // Optional
-  private Double averageRating;        // Optional
-  private Integer reviewCount;         // Optional
   private Boolean isBookmarked;        // Optional
 }
