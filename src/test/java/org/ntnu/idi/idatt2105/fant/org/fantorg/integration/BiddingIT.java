@@ -5,8 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.JwtTokenDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.bid.BidCreateDto;
@@ -21,7 +23,9 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserRegisterDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.integration.util.TestHelpers;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +41,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
@@ -50,10 +55,10 @@ public class BiddingIT {
   private TestRestTemplate restTemplate;
 
 
-  @BeforeEach
+  @BeforeAll
   public void setUpUsers() {
     TestHelpers.registerUser(restTemplate,baseUrl(),"seller@example.com", "password", "Seller", "One", "oslo");
-    TestHelpers.registerUser(restTemplate,baseUrl(),"buyer@example.com", "password", "Buyer", "Two", "bergen");  }
+    TestHelpers.registerUser(restTemplate,baseUrl(),"buyer@example.com", "password", "Buyer", "Two", "bergen");}
   private String baseUrl() {
     return "http://localhost:" + port;
   }
@@ -61,6 +66,7 @@ public class BiddingIT {
   @Test
   public void testBiddingFlow() {
     // 1. Register and Login as seller and buyer
+
     String sellerToken = TestHelpers.loginAndGetToken(restTemplate,baseUrl(),"seller@example.com", "password");
     String buyerToken = TestHelpers.loginAndGetToken(restTemplate,baseUrl(),"buyer@example.com", "password");
     Long subCategoryId = TestHelpers.createCategoryAndSubcategory(restTemplate,baseUrl(),"Collectibles", "Antiques", sellerToken);
@@ -71,9 +77,10 @@ public class BiddingIT {
     itemCreateDto.setDescription("A beautiful, rare antique vase in excellent condition.");
     itemCreateDto.setPrice(new BigDecimal("150.00"));
     itemCreateDto.setSubcategoryId(subCategoryId);
-
+    itemCreateDto.setCondition(Condition.GOOD);
     itemCreateDto.setPostalCode("0150");
     itemCreateDto.setListingType(ListingType.BID); // ensure this field exists in your DTO
+    itemCreateDto.setStatus(Status.ACTIVE);
     // Set other required fields as needed...
 
     HttpHeaders sellerHeaders = new HttpHeaders();
@@ -142,7 +149,8 @@ public class BiddingIT {
     itemCreateDto.setPrice(new BigDecimal("150.00"));
     itemCreateDto.setSubcategoryId(subCategoryId);itemCreateDto.setPostalCode("0150");
     itemCreateDto.setListingType(ListingType.BID); // ensure this field exists in your DTO
-
+    itemCreateDto.setStatus(Status.ACTIVE);
+    itemCreateDto.setCondition(Condition.GOOD);
     HttpHeaders sellerHeaders = new HttpHeaders();
     sellerHeaders.setBearerAuth(sellerToken);
     sellerHeaders.setContentType(MediaType.APPLICATION_JSON);
