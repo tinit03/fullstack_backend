@@ -3,7 +3,6 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 import jakarta.validation.Valid;
 import java.util.Optional;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDetailDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
@@ -58,13 +57,13 @@ public class ItemController {
    * Returns detailed information for a single item.
    */
   @GetMapping("/{id}")
-  public ResponseEntity<ItemDetailDto> getItemDetail(@PathVariable Long id) {
+  public ResponseEntity<ItemDto> getItemDetail(@PathVariable Long id) {
     Optional<Item> optionalItem = itemService.getItemById(id);
     if (optionalItem.isEmpty()) {
       return ResponseEntity.notFound().build();
     }
 
-    ItemDetailDto detailDto = ItemMapper.toItemDetailDto(optionalItem.get());
+    ItemDto detailDto = ItemMapper.toItemDto(optionalItem.get());
     return ResponseEntity.ok(detailDto);
   }
 
