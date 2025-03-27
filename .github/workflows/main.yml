@@ -21,7 +21,7 @@ jobs:
           java-version: 21
 
       - name: Unit Tests
-        run: echo "tests have not been implemented yet"
+        run: mvn -B test --file pom.xml
 
       - name: Build app
-        run: echo "mvn -B clean package --file pom.xml"
+        run: mvn -B clean package --file pom.xml
