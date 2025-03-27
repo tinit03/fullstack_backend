@@ -1,6 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item;
 
-import jakarta.validation.constraints.DecimalMax;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -32,9 +32,6 @@ public class ItemCreateDto {
   private BigDecimal price;
 
   private List<@NotBlank(message = "Tags cannot be blank") String> tags;
-
-  @NotBlank(message = "City is required")
-  private String city;
 
   @NotBlank(message = "Postal code is required")
   private String postalCode;

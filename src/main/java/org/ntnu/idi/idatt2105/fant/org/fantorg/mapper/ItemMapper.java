@@ -7,6 +7,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 
 public class ItemMapper {
   public static ItemDto toItemDto(Item item) {
@@ -23,8 +24,7 @@ public class ItemMapper {
     dto.setForSale(item.isForSale());
     Optional.ofNullable(item.getLocation())
         .ifPresent(location -> {
-          dto.setCity(location.getCity());
-          dto.setPostalCode(location.getPostalCode());
+          dto.setLocation(item.getLocation());
         });
 
     Optional.ofNullable(item.getSeller())

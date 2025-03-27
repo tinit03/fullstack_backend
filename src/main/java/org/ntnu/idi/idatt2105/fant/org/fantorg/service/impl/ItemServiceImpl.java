@@ -17,6 +17,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BringService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ItemService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.specification.ItemSpecification;
 import org.slf4j.Logger;
@@ -36,6 +37,8 @@ public class ItemServiceImpl implements ItemService {
 
   private final ImageRepository imageRepository;
 
+  private final BringService bringService;
+
   private final Logger logger = LoggerFactory.getLogger(ItemServiceImpl.class);
 
   @Override
@@ -49,19 +52,11 @@ public class ItemServiceImpl implements ItemService {
         .orElseThrow(() -> new EntityNotFoundException(
             "subcategory not found")); //create custom exceptions later
     item.setSubCategory(subCategory);
+
+    Location location = bringService.getLocationDetails(dto.getPostalCode());
+    item.setLocation(location);
     //Save item into repository, so we can get an itemId for images.
     Item savedItem = itemRepository.save(item);
-    if (dto.getImages() != null && !dto.getImages().isEmpty()) {
-      List<Image> images = ImageMapper.fromCreateDtoList(dto.getImages());
-      if (images != null && !images.isEmpty()) {
-        // Link each image to the saved item
-        images.forEach(image -> image.setItem(savedItem));
-        // Save all images
-        imageRepository.saveAll(images);
-        // Optionally, attach the images back to the item for return mapping
-        savedItem.setImages(images);
-      }
-    }
     return savedItem;
   }
   @Override
@@ -75,12 +70,12 @@ public class ItemServiceImpl implements ItemService {
     Category subCategory = categoryRepository.findById(updatedItem.getSubcategoryId())
             .orElseThrow(() -> new EntityNotFoundException("subcategory not found"));
 
-
+    Location location = bringService.getLocationDetails(updatedItem.getPostalCode());
     existing.setTitle(updatedItem.getItemName());
     existing.setDescription(updatedItem.getDescription());
     existing.setPrice(updatedItem.getPrice());
     existing.setSubCategory(subCategory);
-    existing.setLocation(new Location(updatedItem.getPostalCode(),updatedItem.getCity()));
+    existing.setLocation(location);
     existing.setListingType(updatedItem.getListingType());
     return itemRepository.save(existing);
   }

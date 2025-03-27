@@ -32,6 +32,14 @@ cloudinary:
   cloud-name: desnhobcx
   api-key: 263157988967636
   api-secret: XbaWVHsEu99xPWlXPdZzPXApSLA
+
+bring:
+  api:
+    url: "https://api.bring.com/address/api/no/postal-codes/"
+    uid: "vildemin.vikan@gmail.com"
+    key: "01d29e59-d8d9-4b83-826e-aedb1ab5f233"
+
+
 #
 #logging:
 #  level:

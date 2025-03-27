@@ -99,6 +99,7 @@ public class LoadData implements CommandLineRunner {
     item.setSubCategory(subCategory); // Set to subcategory
     item.setPrice(new BigDecimal("499.99"));
     item.setPublishedAt(LocalDateTime.now());
+    item.setLocation(new Location("7010", "Trøndelag","Trondheim", "63.4305", "10.3951"));
     item.setTags(List.of("jacket", "winter", "clothes"));
     item.setSeller(user);
     item.setListingType(ListingType.BID);

@@ -13,7 +13,8 @@ import lombok.Setter;
 @Embeddable
 public class Location {
   private String postalCode;
+  private String county;
   private String city;
-//  private double latitude;
-//  private double longitude;
+  private String latitude;
+  private String longitude;
 }

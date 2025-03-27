@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Review;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
@@ -25,8 +26,7 @@ public class ItemDto {
   private String description;
   private BigDecimal price;
   private List<String> tags;
-  private String city;
-  private String postalCode;
+  private Location location;
   private LocalDateTime publishedAt;
   private Long sellerId;         // om vi ønsker å henvise bruker til selgerens brukerside
   private String sellerFullName; // om vi ønsker å vise selger sin brukernavn
