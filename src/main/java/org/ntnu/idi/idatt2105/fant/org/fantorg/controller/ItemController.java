@@ -53,6 +53,20 @@ public class ItemController {
   }
 
   /**
+   * GET /items
+   * Returns all items with pagination.
+   */
+  @GetMapping
+  public Page<ItemDto> getAllItems(
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size
+  ) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
+    Page<Item> itemsPage = itemService.getAllItems(pageable);
+    return itemsPage.map(ItemMapper::toItemDto);
+  }
+
+  /**
    * GET /items/{id}
    * Returns detailed information for a single item.
    */
