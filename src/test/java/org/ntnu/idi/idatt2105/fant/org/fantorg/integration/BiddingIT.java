@@ -20,6 +20,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserLoginDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserRegisterDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.integration.util.TestHelpers;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +71,7 @@ public class BiddingIT {
     itemCreateDto.setDescription("A beautiful, rare antique vase in excellent condition.");
     itemCreateDto.setPrice(new BigDecimal("150.00"));
     itemCreateDto.setSubcategoryId(subCategoryId);
-    itemCreateDto.setCity("Oslo");
+
     itemCreateDto.setPostalCode("0150");
     itemCreateDto.setListingType(ListingType.BID); // ensure this field exists in your DTO
     // Set other required fields as needed...
@@ -139,9 +140,7 @@ public class BiddingIT {
     itemCreateDto.setItemName("Antique Vase");
     itemCreateDto.setDescription("A beautiful, rare antique vase in excellent condition.");
     itemCreateDto.setPrice(new BigDecimal("150.00"));
-    itemCreateDto.setSubcategoryId(subCategoryId);
-    itemCreateDto.setCity("Oslo");
-    itemCreateDto.setPostalCode("0150");
+    itemCreateDto.setSubcategoryId(subCategoryId);itemCreateDto.setPostalCode("0150");
     itemCreateDto.setListingType(ListingType.BID); // ensure this field exists in your DTO
 
     HttpHeaders sellerHeaders = new HttpHeaders();
