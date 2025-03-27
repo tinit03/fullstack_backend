@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 
 @Getter
@@ -40,4 +41,6 @@ public class ItemCreateDto {
 
   @NotNull
   private ListingType listingType;
+
+  private List<ImageCreateDto> images;
 }

@@ -3,9 +3,8 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.mapper;
 import java.util.List;
 import java.util.Optional;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDetailDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 
@@ -31,36 +30,7 @@ public class ItemMapper {
           dto.setSellerFullName(userDto.getFullName());
           dto.setSellerId(userDto.getId());
         });
-
-    return dto;
-  }
-
-  public static ItemDetailDto toItemDetailDto(Item item) {
-    ItemDetailDto dto = new ItemDetailDto();
-    dto.setId(item.getItemId());
-    dto.setName(item.getTitle());
-    dto.setDescription(item.getDescription());
-    dto.setPrice(item.getPrice());
-    dto.setTags(item.getTags());
-    dto.setPublishedAt(item.getPublishedAt());
-
-    Optional.ofNullable(item.getLocation()).ifPresent(location -> {
-      dto.setCity(location.getCity());
-      dto.setPostalCode(location.getPostalCode());
-    });
-
-    Optional.ofNullable(item.getSeller())
-        .map(UserMapper::toDto)
-        .ifPresent(userDto -> {
-          dto.setSellerFullName(userDto.getFullName());
-          dto.setSellerId(userDto.getId());
-        });
-    // legge til logikk senere
-    //dto.setImageUrls(List.of());
-    //dto.setAverageRating(null);
-    //dto.setReviewCount(0);
-    //dto.setIsBookmarked(false);
-
+    dto.setImages(ImageMapper.toDtoList(item.getImages()));
     return dto;
   }
 
@@ -81,6 +51,11 @@ public class ItemMapper {
 
     item.setLocation(location);
     item.setListingType(dto.getListingType());
+    List<Image> images = ImageMapper.fromCreateDtoList(dto.getImages());
+    if (images != null) {
+      images.forEach(image -> image.setItem(item)); // set the item reference on each image
+    }
+    item.setImages(images);
     return item;
   }
 }

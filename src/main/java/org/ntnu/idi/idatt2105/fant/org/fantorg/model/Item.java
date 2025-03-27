@@ -59,4 +59,7 @@ public class Item {
 
   @Enumerated(EnumType.STRING)
   private ListingType listingType;
+
+  @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Image> images = new ArrayList<>();
 }

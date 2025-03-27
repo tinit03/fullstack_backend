@@ -15,8 +15,7 @@ public class ItemSpecification {
 
       return cb.or(
           cb.like(cb.lower(root.get("title")), like),
-          cb.like(cb.lower(root.get("briefDescription")), like),
-          cb.like(cb.lower(root.get("fullDescription")), like),
+          cb.like(cb.lower(root.get("description")), like),
           cb.like(cb.lower(tagsJoin), like)
       );
 

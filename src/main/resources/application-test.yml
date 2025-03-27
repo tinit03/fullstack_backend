@@ -28,6 +28,10 @@ spring:
 jwt:
     secret: Z6Yn1dWRZ3HzkR9MbqZ0MoevtpdXnFLnCp+O8gYTGO59tTAPdOY79lqo02gtKoDDDioZ6p6nu7BjvxUEERkNUw==
 
+cloudinary:
+  cloud-name: desnhobcx
+  api-key: 263157988967636
+  api-secret: XbaWVHsEu99xPWlXPdZzPXApSLA
 #
 #logging:
 #  level:
