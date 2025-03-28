@@ -65,6 +65,8 @@ public class SecurityConfiguration {
                                                 "/auth/renewToken",
                                                 "/swagger-ui/**",
                                                 "/categories/**",
+                                                //Skal endre det senere, for testing
+                                                "/items/**",
                                                 "/v3/api-docs/**")
                                         .permitAll()
                                         .anyRequest()
