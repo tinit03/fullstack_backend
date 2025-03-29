@@ -2,6 +2,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.chat.ChatRoomNotFoundException;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.item.ItemNotFoundException;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.user.UserNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;

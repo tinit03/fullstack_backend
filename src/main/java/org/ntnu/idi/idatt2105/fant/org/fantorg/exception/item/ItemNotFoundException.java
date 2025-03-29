@@ -1,4 +1,4 @@
-package org.ntnu.idi.idatt2105.fant.org.fantorg.exception;
+package org.ntnu.idi.idatt2105.fant.org.fantorg.exception.item;
 
 public class ItemNotFoundException extends RuntimeException{
 

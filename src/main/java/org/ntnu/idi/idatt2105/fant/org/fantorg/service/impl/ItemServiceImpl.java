@@ -7,15 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageCreateDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.ItemNotFoundException;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ImageMapper;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.item.ItemNotFoundException;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
@@ -35,7 +32,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
