@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import java.util.Optional;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
@@ -99,10 +100,10 @@ public class ItemController {
   @PutMapping("/{itemId}")
   public ResponseEntity<ItemDto> updateItem(
       @PathVariable Long itemId,
-      @Valid @RequestBody ItemCreateDto dto,
+      @Valid @RequestBody ItemEditDto dto,
       @AuthenticationPrincipal User user) {
-
     Item updated = itemService.updateItem(itemId, dto, user);
-    return ResponseEntity.ok(ItemMapper.toItemDto(updated));
+    ItemDto updatedDto = ItemMapper.toItemDto(updated);
+    return ResponseEntity.ok(updatedDto);
   }
 }
