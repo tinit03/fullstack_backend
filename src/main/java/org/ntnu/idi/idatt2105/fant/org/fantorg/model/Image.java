@@ -25,8 +25,10 @@ public class Image {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
+  @Column(length = 1000) // Increased from 255
   private String url;
+
+  private String publicId;
 
   private String caption;
 

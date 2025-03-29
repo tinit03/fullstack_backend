@@ -2,9 +2,11 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.config;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
@@ -13,6 +15,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Role;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -26,6 +29,7 @@ public class LoadData implements CommandLineRunner {
   private final ItemRepository itemRepository;
   private final CategoryRepository categoryRepository;
 
+  private final ImageRepository imageRepository;
   private final PasswordEncoder passwordEncoder;
 
   /**
@@ -107,6 +111,16 @@ public class LoadData implements CommandLineRunner {
     item.setCondition(Condition.ACCEPTABLE);
     item.setForSale(false);
     itemRepository.save(item);
+
+    List<Image> images = new ArrayList<>();
+    Image image = new Image();
+    image.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1743251398/qpsm7x97gizcivhstmob.png");
+    image.setPublicId("qpsm7x97gizcivhstmob");
+    image.setCaption("AON-netter");
+    image.setItem(item);
+    images.add(image);
+    imageRepository.saveAll(images);
+    item.setImages(images);
 
     System.out.println("Inserted test data.");
   }

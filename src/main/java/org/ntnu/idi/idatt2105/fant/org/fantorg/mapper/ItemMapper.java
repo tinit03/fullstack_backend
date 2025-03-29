@@ -50,12 +50,6 @@ public class ItemMapper {
     } else {
       item.setTags(List.of()); // Default to empty list if no tags are added
     }
-
-    List<Image> images = ImageMapper.fromCreateDtoList(dto.getImages());
-    if (images != null) {
-      images.forEach(image -> image.setItem(item)); // set the item reference on each image
-    }
-    item.setImages(images);
     return item;
   }
 }

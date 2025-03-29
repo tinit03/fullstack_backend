@@ -5,8 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ImageDto {
-  private Long id;
+public class ImageEditDto {
+  private String base64Url;
   private String url;
   private String caption;
   private String publicId;

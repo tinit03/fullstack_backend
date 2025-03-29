@@ -16,18 +16,18 @@ import org.springframework.web.multipart.MultipartFile;
 public class CloudinaryController {
   private final CloudinaryService cloudinaryService;
 
-  @PostMapping("/upload")
-  public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
-    try {
-      String url = cloudinaryService.uploadImage(file);
-      return ResponseEntity.ok(url);
-    } catch (IllegalArgumentException e) {
-      // Validation error (e.g., file too big or wrong type)
-      return ResponseEntity.badRequest().body(e.getMessage());
-    } catch (IOException e) {
-      // IO error during upload
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body("Upload failed: " + e.getMessage());
-    }
-  }
+//  @PostMapping("/upload")
+//  public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+//    try {
+//      String url = cloudinaryService.uploadImage(file);
+//      return ResponseEntity.ok(url);
+//    } catch (IllegalArgumentException e) {
+//      // Validation error (e.g., file too big or wrong type)
+//      return ResponseEntity.badRequest().body(e.getMessage());
+//    } catch (IOException e) {
+//      // IO error during upload
+//      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//          .body("Upload failed: " + e.getMessage());
+//    }
+//  }
 }
