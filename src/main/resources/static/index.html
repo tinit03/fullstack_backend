@@ -1,46 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <title>Spring Boot WebSocket Chat Application</title>
-  <link rel="stylesheet" href="/css/main.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/main.css">
+  <title>Chat Application</title>
 </head>
 <body>
-<noscript>
-  <h2>Sorry! Your browser doesn't support Javascript</h2>
-</noscript>
 
-<div id="username-page">
-  <div class="username-page-container">
-    <h1 class="title">Type your username to enter the Chatroom</h1>
-    <form id="usernameForm" name="usernameForm">
-      <div class="form-group">
-        <input type="text" id="name" placeholder="Username" autocomplete="off" class="form-control" />
-      </div>
-      <div class="form-group">
-        <button type="submit" class="accent username-submit">Start Chatting</button>
-      </div>
-    </form>
-  </div>
+<h2>One to One Chat | Spring boot & Websocket | By Alibou</h2>
+
+<div class="user-form" id="username-page">
+  <h2>Enter Chatroom</h2>
+  <form id="usernameForm">
+    <label for="nickname">mail:</label>
+    <input type="text" id="nickname" name="nickname" required value="a@a">
+
+    <label for="fullname">item:</label>
+    <input type="text" id="fullname" name="realname" required value="1">
+
+    <button type="submit">Enter Chatroom</button>
+  </form>
 </div>
 
-<div id="chat-page" class="hidden">
-  <div class="chat-container">
-    <div class="chat-header">
-      <h2>Spring WebSocket Chat Demo - By Alibou</h2>
+<div class="chat-container hidden" id="chat-page">
+  <div class="users-list">
+    <div class="users-list-container">
+      <h2>Online Users</h2>
+      <ul id="connectedUsers">
+      </ul>
     </div>
-    <div class="connecting">
-      Connecting...
+    <div>
+      <p id="connected-user-fullname"></p>
+      <a class="logout" href="javascript:void(0)" id="logout">Logout</a>
     </div>
-    <ul id="messageArea">
+  </div>
 
-    </ul>
-    <form id="messageForm" name="messageForm">
-      <div class="form-group">
-        <div class="input-group clearfix">
-          <input type="text" id="message" placeholder="Type a message..." autocomplete="off" class="form-control"/>
-          <button type="submit" class="primary">Send</button>
-        </div>
+  <div class="chat-area">
+    <div class="chat-area" id="chat-messages">
+    </div>
+
+    <form id="messageForm" name="messageForm" class="hidden">
+      <div class="message-input">
+        <input autocomplete="off" type="text" id="message" placeholder="Type your message...">
+        <button>Send</button>
       </div>
     </form>
   </div>
