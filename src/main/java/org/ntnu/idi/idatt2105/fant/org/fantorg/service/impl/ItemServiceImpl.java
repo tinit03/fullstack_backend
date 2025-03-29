@@ -14,6 +14,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.ItemNotFoundException;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ImageMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
@@ -188,8 +189,8 @@ public class ItemServiceImpl implements ItemService {
   }
 
   @Override
-  public Optional<Item> getItemById(Long id) {
-    return itemRepository.findById(id);
+  public Item getItemById(Long id) {
+    return itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id));
   }
 
   @Override
