@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ImageCreateDto {
-  private String url;
+  private String base64Url;
   private String caption;
 }
