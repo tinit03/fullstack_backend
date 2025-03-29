@@ -1,5 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,6 +36,7 @@ public class Image {
   // Many images can belong to one item
   @ManyToOne
   @JoinColumn(name = "item_id")
+  @JsonIgnore
   private Item item;
 }
 
