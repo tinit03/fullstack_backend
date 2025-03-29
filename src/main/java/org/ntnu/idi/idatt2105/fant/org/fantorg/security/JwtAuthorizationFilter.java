@@ -48,7 +48,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             @NotNull FilterChain filterChain)
             throws IOException {
         try {
-            logger.info("Checking 'Authorization' header");
+            //logger.info("Checking 'Authorization' header");
             final String authHeader = request.getHeader("Authorization");
             final String jwt;
             final String username;
@@ -56,22 +56,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
-            logger.info("Extracting token");
             jwt = authHeader.substring(7);
-            logger.info("Extracting username from token");
             username = jwtService.extractUsername(jwt);
             // Checks if user is not null and that it has not already been authenticated - else
             // there is
             // no point in re-authenticating
-            logger.info(
-                    "Checking that username is not null and that it hasn't been authenticated yet");
             if (username != null
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
-                logger.info("Finding user");
                 // Retrieve user details from database for validation
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
                 // If token is valid, update security context
-                logger.info("Checking token validity");
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
@@ -79,14 +73,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     authToken.setDetails(
                             new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    logger.info("Set authentication context to current user");
                 }
             }
-            logger.info("Continue filter chain");
             filterChain.doFilter(request, response);
         } catch (JwtException | ServletException e) {
-            logger.error("Caught exception in filter: {}", e.getMessage());
-            String responseMsg = "Invalid or expired JWT token";
+            String responseMsg = "Error in filter: " + e.getMessage();
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getWriter().write(responseMsg);
         }
