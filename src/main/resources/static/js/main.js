@@ -50,9 +50,8 @@ async function findAndDisplayConnectedUsers() {
 
   let connectedUsers = await connectedUsersResponse.json();
 
-  console.log(connectedUsers)
-
   connectedUsers = connectedUsers.filter(user => user.email !== nickname);
+  console.log("Connected users after filtering", connectedUsers)
   const connectedUsersList = document.getElementById('connectedUsers');
   connectedUsersList.innerHTML = '';
 
@@ -75,7 +74,6 @@ function appendUserElement(user, connectedUsersList) {
   userImage.alt = ":)";
 
   const usernameSpan = document.createElement('span');
-  console.log("setting text content", use.email)
   usernameSpan.textContent = user.email;
 
   const receivedMsgs = document.createElement('span');
