@@ -75,7 +75,8 @@ function appendUserElement(user, connectedUsersList) {
   userImage.alt = ":)";
 
   const usernameSpan = document.createElement('span');
-  usernameSpan.textContent = user.fullName;
+  console.log("setting text content", use.email)
+  usernameSpan.textContent = user.email;
 
   const receivedMsgs = document.createElement('span');
   receivedMsgs.textContent = '0';
