@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: Fant.org
+  datasource:
+    url: jdbc:mysql://localhost:3306/fant_db
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+springdoc:
+  api-docs:
+    path: /api-docs

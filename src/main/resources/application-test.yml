@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: Fant.org
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop # or update, depending on your test style
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+  sql:
+    init:
+      mode: embedded
+
+  docker:
+    compose:
+      enabled: false
+
+
+jwt:
+    secret: Z6Yn1dWRZ3HzkR9MbqZ0MoevtpdXnFLnCp+O8gYTGO59tTAPdOY79lqo02gtKoDDDioZ6p6nu7BjvxUEERkNUw==
+
+cloudinary:
+  cloud-name: desnhobcx
+  api-key: 263157988967636
+  api-secret: XbaWVHsEu99xPWlXPdZzPXApSLA
+
+bring:
+  api:
+    url: "https://api.bring.com/address/api/no/postal-codes/"
+    uid: "vildemin.vikan@gmail.com"
+    key: "01d29e59-d8d9-4b83-826e-aedb1ab5f233"
+
+
+#
+#logging:
+#  level:
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
