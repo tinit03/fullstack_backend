@@ -27,6 +27,8 @@ public class ChatController {
   private final SimpMessagingTemplate messagingTemplate;
   private final ChatRoomRepository chatRoomRepository;
 
+  //@GetMapping("/chats/{itemId}/{senderId}")
+
   @GetMapping("/messages/{itemId}/{senderId}/{recipientId}")
   public ResponseEntity<List<ChatMessageDto>> findChatMessages(
       @PathVariable("itemId") Long itemId,
