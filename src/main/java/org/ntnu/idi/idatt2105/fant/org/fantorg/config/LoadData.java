@@ -18,6 +18,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatRoomServiceImpl;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,7 @@ public class LoadData implements CommandLineRunner {
 
   private final ImageRepository imageRepository;
   private final PasswordEncoder passwordEncoder;
+  private final ChatRoomServiceImpl chatRoomServiceImpl;
 
   /**
    * Callback used to run the bean.
@@ -50,21 +52,21 @@ public class LoadData implements CommandLineRunner {
     user.setRole(Role.USER);
     userRepository.save(user);
 
-    User a = new User();
-    a.setEmail("b@b");
-    a.setPassword(passwordEncoder.encode("password"));
-    a.setFirstName("Test");
-    a.setLastName("User");
-    a.setRole(Role.USER);
-    userRepository.save(a);
+    User userA = new User();
+    userA.setEmail("a@a");
+    userA.setPassword(passwordEncoder.encode("password"));
+    userA.setFirstName("Test");
+    userA.setLastName("User");
+    userA.setRole(Role.USER);
+    userRepository.save(userA);
 
-    User otherUser = new User();
-    otherUser.setEmail("a@a");
-    otherUser.setPassword(passwordEncoder.encode("password"));
-    otherUser.setFirstName("Test");
-    otherUser.setLastName("User");
-    otherUser.setRole(Role.USER);
-    userRepository.save(otherUser);
+    User userB = new User();
+    userB.setEmail("b@b");
+    userB.setPassword(passwordEncoder.encode("password"));
+    userB.setFirstName("Test");
+    userB.setLastName("User");
+    userB.setRole(Role.USER);
+    userRepository.save(userB);
 
     // 2. Create parent category
     Category parentCategory = new Category();
@@ -153,6 +155,8 @@ public class LoadData implements CommandLineRunner {
     imageRepository.saveAll(images);
     item.setImages(images);
 
+    // 5: Create test chat room
+    chatRoomServiceImpl.getChatRoomId(userA.getEmail(), userB.getEmail(), item.getItemId(), true);
     System.out.println("Inserted test data.");
   }
 }
