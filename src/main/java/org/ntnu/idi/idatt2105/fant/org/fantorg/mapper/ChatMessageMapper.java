@@ -13,6 +13,7 @@ public class ChatMessageMapper {
         .id(chatMessage.getId())
         .senderId(chatMessage.getSender().getEmail())
         .recipientId(chatMessage.getRecipient().getEmail())
+        .itemId(chatMessage.getItem().getItemId())
         .chatId(chatMessage.getChatId())
         .content(chatMessage.getContent())
         .timestamp(chatMessage.getTimestamp())
