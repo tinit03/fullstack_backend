@@ -55,7 +55,7 @@ public class ChatController {
     log.info("Saved chat msg: '{}'", savedMsgDto);
 
     log.info("Sending message to /{}/queue/messages", savedMsgDto.getRecipientId());
-    messagingTemplate.convertAndSendToUser(savedMsgDto.getRecipientId(), "/queue/messages/" + messageDto.getItemId(),
+    messagingTemplate.convertAndSendToUser(savedMsgDto.getRecipientId(), "/queue/messages",
         ChatNotification.builder()
             .id(savedMsgDto.getId())
             .senderId(savedMsgDto.getSenderId())
@@ -70,7 +70,6 @@ public class ChatController {
   @GetMapping("/chat/recipient/{recipientId}")
   public ChatProfileDto getRecipientInfo(@PathVariable String recipientId) {
     return userServiceImpl.findChatProfile(recipientId);
-
   }
   @GetMapping("/getChats")
   public List<ChatRoom> getChatRooms() {
