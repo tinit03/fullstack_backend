@@ -20,20 +20,18 @@ public class AuthenticationService {
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
-  public void registerUser(UserRegisterDto dto) {
+  public String registerUser(UserRegisterDto dto) {
     if(userRepository.existsByEmail(dto.getEmail())){
       throw new IllegalArgumentException("Email already in use!");
     }
-
     User user = new User();
     user.setRole(Role.USER);
     user.setEmail(dto.getEmail());
     user.setPassword(passwordEncoder.encode(dto.getPassword()));
     user.setFirstName(dto.getFirstName());
     user.setLastName(dto.getLastName());
-    user.setAddress(dto.getAddress());
-
     userRepository.save(user);
+    return authenticateAndGenerateToken(new UserLoginDto(dto.getEmail(),dto.getPassword()));
   }
   public String authenticateAndGenerateToken(UserLoginDto loginRequest) {
     Authentication authentication = authenticationManager.authenticate(
