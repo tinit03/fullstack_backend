@@ -73,12 +73,8 @@ public class ItemController {
    */
   @GetMapping("/{id}")
   public ResponseEntity<ItemDto> getItemDetail(@PathVariable Long id) {
-    Optional<Item> optionalItem = itemService.getItemById(id);
-    if (optionalItem.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-
-    ItemDto detailDto = ItemMapper.toItemDto(optionalItem.get());
+    Item item = itemService.getItemById(id);
+    ItemDto detailDto = ItemMapper.toItemDto(item);
     return ResponseEntity.ok(detailDto);
   }
 

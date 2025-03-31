@@ -1,5 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -51,6 +52,7 @@ public class Item {
 
   @ManyToOne
   @JoinColumn(name = "seller_id")
+  @JsonIgnore
   private User seller;
 
   @ElementCollection
