@@ -6,14 +6,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatNotification;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatProfileDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatRoom;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatRoomRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatMessageServiceImpl;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.UserServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,11 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class ChatController {
 
   private final ChatMessageServiceImpl chatMessageService;
   private final SimpMessagingTemplate messagingTemplate;
   private final ChatRoomRepository chatRoomRepository;
+  private final UserServiceImpl userServiceImpl;
 
   //@GetMapping("/chats/{itemId}/{senderId}")
 
@@ -63,6 +67,11 @@ public class ChatController {
     log.info("Sent to recipient");
   }
 
+  @GetMapping("/chat/recipient/{recipientId}")
+  public ChatProfileDto getRecipientInfo(@PathVariable String recipientId) {
+    return userServiceImpl.findChatProfile(recipientId);
+
+  }
   @GetMapping("/getChats")
   public List<ChatRoom> getChatRooms() {
     return chatRoomRepository.findAll();
