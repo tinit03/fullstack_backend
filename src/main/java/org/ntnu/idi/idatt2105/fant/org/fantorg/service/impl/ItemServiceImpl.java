@@ -72,7 +72,7 @@ public class ItemServiceImpl implements ItemService {
 
     for (ImageCreateDto imgDto : dto.getImages()) {
       try {
-        Map<String, String> result = cloudinaryService.uploadBase64Image(imgDto.getBase64Url());
+        Map<String, String> result = cloudinaryService.uploadBase64Image(imgDto.getUrl());
         Image image = new Image();
         image.setUrl(result.get("url"));
         image.setPublicId(result.get("public_id"));
@@ -105,14 +105,17 @@ public class ItemServiceImpl implements ItemService {
     existing.setSubCategory(subCategory);
     existing.setLocation(location);
     existing.setListingType(updatedItem.getListingType());
+    existing.setCondition(updatedItem.getCondition());
+    existing.setTags(updatedItem.getTags());
+    existing.setForSale(updatedItem.isForSale());
 
     // Step 1: Upload new base64 images first and enrich DTO
     // Basically går gjennom alle bildene som har blitt lastet opp fra frontend.
     List<Image> newImages = new ArrayList<>();
     for (ImageEditDto imgDto : updatedItem.getImages()) {
-      if (imgDto.getPublicId() == null && imgDto.getBase64Url() != null) {
+      if (imgDto.getPublicId() == null && imgDto.getUrl() != null) {
         try {
-          Map<String, String> result = cloudinaryService.uploadBase64Image(imgDto.getBase64Url());
+          Map<String, String> result = cloudinaryService.uploadBase64Image(imgDto.getUrl());
           imgDto.setPublicId(result.get("public_id")); // Update the DTO
           imgDto.setUrl(result.get("url"));
           Image image = new Image();
