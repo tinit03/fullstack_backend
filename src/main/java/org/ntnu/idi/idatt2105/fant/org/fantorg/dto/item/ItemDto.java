@@ -27,6 +27,8 @@ public class ItemDto {
   private BigDecimal price;
   private List<String> tags;
   private Location location;
+  private Long categoryId;
+  private Long subCategoryId;
   private LocalDateTime publishedAt;
   private Long sellerId;         // om vi ønsker å henvise bruker til selgerens brukerside
   private String sellerFullName; // om vi ønsker å vise selger sin brukernavn

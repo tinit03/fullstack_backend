@@ -12,7 +12,6 @@ public class ImageMapper {
     if (image == null) return null;
 
     ImageDto dto = new ImageDto();
-    dto.setId(image.getId());
     dto.setUrl(image.getUrl());
     dto.setCaption(image.getCaption());
     dto.setPublicId(image.getPublicId());
@@ -27,7 +26,7 @@ public class ImageMapper {
     if (dto == null) return null;
 
     Image image = new Image();
-    image.setUrl(dto.getBase64Url());
+    image.setUrl(dto.getUrl());
     image.setCaption(dto.getCaption());
     return image;
   }
