@@ -23,21 +23,18 @@ spring:
   docker:
     compose:
       enabled: false
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 
-jwt:
-    secret: Z6Yn1dWRZ3HzkR9MbqZ0MoevtpdXnFLnCp+O8gYTGO59tTAPdOY79lqo02gtKoDDDioZ6p6nu7BjvxUEERkNUw==
 
-cloudinary:
-  cloud-name: desnhobcx
-  api-key: 263157988967636
-  api-secret: XbaWVHsEu99xPWlXPdZzPXApSLA
-
-bring:
-  api:
-    url: "https://api.bring.com/address/api/no/postal-codes/"
-    uid: "vildemin.vikan@gmail.com"
-    key: "01d29e59-d8d9-4b83-826e-aedb1ab5f233"
 
 
 #

@@ -1,8 +1,8 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.service;
 
 import lombok.RequiredArgsConstructor;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserLoginDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserRegisterDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.authentication.UserLoginDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.authentication.UserRegisterDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Role;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
@@ -39,7 +39,6 @@ public class AuthenticationService {
             loginRequest.getEmail(), loginRequest.getPassword()
         )
     );
-
     User user = (User) authentication.getPrincipal();
     return jwtService.generateToken(user, 30);
   }

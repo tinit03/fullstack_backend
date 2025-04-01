@@ -57,9 +57,7 @@ public class SecurityConfiguration {
                                 authorize
                                         .requestMatchers(
                                                 "/forgotPassword/**",
-                                                "/auth/login",
-                                                "/auth/register",
-                                                "/auth/renewToken",
+                                                "/auth/**",
                                                 "/swagger-ui/**",
                                                 "/categories/**",
                                                 //Skal endre det senere, for testing
