@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemStatusUpdate;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
@@ -92,6 +93,16 @@ public class ItemController {
       @Valid @RequestBody ItemEditDto dto,
       @AuthenticationPrincipal User user) {
     Item updated = itemService.updateItem(itemId, dto, user);
+    ItemDto updatedDto = ItemMapper.toItemDto(updated);
+    return ResponseEntity.ok(updatedDto);
+  }
+
+  @PutMapping("/{itemId}/status")
+  public ResponseEntity<ItemDto> updateStatus(
+      @PathVariable Long itemId,
+      @Valid @RequestBody ItemStatusUpdate status,
+      @AuthenticationPrincipal User user) {
+    Item updated = itemService.changeStatus(itemId,status.getStatus(),user);
     ItemDto updatedDto = ItemMapper.toItemDto(updated);
     return ResponseEntity.ok(updatedDto);
   }

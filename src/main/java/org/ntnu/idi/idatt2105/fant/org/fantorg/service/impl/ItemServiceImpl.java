@@ -19,6 +19,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
@@ -169,6 +170,19 @@ public class ItemServiceImpl implements ItemService {
     imageRepository.saveAll(retainedImages);
 
     return itemRepository.save(existing);
+  }
+
+  @Override
+  public Item changeStatus(Long id, Status status, User seller) {
+    Item existing = itemRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Item not found"));
+
+    if (!existing.getSeller().getId().equals(seller.getId())) {
+      throw new SecurityException("You don't own this item");
+    }
+    existing.setStatus(status);
+    Item savedItem = itemRepository.save(existing);
+    return savedItem;
   }
 
   @Override

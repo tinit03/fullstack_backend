@@ -5,12 +5,14 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ItemService {
   Item createItem(ItemCreateDto dto, User seller);
   Item updateItem(Long id, ItemEditDto dto, User seller);
+  Item changeStatus(Long id, Status status, User seller);
   void deleteItem(Long id, User seller);
 
   //TODO: Endre alle Item til ItemDto, burde ikke sende entitet til klient.
