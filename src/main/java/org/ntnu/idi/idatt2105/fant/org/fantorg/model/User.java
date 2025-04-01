@@ -99,10 +99,9 @@ public class User implements UserDetails {
         inverseJoinColumns = @JoinColumn(name = "item_id")
     )
     private Set<Item> bookmarkedItems = new HashSet<>();
-
-
-    @OneToMany(mappedBy = "author")
-    private List<Review> writtenReviews;
+    @OneToOne
+    @JoinColumn(name = "profile_image_id")
+    private Image profileImage;
     // Let email behave like username
     @Override
     public String getUsername() {
