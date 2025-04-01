@@ -106,4 +106,16 @@ public class ItemController {
     ItemDto updatedDto = ItemMapper.toItemDto(updated);
     return ResponseEntity.ok(updatedDto);
   }
+
+  @GetMapping("/me")
+  public Page<ItemDto> getOwnItems(
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size,
+      @AuthenticationPrincipal User user
+  )
+  {
+    Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
+    Page<Item> itemPage = itemService.getItemsBySeller(user, pageable);
+    return itemPage.map(ItemMapper::toItemDto);
+  }
 }
