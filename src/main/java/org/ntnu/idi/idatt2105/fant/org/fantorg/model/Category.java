@@ -1,5 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,6 +34,7 @@ public class Category {
 
   @ManyToOne
   @JoinColumn(name="parent_id")
+  @JsonIgnore
   private Category parentCategory; // self referencing for creating the category-subcategory system
 
   @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)

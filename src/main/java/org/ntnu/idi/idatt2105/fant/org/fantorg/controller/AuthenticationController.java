@@ -37,8 +37,14 @@ public class AuthenticationController {
     }
   }
   @PostMapping("/register")
-  public ResponseEntity<Void> register(@Valid @RequestBody UserRegisterDto registerDto) {
-    userService.registerUser(registerDto);
-    return ResponseEntity.ok().build();
+  public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDto registerDto) {
+    try {
+      String token = userService.registerUser(registerDto);
+      return ResponseEntity.ok(new JwtTokenDto(token));
+    } catch (BadCredentialsException ex){
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body("Something happened: "+ex);
+    }
+
   }
 }

@@ -50,6 +50,22 @@ public class LoadData implements CommandLineRunner {
     user.setRole(Role.USER);
     userRepository.save(user);
 
+    User a = new User();
+    a.setEmail("b@b");
+    a.setPassword(passwordEncoder.encode("password"));
+    a.setFirstName("Test");
+    a.setLastName("User");
+    a.setRole(Role.USER);
+    userRepository.save(a);
+
+    User otherUser = new User();
+    otherUser.setEmail("a@a");
+    otherUser.setPassword(passwordEncoder.encode("password"));
+    otherUser.setFirstName("Test");
+    otherUser.setLastName("User");
+    otherUser.setRole(Role.USER);
+    userRepository.save(otherUser);
+
     // 2. Create parent category
     Category parentCategory = new Category();
     parentCategory.setCategoryName("Clothes");
@@ -111,6 +127,21 @@ public class LoadData implements CommandLineRunner {
     item.setCondition(Condition.ACCEPTABLE);
     item.setForSale(false);
     itemRepository.save(item);
+
+    Item item1 = new Item();
+    item1.setTitle("Winter Jacket");
+    item1.setDescription("Insulated winter jacket in great condition");
+    item1.setSubCategory(subCategory); // Set to subcategory
+    item1.setPrice(new BigDecimal("499.99"));
+    item1.setPublishedAt(LocalDateTime.now());
+    item1.setLocation(new Location("7010", "Trøndelag","Trondheim", "63.4305", "10.3951"));
+    item1.setTags(List.of("jacket", "winter", "clothes"));
+    item1.setSeller(user);
+    item1.setListingType(ListingType.BID);
+    item1.setStatus(Status.ACTIVE);
+    item1.setCondition(Condition.ACCEPTABLE);
+    item1.setForSale(false);
+    itemRepository.save(item1);
 
     List<Image> images = new ArrayList<>();
     Image image = new Image();
