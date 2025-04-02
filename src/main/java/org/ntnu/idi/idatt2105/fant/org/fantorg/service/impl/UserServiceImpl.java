@@ -46,12 +46,16 @@ public class UserServiceImpl implements UserService {
     try{
       // Step 1: Delete old image if exists
       if (user.getProfileImage() != null) {
+        Image oldImage = user.getProfileImage();
         String oldPublicId = user.getProfileImage().getPublicId();
         if (oldPublicId != null && !oldPublicId.isBlank()) {
           cloudinaryService.deleteImage(oldPublicId);
         }
-        imageRepository.delete(user.getProfileImage());
+        user.setProfileImage(null);
+        userRepository.save(user);
+        imageRepository.delete(oldImage);
       }
+
       Map<String, String> uploadResult = cloudinaryService.uploadBase64Image(url);
       ImageProfileDto profileDto = new ImageProfileDto();
       profileDto.setUrl(uploadResult.get("url"));
