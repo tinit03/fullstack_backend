@@ -92,14 +92,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "seller")
     private List<Item> items;
 
-    @ManyToMany
-    @JoinTable(
-        name = "user_bookmarked_items",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "item_id")
-    )
-    private Set<Item> bookmarkedItems = new HashSet<>();
-    @OneToOne
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Bookmark> bookmarks = new HashSet<>();    @OneToOne
     @JoinColumn(name = "profile_image_id")
     private Image profileImage;
     // Let email behave like username

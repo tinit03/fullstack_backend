@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageEditDto;
@@ -22,6 +23,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.BookmarkRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
@@ -47,7 +49,7 @@ public class ItemServiceImpl implements ItemService {
 
   private final CloudinaryService cloudinaryService;
 
-  private final UserRepository userRepository;
+  private final BookmarkRepository bookmarkRepository;
 
   private final BookmarkService bookmarkService;
 
@@ -258,7 +260,10 @@ public class ItemServiceImpl implements ItemService {
 
   private Page<ItemDto> markDtosWithBookmarkStatus(Page<ItemDto> dtos, User user) {
     if (user == null) return dtos;
-    Set<Long> bookmarkedIds = userRepository.findBookmarkedItemIds(user.getId());
+    Set<Long> bookmarkedIds = bookmarkRepository.findByUser(user)
+        .stream()
+        .map(bookmark -> bookmark.getItem().getItemId())
+        .collect(Collectors.toSet());
     for (ItemDto dto : dtos) {
       dto.setIsBookmarked(bookmarkedIds.contains(dto.getId()));
     }

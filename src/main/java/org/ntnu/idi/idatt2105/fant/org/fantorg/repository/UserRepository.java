@@ -23,6 +23,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
-    @Query("SELECT i.itemId FROM User u JOIN u.bookmarkedItems i WHERE u.id = :userId")
-    Set<Long> findBookmarkedItemIds(@Param("userId") Long userId);
+
 }
