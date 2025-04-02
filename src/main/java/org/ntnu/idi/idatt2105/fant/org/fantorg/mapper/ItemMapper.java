@@ -19,6 +19,8 @@ public class ItemMapper {
     dto.setTags(item.getTags());
     dto.setCategoryId(item.getSubCategory().getParentCategory().getCategoryId());
     dto.setSubCategoryId(item.getSubCategory().getCategoryId());
+    dto.setCategoryName(item.getSubCategory().getParentCategory().getCategoryName());
+    dto.setSubCategoryName(item.getSubCategory().getCategoryName());
     dto.setPublishedAt(item.getPublishedAt());
     dto.setListingType(item.getListingType());
     dto.setCondition(item.getCondition());
