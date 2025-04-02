@@ -131,7 +131,7 @@ public class LoadData implements CommandLineRunner {
     Item item1 = new Item();
     item1.setTitle("Cat");
     item1.setDescription("Super cool cat");
-    item1.setSubCategory(sports); // Set to subcategory
+    item1.setSubCategory(balls); // Set to subcategory
     item1.setPrice(new BigDecimal("1500"));
     item1.setPublishedAt(LocalDateTime.now());
     item1.setLocation(new Location("7010", "Trøndelag","Trondheim", "63.4305", "10.3951"));
@@ -146,7 +146,7 @@ public class LoadData implements CommandLineRunner {
     List<Image> images = new ArrayList<>();
     Image image = new Image();
     image.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1742651144/samples/people/boy-snow-hoodie.jpg");
-    image.setPublicId("samples/animals/cat");
+    image.setPublicId("samples/people/boy-snow-hoodie");
     image.setCaption("winter jacket");
     image.setItem(item);
     images.add(image);
@@ -157,7 +157,9 @@ public class LoadData implements CommandLineRunner {
     image1.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1742651143/samples/animals/cat.jpg");
     image1.setPublicId("samples/animals/cat");
     image1.setCaption("cool cat");
+    image1.setItem(item1);
     images1.add(image1);
+    imageRepository.saveAll(images1);
     item1.setImages(images1);
 
     System.out.println("Inserted test data.");
