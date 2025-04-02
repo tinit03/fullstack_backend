@@ -129,13 +129,13 @@ public class LoadData implements CommandLineRunner {
     itemRepository.save(item);
 
     Item item1 = new Item();
-    item1.setTitle("Winter Jacket");
-    item1.setDescription("Insulated winter jacket in great condition");
-    item1.setSubCategory(subCategory); // Set to subcategory
-    item1.setPrice(new BigDecimal("499.99"));
+    item1.setTitle("Cat");
+    item1.setDescription("Super cool cat");
+    item1.setSubCategory(sports); // Set to subcategory
+    item1.setPrice(new BigDecimal("1500"));
     item1.setPublishedAt(LocalDateTime.now());
     item1.setLocation(new Location("7010", "Trøndelag","Trondheim", "63.4305", "10.3951"));
-    item1.setTags(List.of("jacket", "winter", "clothes"));
+    item1.setTags(List.of("animal", "cat", "feline"));
     item1.setSeller(user);
     item1.setListingType(ListingType.BID);
     item1.setStatus(Status.ACTIVE);
@@ -145,13 +145,20 @@ public class LoadData implements CommandLineRunner {
 
     List<Image> images = new ArrayList<>();
     Image image = new Image();
-    image.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1743251398/qpsm7x97gizcivhstmob.png");
-    image.setPublicId("qpsm7x97gizcivhstmob");
-    image.setCaption("AON-netter");
+    image.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1742651144/samples/people/boy-snow-hoodie.jpg");
+    image.setPublicId("samples/animals/cat");
+    image.setCaption("winter jacket");
     image.setItem(item);
     images.add(image);
     imageRepository.saveAll(images);
     item.setImages(images);
+    List<Image> images1 = new ArrayList<>();
+    Image image1 = new Image();
+    image1.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1742651143/samples/animals/cat.jpg");
+    image1.setPublicId("samples/animals/cat");
+    image1.setCaption("cool cat");
+    images1.add(image1);
+    item1.setImages(images1);
 
     System.out.println("Inserted test data.");
   }
