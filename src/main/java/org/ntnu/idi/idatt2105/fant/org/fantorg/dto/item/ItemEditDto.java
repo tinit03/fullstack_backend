@@ -27,9 +27,6 @@ public class ItemEditDto {
   @Size(max = 2048, message = "Full description must be under 2048 characters")
   private String description;
 
-  //Actually if the seller chooses to give away the item, it should be able to 0
-  @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
-  @Digits(integer = 10, fraction = 2, message = "Price format is invalid")
   private BigDecimal price;
 
   private List<@NotBlank(message = "Tags cannot be blank") String> tags;

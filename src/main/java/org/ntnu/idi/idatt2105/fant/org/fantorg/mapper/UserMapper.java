@@ -13,6 +13,8 @@ public class UserMapper {
     dto.setId(user.getId());
     dto.setEmail(user.getEmail());
     dto.setFullName(user.getFirstName()+" "+user.getLastName());
+    dto.setFirstName(user.getFirstName());
+    dto.setLastName(user.getLastName());
     dto.setProfilePicture(ImageMapper.toProfileDto(user.getProfileImage()));
     return dto;
   }
