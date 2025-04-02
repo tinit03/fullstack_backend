@@ -44,7 +44,20 @@ public class UserServiceImpl implements UserService {
   @Override
   public User updateProfilePicture(String url, User user) {
     try{
-      // Step 1: Delete old image if exists
+      if (url == null || url.isBlank()) {
+        Image oldImage = user.getProfileImage();
+        if (oldImage != null) {
+          String oldPublicId = oldImage.getPublicId();
+          if (oldPublicId != null && !oldPublicId.isBlank()) {
+            cloudinaryService.deleteImage(oldPublicId);
+          }
+          user.setProfileImage(null);
+          userRepository.save(user);
+          imageRepository.delete(oldImage);
+        }
+        return user;
+      }
+      if (url.startsWith("http://") || url.startsWith("https://")) return user;
       if (user.getProfileImage() != null) {
         Image oldImage = user.getProfileImage();
         String oldPublicId = user.getProfileImage().getPublicId();
