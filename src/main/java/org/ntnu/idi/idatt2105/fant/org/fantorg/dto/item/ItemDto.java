@@ -42,5 +42,5 @@ public class ItemDto {
   private Status status;
   private boolean forSale;
   private List<ImageDto> images;
-  private Boolean isBookmarked;        // Optional
+  private Boolean isBookmarked = false;
 }
