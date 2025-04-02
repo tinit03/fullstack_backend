@@ -38,12 +38,12 @@ public class ItemController {
   public Page<ItemDto> searchItems(
       @RequestParam(value = "keyword", required = false) String keyword,
       @RequestParam(value = "page", defaultValue = "0") int page,
-      @RequestParam(value = "size", defaultValue = "10") int size) {
+      @RequestParam(value = "size", defaultValue = "10") int size,
+      @AuthenticationPrincipal User user) {
 
     Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
-    Page<Item> itemsPage = itemService.searchItems(keyword, pageable);
+    return itemService.searchItems(keyword, pageable, user);
 
-    return itemsPage.map(ItemMapper::toItemDto);
   }
 
   /**
@@ -53,11 +53,12 @@ public class ItemController {
   @GetMapping
   public Page<ItemDto> getAllItems(
       @RequestParam(value = "page", defaultValue = "0") int page,
-      @RequestParam(value = "size", defaultValue = "10") int size
+      @RequestParam(value = "size", defaultValue = "10") int size,
+      @AuthenticationPrincipal User user
   ) {
     Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
-    Page<Item> itemsPage = itemService.getAllItems(pageable);
-    return itemsPage.map(ItemMapper::toItemDto);
+    return itemService.getAllItems(pageable,user);
+
   }
 
   /**
@@ -65,10 +66,9 @@ public class ItemController {
    * Returns detailed information for a single item.
    */
   @GetMapping("/{id}")
-  public ResponseEntity<ItemDto> getItemDetail(@PathVariable Long id) {
-    Item item = itemService.getItemById(id);
-    ItemDto detailDto = ItemMapper.toItemDto(item);
-    return ResponseEntity.ok(detailDto);
+  public ResponseEntity<ItemDto> getItemDetail(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    ItemDto dto = itemService.getItemByIdBookmarked(id,user);
+    return ResponseEntity.ok(dto);
   }
 
   @PostMapping
@@ -115,7 +115,7 @@ public class ItemController {
   )
   {
     Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
-    Page<Item> itemPage = itemService.getItemsBySeller(user, pageable);
-    return itemPage.map(ItemMapper::toItemDto);
+    Page<ItemDto> itemPage = itemService.getItemsBySeller(user, pageable);
+    return itemPage;
   }
 }

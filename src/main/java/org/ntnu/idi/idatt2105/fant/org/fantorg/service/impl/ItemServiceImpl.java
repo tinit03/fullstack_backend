@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.item.ItemNotFoundException;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
@@ -23,6 +25,8 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BookmarkService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BringService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.CloudinaryService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ItemService;
@@ -42,6 +46,10 @@ public class ItemServiceImpl implements ItemService {
   private final CategoryRepository categoryRepository;
 
   private final CloudinaryService cloudinaryService;
+
+  private final UserRepository userRepository;
+
+  private final BookmarkService bookmarkService;
 
   private final ImageRepository imageRepository;
 
@@ -212,12 +220,24 @@ public class ItemServiceImpl implements ItemService {
   }
 
   @Override
-  public Page<Item> getAllItems(Pageable pageable) {
-    return itemRepository.findAll(pageable);
+  public ItemDto getItemByIdBookmarked(Long id, User user) {
+    Item item = getItemById(id);
+    ItemDto dto = ItemMapper.toItemDto(item);
+    if(bookmarkService.isBookmarked(user,id)){
+      dto.setIsBookmarked(true);
+    }
+    return dto;
   }
 
   @Override
-  public Page<Item> searchItems(String keyword, Pageable pageable) {
+  public Page<ItemDto> getAllItems(Pageable pageable, User user) {
+    Page<Item> pageItem = itemRepository.findAll(pageable);
+    Page<ItemDto> pageDto = pageItem.map(ItemMapper::toItemDto);
+    return markDtosWithBookmarkStatus(pageDto,user);
+  }
+
+  @Override
+  public Page<ItemDto> searchItems(String keyword, Pageable pageable, User user) {
     Specification<Item> spec = Specification.where(null);
     if (keyword != null && !keyword.isBlank()) {
       String[] tokens = keyword.toLowerCase().split(" ");
@@ -225,11 +245,23 @@ public class ItemServiceImpl implements ItemService {
         spec = spec.and(ItemSpecification.hasKeyWordInAnyField(token));
       }
     }
-    return itemRepository.findAll(spec, pageable);
+    Page<Item> items =  itemRepository.findAll(spec, pageable);
+    Page<ItemDto> dto = items.map(ItemMapper::toItemDto);
+    return markDtosWithBookmarkStatus(dto,user);
   }
 
   @Override
-  public Page<Item> getItemsBySeller(User seller, Pageable pageable) {
-    return itemRepository.findItemBySeller(seller, pageable);
+  public Page<ItemDto> getItemsBySeller(User seller, Pageable pageable) {
+    Page<Item> items = itemRepository.findItemBySeller(seller, pageable);
+    return items.map(ItemMapper::toItemDto);
+  }
+
+  private Page<ItemDto> markDtosWithBookmarkStatus(Page<ItemDto> dtos, User user) {
+    if (user == null) return dtos;
+    Set<Long> bookmarkedIds = userRepository.findBookmarkedItemIds(user.getId());
+    for (ItemDto dto : dtos) {
+      dto.setIsBookmarked(bookmarkedIds.contains(dto.getId()));
+    }
+    return dtos;
   }
 }
