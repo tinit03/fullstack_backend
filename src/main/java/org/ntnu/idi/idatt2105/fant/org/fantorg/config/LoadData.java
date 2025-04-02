@@ -131,7 +131,7 @@ public class LoadData implements CommandLineRunner {
     Item item1 = new Item();
     item1.setTitle("Cat");
     item1.setDescription("Super cool cat");
-    item1.setSubCategory(sports); // Set to subcategory
+    item1.setSubCategory(balls); // Set to subcategory
     item1.setPrice(new BigDecimal("1500"));
     item1.setPublishedAt(LocalDateTime.now());
     item1.setLocation(new Location("7010", "Trøndelag","Trondheim", "63.4305", "10.3951"));
