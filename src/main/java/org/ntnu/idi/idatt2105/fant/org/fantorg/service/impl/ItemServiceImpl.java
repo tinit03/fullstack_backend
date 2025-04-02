@@ -225,6 +225,9 @@ public class ItemServiceImpl implements ItemService {
   public ItemDto getItemByIdBookmarked(Long id, User user) {
     Item item = getItemById(id);
     ItemDto dto = ItemMapper.toItemDto(item);
+    if(user==null){
+      return dto;
+    }
     if(bookmarkService.isBookmarked(user,id)){
       dto.setIsBookmarked(true);
     }
