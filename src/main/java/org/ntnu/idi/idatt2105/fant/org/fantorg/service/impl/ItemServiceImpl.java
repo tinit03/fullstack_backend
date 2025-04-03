@@ -7,10 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.item.ItemNotFoundException;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
@@ -19,9 +22,12 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.BookmarkRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BookmarkService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BringService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.CloudinaryService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ItemService;
@@ -41,6 +47,10 @@ public class ItemServiceImpl implements ItemService {
   private final CategoryRepository categoryRepository;
 
   private final CloudinaryService cloudinaryService;
+
+  private final BookmarkRepository bookmarkRepository;
+
+  private final BookmarkService bookmarkService;
 
   private final ImageRepository imageRepository;
 
@@ -72,7 +82,7 @@ public class ItemServiceImpl implements ItemService {
 
     for (ImageCreateDto imgDto : dto.getImages()) {
       try {
-        Map<String, String> result = cloudinaryService.uploadBase64Image(imgDto.getBase64Url());
+        Map<String, String> result = cloudinaryService.uploadBase64Image(imgDto.getUrl());
         Image image = new Image();
         image.setUrl(result.get("url"));
         image.setPublicId(result.get("public_id"));
@@ -105,14 +115,17 @@ public class ItemServiceImpl implements ItemService {
     existing.setSubCategory(subCategory);
     existing.setLocation(location);
     existing.setListingType(updatedItem.getListingType());
+    existing.setCondition(updatedItem.getCondition());
+    existing.setTags(updatedItem.getTags());
+    existing.setForSale(updatedItem.isForSale());
 
     // Step 1: Upload new base64 images first and enrich DTO
     // Basically går gjennom alle bildene som har blitt lastet opp fra frontend.
     List<Image> newImages = new ArrayList<>();
     for (ImageEditDto imgDto : updatedItem.getImages()) {
-      if (imgDto.getPublicId() == null && imgDto.getBase64Url() != null) {
+      if (imgDto.getPublicId() == null && imgDto.getUrl() != null) {
         try {
-          Map<String, String> result = cloudinaryService.uploadBase64Image(imgDto.getBase64Url());
+          Map<String, String> result = cloudinaryService.uploadBase64Image(imgDto.getUrl());
           imgDto.setPublicId(result.get("public_id")); // Update the DTO
           imgDto.setUrl(result.get("url"));
           Image image = new Image();
@@ -169,6 +182,19 @@ public class ItemServiceImpl implements ItemService {
   }
 
   @Override
+  public Item changeStatus(Long id, Status status, User seller) {
+    Item existing = itemRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Item not found"));
+
+    if (!existing.getSeller().getId().equals(seller.getId())) {
+      throw new SecurityException("You don't own this item");
+    }
+    existing.setStatus(status);
+    Item savedItem = itemRepository.save(existing);
+    return savedItem;
+  }
+
+  @Override
   public void deleteItem(Long id, User seller) {
     Item existing = itemRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Item not found"));
@@ -195,24 +221,63 @@ public class ItemServiceImpl implements ItemService {
   }
 
   @Override
-  public Page<Item> getAllItems(Pageable pageable) {
-    return itemRepository.findAll(pageable);
+  public ItemDto getItemByIdBookmarked(Long id, User user) {
+    Item item = getItemById(id);
+    ItemDto dto = ItemMapper.toItemDto(item);
+    if(user==null){
+      return dto;
+    }
+    if(bookmarkService.isBookmarked(user,id)){
+      dto.setIsBookmarked(true);
+    }
+    return dto;
   }
 
   @Override
-  public Page<Item> searchItems(String keyword, Pageable pageable) {
+  public Page<ItemDto> getAllItems(Pageable pageable, Status status, User user) {
     Specification<Item> spec = Specification.where(null);
+    if (status != null) {
+      spec = spec.and(ItemSpecification.hasStatus(status));
+    }
+    Page<Item> pageItem = itemRepository.findAll(pageable);
+    Page<ItemDto> pageDto = pageItem.map(ItemMapper::toItemDto);
+    return markDtosWithBookmarkStatus(pageDto,user);
+  }
+
+  @Override
+  public Page<ItemDto> searchItems(String keyword, Pageable pageable, User user) {
+    Specification<Item> spec = ItemSpecification.hasStatus(Status.ACTIVE);
     if (keyword != null && !keyword.isBlank()) {
       String[] tokens = keyword.toLowerCase().split(" ");
       for (String token : tokens) {
         spec = spec.and(ItemSpecification.hasKeyWordInAnyField(token));
       }
     }
-    return itemRepository.findAll(spec, pageable);
+    Page<Item> items =  itemRepository.findAll(spec, pageable);
+    Page<ItemDto> dto = items.map(ItemMapper::toItemDto);
+    return markDtosWithBookmarkStatus(dto,user);
   }
 
   @Override
-  public Page<Item> getItemsBySeller(User seller, Pageable pageable) {
-    return itemRepository.findItemBySeller(seller, pageable);
+  public Page<ItemDto> getItemsBySeller(User seller, Status status, Pageable pageable) {
+    Specification<Item> spec = ItemSpecification.hasSeller(seller);
+    if (status != null) {
+      spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));
+    }
+    Page<Item> items = itemRepository.findAll(spec,pageable);
+    return items.map(ItemMapper::toItemDto);
+  }
+
+
+  private Page<ItemDto> markDtosWithBookmarkStatus(Page<ItemDto> dtos, User user) {
+    if (user == null) return dtos;
+    Set<Long> bookmarkedIds = bookmarkRepository.findByUser(user)
+        .stream()
+        .map(bookmark -> bookmark.getItem().getItemId())
+        .collect(Collectors.toSet());
+    for (ItemDto dto : dtos) {
+      dto.setIsBookmarked(bookmarkedIds.contains(dto.getId()));
+    }
+    return dtos;
   }
 }

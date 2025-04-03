@@ -1,37 +1,40 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "\"Reviews\"")
-public class Review {
+public class PasswordResetToken {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private int rating; // 1-5 stars
-  private String comment;
+  @Column(nullable = false, unique = true)
+  private String token;
 
-  private LocalDateTime createdAt = LocalDateTime.now();
+  @OneToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-  @ManyToOne
-  @JoinColumn(name = "order_id", nullable = false, unique = true)
-  private Order order;
-
-
+  @Column(nullable = false)
+  private LocalDateTime expiryDate;
+  @Column(name = "used", nullable = false)
+  private boolean used = false;
+  public boolean isExpired() {
+    return expiryDate.isBefore(LocalDateTime.now());
+  }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageProfileDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 
 public class ImageMapper {
@@ -12,7 +13,6 @@ public class ImageMapper {
     if (image == null) return null;
 
     ImageDto dto = new ImageDto();
-    dto.setId(image.getId());
     dto.setUrl(image.getUrl());
     dto.setCaption(image.getCaption());
     dto.setPublicId(image.getPublicId());
@@ -22,13 +22,29 @@ public class ImageMapper {
   public static List<ImageDto> toDtoList(List<Image> images) {
     return images == null ? null : images.stream().map(ImageMapper::toDto).collect(Collectors.toList());
   }
-
+  public static ImageProfileDto toProfileDto(Image image){
+    if(image == null) return null;
+    ImageProfileDto dto = new ImageProfileDto();
+    dto.setPublicId(image.getPublicId());
+    dto.setUrl(image.getUrl());
+    return dto;
+  }
   public static Image fromCreateDto(ImageCreateDto dto) {
     if (dto == null) return null;
 
     Image image = new Image();
-    image.setUrl(dto.getBase64Url());
+    image.setUrl(dto.getUrl());
     image.setCaption(dto.getCaption());
+    return image;
+  }
+
+  public static Image fromProfileDto(ImageProfileDto dto) {
+    if (dto == null) return null;
+    Image image = new Image();
+    image.setItem(null);
+    image.setCaption("");
+    image.setPublicId(dto.getPublicId());
+    image.setUrl(dto.getUrl());
     return image;
   }
 

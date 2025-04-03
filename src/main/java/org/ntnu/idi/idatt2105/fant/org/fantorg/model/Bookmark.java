@@ -4,34 +4,33 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
 @Entity
+@Table(name = "bookmark")
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "\"Reviews\"")
-public class Review {
+@Builder
+public class Bookmark {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private int rating; // 1-5 stars
-  private String comment;
+  @ManyToOne(optional = false)
+  private User user;
 
-  private LocalDateTime createdAt = LocalDateTime.now();
+  @ManyToOne(optional = false)
+  private Item item;
 
-  @ManyToOne
-  @JoinColumn(name = "order_id", nullable = false, unique = true)
-  private Order order;
-
-
+  private LocalDateTime bookmarkedAt;
 }
