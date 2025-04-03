@@ -3,6 +3,8 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl;
 import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.notification.NotificationDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.NotificationMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Notification;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.NotificationType;
@@ -32,8 +34,9 @@ public class NotificationServiceImpl implements NotificationService {
   }
 
   @Override
-  public Page<Notification> getNotifications(User user, Pageable pageable) {
-    return notificationRepository.findByRecipient(user, pageable);
+  public Page<NotificationDto> getNotifications(User user, Pageable pageable) {
+    Page<Notification> notifications= notificationRepository.findByRecipient(user, pageable);
+    return notifications.map(NotificationMapper::toDto);
   }
 
   @Override
@@ -49,13 +52,5 @@ public class NotificationServiceImpl implements NotificationService {
     notificationRepository.save(notification);
   }
 
-  public Map<String, String> buildArgs(NotificationType type, Object... args) {
-    return switch (type) {
-      case NEW_BID -> Map.of("user", args[0].toString(), "item", args[1].toString());
-      case BID_ACCEPTED -> Map.of("item", args[0].toString());
-      case ITEM_SOLD -> Map.of("item", args[0].toString());
-      case ITEM_SOLD_ELSE -> Map.of("item", args[0].toString());
-      case MESSAGE_RECEIVED -> Map.of("from", args[0].toString());
-    };
-  }
+
 }
