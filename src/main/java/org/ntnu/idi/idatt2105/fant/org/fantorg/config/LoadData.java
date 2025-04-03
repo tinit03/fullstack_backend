@@ -68,9 +68,12 @@ public class LoadData implements CommandLineRunner {
 
     // 2. Create parent category
     Category parentCategory = new Category();
+    Image clothesImage = new Image();
+    clothesImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1743697236/clothes-hanger-svgrepo-com_lnddra.svg");
+    clothesImage.setPublicId("clothes-hanger-svgrepo-com_lnddra");
+    parentCategory.setImage(clothesImage);
     parentCategory.setCategoryName("Clothes");
     categoryRepository.save(parentCategory);
-
     // 3. Create subcategory (e.g. Jackets)
     Category subCategory = new Category();
     subCategory.setCategoryName("Jackets");
@@ -84,6 +87,10 @@ public class LoadData implements CommandLineRunner {
 
     // === PARENT CATEGORY: Electronics ===
     Category electronics = new Category();
+    Image imageElectronics = new Image();
+    imageElectronics.setPublicId("computer-svgrepo-com_gz7m1c");
+    imageElectronics.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1743697442/computer-svgrepo-com_gz7m1c.svg");
+    electronics.setImage(imageElectronics);
     electronics.setCategoryName("Electronics");
     categoryRepository.save(electronics);
 
@@ -99,6 +106,10 @@ public class LoadData implements CommandLineRunner {
 
     // === PARENT CATEGORY: Sports ===
     Category sports = new Category();
+    Image imageSport = new Image();
+    imageSport.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1743698155/ymlpxut6wpax101shhqw.svg");
+    imageSport.setPublicId("ymlpxut6wpax101shhqw");
+    sports.setImage(imageSport);
     sports.setCategoryName("Sports");
     categoryRepository.save(sports);
 
