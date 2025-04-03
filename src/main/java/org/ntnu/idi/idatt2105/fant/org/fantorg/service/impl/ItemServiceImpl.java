@@ -234,12 +234,17 @@ public class ItemServiceImpl implements ItemService {
   }
 
   @Override
-  public Page<ItemDto> getAllItems(Pageable pageable, Status status, User user) {
+  public Page<ItemDto> getAllItems(Pageable pageable, User user, Status status) {
     Specification<Item> spec = Specification.where(null);
-    if (status != null) {
+    //Vanlig filtrering når status er satt til en verdi e.g. status=ACTIVE eller status=SOLD
+    if (status != null && status != Status.INACTIVE) {
       spec = spec.and(ItemSpecification.hasStatus(status));
-    }
-    Page<Item> pageItem = itemRepository.findAll(pageable);
+    } else if (status==null) {
+      // Om det er ikke satt noe filter, så sender den alle aktive og solgte
+      spec = spec.and(ItemSpecification.hasStatusIn(Status.ACTIVE,Status.SOLD));
+    } else throw new IllegalArgumentException("Inactive items are private");
+
+    Page<Item> pageItem = itemRepository.findAll(spec,pageable);
     Page<ItemDto> pageDto = pageItem.map(ItemMapper::toItemDto);
     return markDtosWithBookmarkStatus(pageDto,user);
   }

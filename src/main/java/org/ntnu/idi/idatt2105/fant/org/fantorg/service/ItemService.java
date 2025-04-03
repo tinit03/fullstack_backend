@@ -21,7 +21,7 @@ public interface ItemService {
 
   ItemDto getItemByIdBookmarked(Long id, User user);
 
-  Page<ItemDto> getAllItems(Pageable pageable,Status status, User user);
+  Page<ItemDto> getAllItems(Pageable pageable,User user, Status status);
 
   Page<ItemDto> searchItems(String keyword, Pageable pageable, User user);
   Page<ItemDto> getItemsBySeller(User seller, Status status, Pageable pageable);
