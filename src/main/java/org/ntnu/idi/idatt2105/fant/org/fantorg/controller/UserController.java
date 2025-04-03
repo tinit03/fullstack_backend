@@ -29,11 +29,11 @@ public class UserController {
   private final UserService userService;
   @GetMapping("/users")
   public ResponseEntity<List<UserDto>> findConnectedUsers() {
-    return ResponseEntity.ok(UserMapper.toDtoList(userService.findAll()));
+    return ResponseEntity.ok(userService.findAll());
   }
   @GetMapping("/me")
   public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal User user) {
-    return ResponseEntity.ok(UserMapper.toDto(user));
+    return ResponseEntity.ok(userService.findById(user.getId()));
   }
 
   @PostMapping("/profilePicture")

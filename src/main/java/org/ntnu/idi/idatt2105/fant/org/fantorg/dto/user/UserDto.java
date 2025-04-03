@@ -15,7 +15,7 @@ public class UserDto {
   private String fullName;
   private String firstName;
   private String lastName;
-  private List<ItemDto> ownItems;
-  private Set<ItemDto> bookmarkedItems;
   private ImageProfileDto profilePicture;
+  private double averageRating;
+  private long totalReviews;
 }
