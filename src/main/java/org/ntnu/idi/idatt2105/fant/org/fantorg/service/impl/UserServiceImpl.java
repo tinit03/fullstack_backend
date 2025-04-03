@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageProfileDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UpdatePasswordDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.user.UserNotFoundException;

@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageCreateDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageItemUploadDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
@@ -80,7 +80,7 @@ public class ItemServiceImpl implements ItemService {
       return savedItem;
     }
 
-    for (ImageCreateDto imgDto : dto.getImages()) {
+    for (ImageItemUploadDto imgDto : dto.getImages()) {
       try {
         Map<String, String> result = cloudinaryService.uploadBase64Image(imgDto.getUrl());
         Image image = new Image();
