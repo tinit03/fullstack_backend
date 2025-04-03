@@ -9,7 +9,9 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemStatusUpdate;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ItemService;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.specification.SortUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,10 +56,14 @@ public class ItemController {
   public Page<ItemDto> getAllItems(
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size,
+      @RequestParam(defaultValue = "publishedAt") String sortField,
+      @RequestParam(defaultValue = "desc") String sortDir,
+      @RequestParam(defaultValue = "ACTIVE") Status status,
       @AuthenticationPrincipal User user
   ) {
-    Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
-    return itemService.getAllItems(pageable,user);
+    Sort sort = SortUtil.buildSort(sortField,sortDir);
+    Pageable pageable = PageRequest.of(page, size, sort);
+    return itemService.getAllItems(pageable,status, user);
 
   }
 
@@ -111,11 +117,16 @@ public class ItemController {
   public Page<ItemDto> getOwnItems(
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size,
+      @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
+      @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+      @RequestParam(value = "status", required = false) Status status,
       @AuthenticationPrincipal User user
   )
   {
-    Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
-    Page<ItemDto> itemPage = itemService.getItemsBySeller(user, pageable);
+    Sort sort = SortUtil.buildSort(sortField,sortDir);
+
+    Pageable pageable = PageRequest.of(page, size, sort);
+    Page<ItemDto> itemPage = itemService.getItemsBySeller(user,status, pageable);
     return itemPage;
   }
 }

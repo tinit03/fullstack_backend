@@ -27,7 +27,6 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.BookmarkRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BookmarkService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BringService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.CloudinaryService;
@@ -235,7 +234,11 @@ public class ItemServiceImpl implements ItemService {
   }
 
   @Override
-  public Page<ItemDto> getAllItems(Pageable pageable, User user) {
+  public Page<ItemDto> getAllItems(Pageable pageable, Status status, User user) {
+    Specification<Item> spec = Specification.where(null);
+    if (status != null) {
+      spec = spec.and(ItemSpecification.hasStatus(status));
+    }
     Page<Item> pageItem = itemRepository.findAll(pageable);
     Page<ItemDto> pageDto = pageItem.map(ItemMapper::toItemDto);
     return markDtosWithBookmarkStatus(pageDto,user);
@@ -243,7 +246,7 @@ public class ItemServiceImpl implements ItemService {
 
   @Override
   public Page<ItemDto> searchItems(String keyword, Pageable pageable, User user) {
-    Specification<Item> spec = Specification.where(null);
+    Specification<Item> spec = ItemSpecification.hasStatus(Status.ACTIVE);
     if (keyword != null && !keyword.isBlank()) {
       String[] tokens = keyword.toLowerCase().split(" ");
       for (String token : tokens) {
@@ -256,10 +259,15 @@ public class ItemServiceImpl implements ItemService {
   }
 
   @Override
-  public Page<ItemDto> getItemsBySeller(User seller, Pageable pageable) {
-    Page<Item> items = itemRepository.findItemBySeller(seller, pageable);
+  public Page<ItemDto> getItemsBySeller(User seller, Status status, Pageable pageable) {
+    Specification<Item> spec = ItemSpecification.hasSeller(seller);
+    if (status != null) {
+      spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));
+    }
+    Page<Item> items = itemRepository.findAll(spec,pageable);
     return items.map(ItemMapper::toItemDto);
   }
+
 
   private Page<ItemDto> markDtosWithBookmarkStatus(Page<ItemDto> dtos, User user) {
     if (user == null) return dtos;
