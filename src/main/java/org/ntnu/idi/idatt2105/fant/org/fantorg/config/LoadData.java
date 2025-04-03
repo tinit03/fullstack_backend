@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatMessage;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
@@ -15,6 +16,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Role;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatMessageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
@@ -33,6 +35,8 @@ public class LoadData implements CommandLineRunner {
   private final ImageRepository imageRepository;
   private final PasswordEncoder passwordEncoder;
   private final ChatRoomServiceImpl chatRoomServiceImpl;
+  private final ChatMessageRepository chatMessageRepository;
+
 
   /**
    * Callback used to run the bean.
@@ -156,7 +160,42 @@ public class LoadData implements CommandLineRunner {
     item.setImages(images);
 
     // 5: Create test chat room
-    chatRoomServiceImpl.getChatRoomId(userA.getEmail(), userB.getEmail(), item.getItemId(), true);
+    String chatId = chatRoomServiceImpl.getChatRoomId(userA.getEmail(), userB.getEmail(), item.getItemId(), true).orElseThrow();
+    ChatMessage chatMessage = ChatMessage.builder()
+        .sender(userA)
+        .recipient(userB)
+        .item(item)
+        .content("first message")
+        .chatId(chatId)
+        .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+        .build();
+
+    chatMessageRepository.save(chatMessage);
+
+    String otherChatId = chatRoomServiceImpl.getChatRoomId(userA.getEmail(), user.getEmail(), item1.getItemId(), true).orElseThrow();
+    ChatMessage otherChatMessage = ChatMessage.builder()
+        .sender(userA)
+        .recipient(user)
+        .item(item1)
+        .content("other message")
+        .chatId(otherChatId)
+        .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+        .build();
+
+    chatMessageRepository.save(otherChatMessage);
+
+    String anotherChatId = chatRoomServiceImpl.getChatRoomId(user.getEmail(), userA.getEmail(), item1.getItemId(), true).orElseThrow();
+    ChatMessage antotherChatMessage = ChatMessage.builder()
+        .sender(user)
+        .recipient(userA)
+        .item(item1)
+        .content("antother messgae")
+        .chatId(anotherChatId)
+        .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+        .build();
+
+    chatMessageRepository.save(antotherChatMessage);
+
     System.out.println("Inserted test data.");
   }
 }

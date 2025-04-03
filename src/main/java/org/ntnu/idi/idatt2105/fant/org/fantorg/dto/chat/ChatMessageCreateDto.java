@@ -3,6 +3,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.sql.Date;
+import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +31,4 @@ public class ChatMessageCreateDto {
 
   @Size(max = 200, message = "Message cannot be longer than 200 characters")
   private String content;
-
-  @NotNull(message = "Timestamp is required")
-  private Date timestamp;
 }

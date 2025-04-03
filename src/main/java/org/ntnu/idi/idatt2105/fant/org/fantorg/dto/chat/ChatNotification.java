@@ -15,9 +15,7 @@ import lombok.ToString;
 @ToString
 public class ChatNotification {
 
-  private Long id;
-
-  private String senderId;
+private String senderId;
 
   private String recipientId;
 

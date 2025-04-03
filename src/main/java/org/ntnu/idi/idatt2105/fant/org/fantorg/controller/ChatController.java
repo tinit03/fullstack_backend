@@ -3,6 +3,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatNotification;
@@ -10,11 +11,13 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatProfileDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatRoom;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatRoomRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatMessageServiceImpl;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatRoomServiceImpl;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.UserServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,8 +33,18 @@ public class ChatController {
   private final SimpMessagingTemplate messagingTemplate;
   private final ChatRoomRepository chatRoomRepository;
   private final UserServiceImpl userServiceImpl;
+  private final ChatRoomServiceImpl chatRoomService;
 
-  //@GetMapping("/chats/{itemId}/{senderId}")
+  @GetMapping("/chats/{senderId}")
+  public ResponseEntity<List<ChatDto>> getUserChats(
+      @PathVariable("senderId") String senderId
+  ) {
+    log.info("Received GET request for /chats/{}", senderId);
+    List<ChatDto> chats = chatRoomService.getChats(senderId);
+    log.info("Returning result for /chats/{}", senderId);
+    log.info("senderId: {}", chats.getFirst().getSenderId());
+    return ResponseEntity.ok(chats);
+  }
 
   @GetMapping("/messages/{itemId}/{senderId}/{recipientId}")
   public ResponseEntity<List<ChatMessageDto>> findChatMessages(
@@ -57,7 +70,6 @@ public class ChatController {
     log.info("Sending message to /{}/queue/messages", savedMsgDto.getRecipientId());
     messagingTemplate.convertAndSendToUser(savedMsgDto.getRecipientId(), "/queue/messages",
         ChatNotification.builder()
-            .id(savedMsgDto.getId())
             .senderId(savedMsgDto.getSenderId())
             .recipientId(savedMsgDto.getRecipientId())
             .itemId(savedMsgDto.getItemId())
