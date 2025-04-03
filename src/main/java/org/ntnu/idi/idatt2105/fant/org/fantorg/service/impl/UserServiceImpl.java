@@ -16,6 +16,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.CloudinaryService;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ImageService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ReviewService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +28,7 @@ public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
   private final CloudinaryService cloudinaryService;
+  private final ImageService imageService;
   private final PasswordEncoder passwordEncoder;
   private final ImageRepository imageRepository;
 
@@ -51,45 +53,14 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User updateProfilePicture(String url, User user) {
-    try{
-      if (url == null || url.isBlank()) {
-        Image oldImage = user.getProfileImage();
-        if (oldImage != null) {
-          String oldPublicId = oldImage.getPublicId();
-          if (oldPublicId != null && !oldPublicId.isBlank()) {
-            cloudinaryService.deleteImage(oldPublicId);
-          }
-          user.setProfileImage(null);
-          userRepository.save(user);
-          imageRepository.delete(oldImage);
-        }
-        return user;
-      }
-      if (url.startsWith("http://") || url.startsWith("https://")) return user;
-      if (user.getProfileImage() != null) {
-        Image oldImage = user.getProfileImage();
-        String oldPublicId = user.getProfileImage().getPublicId();
-        if (oldPublicId != null && !oldPublicId.isBlank()) {
-          cloudinaryService.deleteImage(oldPublicId);
-        }
-        user.setProfileImage(null);
-        userRepository.save(user);
-        imageRepository.delete(oldImage);
-      }
-
-      Map<String, String> uploadResult = cloudinaryService.uploadBase64Image(url);
-      ImageProfileDto profileDto = new ImageProfileDto();
-      profileDto.setUrl(uploadResult.get("url"));
-      profileDto.setPublicId(uploadResult.get("public_id"));
-      Image newProfileImage = ImageMapper.fromProfileDto(profileDto);
-      imageRepository.save(newProfileImage);
-      user.setProfileImage(newProfileImage);
-      return userRepository.save(user);
-
-    } catch (IOException e){
-      throw new RuntimeException("Failed to upload profile picture", e);
+    Image currentImage = user.getProfileImage();
+    if(((url == null || url.isBlank()) || !url.startsWith("http"))){
+      user.setProfileImage(null);
+      userRepository.save(user);
     }
-
+    Image newProfileImage = imageService.updateImage(url,currentImage);
+    user.setProfileImage(newProfileImage);
+    return userRepository.save(user);
   }
 
   @Override
