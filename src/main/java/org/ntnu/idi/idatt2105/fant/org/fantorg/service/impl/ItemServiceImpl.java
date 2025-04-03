@@ -65,6 +65,11 @@ public class ItemServiceImpl implements ItemService {
 
     List<Image> imageEntities = new ArrayList<>();
     Item savedItem = itemRepository.save(item);
+
+    if (null == dto.getImages()) {
+      return savedItem;
+    }
+
     for (ImageCreateDto imgDto : dto.getImages()) {
       try {
         Map<String, String> result = cloudinaryService.uploadBase64Image(imgDto.getBase64Url());
