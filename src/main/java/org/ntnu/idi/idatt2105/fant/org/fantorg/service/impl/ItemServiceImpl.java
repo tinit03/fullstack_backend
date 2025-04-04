@@ -230,16 +230,22 @@ public class ItemServiceImpl implements ItemService {
     if(bookmarkService.isBookmarked(user,id)){
       dto.setIsBookmarked(true);
     }
+    if(user.getId().equals(item.getSeller().getId())){
+      dto.setIsOwner(true);
+    }
     return dto;
   }
 
   @Override
   public Page<ItemDto> getAllItems(Pageable pageable, Status status, User user) {
     Specification<Item> spec = Specification.where(null);
+    if(user!=null){
+      spec = spec.and(ItemSpecification.hasNotSeller(user));
+    }
     if (status != null) {
       spec = spec.and(ItemSpecification.hasStatus(status));
     }
-    Page<Item> pageItem = itemRepository.findAll(pageable);
+    Page<Item> pageItem = itemRepository.findAll(spec, pageable);
     Page<ItemDto> pageDto = pageItem.map(ItemMapper::toItemDto);
     return markDtosWithBookmarkStatus(pageDto,user);
   }

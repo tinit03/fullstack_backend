@@ -30,4 +30,8 @@ public class ItemSpecification {
   public static Specification<Item> hasSeller(User seller) {
     return (root, query, cb) -> cb.equal(root.get("seller"), seller);
   }
+
+  public static Specification<Item> hasNotSeller(User seller) {
+    return (root, query, cb) -> cb.notEqual(root.get("seller"), seller);
+  }
 }
