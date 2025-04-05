@@ -2,6 +2,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemSearchFilter;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.item.ItemNotFoundException;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
@@ -22,6 +24,8 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.BookmarkRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
@@ -250,15 +254,42 @@ public class ItemServiceImpl implements ItemService {
   }
 
   @Override
-  public Page<ItemDto> searchItems(String keyword, Pageable pageable, User user) {
+  public Page<ItemDto> searchItems(
+      ItemSearchFilter itemSearchFilter,
+      Pageable pageable,
+      User user
+  ) {
     Specification<Item> spec = ItemSpecification.hasStatus(Status.ACTIVE);
-    if (keyword != null && !keyword.isBlank()) {
-      String[] tokens = keyword.toLowerCase().split(" ");
+    if (itemSearchFilter.getKeyword()!= null && !itemSearchFilter.getKeyword().isBlank()) {
+      String[] tokens = itemSearchFilter.getKeyword().toLowerCase().split(" ");
       for (String token : tokens) {
         spec = spec.and(ItemSpecification.hasKeyWordInAnyField(token));
       }
+    } if (itemSearchFilter.getCategoryId() != null) {
+      spec = spec.and(ItemSpecification.hasCategory(itemSearchFilter.getCategoryId()));
     }
-    Page<Item> items =  itemRepository.findAll(spec, pageable);
+    if (itemSearchFilter.getSubCategoryId() != null) {
+      spec = spec.and(ItemSpecification.hasSubCategory(itemSearchFilter.getSubCategoryId()));
+    }
+    if (itemSearchFilter.getCondition()!= null) {
+      spec = spec.and(ItemSpecification.hasCondition(itemSearchFilter.getCondition()));
+    }
+    if (itemSearchFilter.getCounty()!= null && !itemSearchFilter.getCounty().isBlank()) {
+      spec = spec.and(ItemSpecification.isInCounty(itemSearchFilter.getCounty()));
+    }
+    Double min = itemSearchFilter.getMinPrice();
+    Double max = itemSearchFilter.getMaxPrice();
+
+    if (min != null || max != null) {
+      BigDecimal minPrice = min != null ? BigDecimal.valueOf(min) : null;
+      BigDecimal maxPrice = max != null ? BigDecimal.valueOf(max) : null;
+      spec = spec.and(ItemSpecification.hasPriceBetween(minPrice, maxPrice));
+    }
+    if (itemSearchFilter.getType() != null) {
+      spec = spec.and(ItemSpecification.hasListingType(itemSearchFilter.getType()));
+    }
+
+    Page<Item> items = itemRepository.findAll(spec, pageable);
     Page<ItemDto> dto = items.map(ItemMapper::toItemDto);
     return markDtosWithBookmarkStatus(dto,user);
   }
