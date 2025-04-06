@@ -6,6 +6,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemSearchFilter;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemSearchResponse;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
@@ -28,7 +29,7 @@ public interface ItemService {
   Page<ItemDto> getAllItems(Pageable pageable,User user, Status status);
 
 
-  Page<ItemDto> searchItems(ItemSearchFilter itemSearchFilter,Pageable pageable, User user
+  ItemSearchResponse searchItems(ItemSearchFilter itemSearchFilter,Pageable pageable, User user
   );
 
   Page<ItemDto> getItemsBySeller(User seller, Status status, Pageable pageable);

@@ -3,6 +3,8 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.specification;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
@@ -36,24 +38,27 @@ public class ItemSpecification {
     return (root, query, cb) -> cb.equal(root.get("seller"), seller);
   }
 
-  public static Specification<Item> hasCategory(Long categoryId) {
+  public static Specification<Item> hasCategoryIn(List<Long> categoryIds) {
     return (root, query, cb) ->
-        cb.equal(root.get("subCategory").get("parentCategory").get("id"), categoryId);
+        root.get("subCategory").get("parentCategory").get("id").in(categoryIds);
   }
 
-  public static Specification<Item> hasSubCategory(Long subCategoryId) {
+  public static Specification<Item> hasSubCategoryIn(List<Long> subCategoryIds) {
     return (root, query, cb) ->
-        cb.equal(root.get("subCategory").get("id"), subCategoryId);
+        root.get("subCategory").get("id").in(subCategoryIds);
   }
 
-  public static Specification<Item> hasCondition(Condition condition) {
-    return (root, query, cb) ->
-        cb.equal(root.get("condition"), condition);
+  public static Specification<Item> hasConditionIn(List<Condition> conditions) {
+    return (root, query, cb) -> root.get("condition").in(conditions);
   }
 
-  public static Specification<Item> isInCounty(String county) {
-    return (root, query, cb) ->
-        cb.equal(cb.lower(root.get("location").get("county")), county.toLowerCase());
+  public static Specification<Item> isInCounties(List<String> counties) {
+    return (root, query, cb) -> {
+      List<String> lowered = counties.stream()
+          .map(String::toLowerCase)
+          .collect(Collectors.toList());
+      return cb.lower(root.get("location").get("county")).in(lowered);
+    };
   }
 
   public static Specification<Item> hasPriceBetween(BigDecimal min, BigDecimal max) {
@@ -69,8 +74,7 @@ public class ItemSpecification {
       }
     };
   }
-  public static Specification<Item> hasListingType(ListingType type) {
-    return (root, query, cb) ->
-        cb.equal(root.get("listingType"), type);
+  public static Specification<Item> hasListingTypeIn(List<ListingType> types) {
+    return (root, query, cb) -> root.get("listingType").in(types);
   }
 }

@@ -6,6 +6,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemSearchFilter;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemSearchResponse;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemStatusUpdate;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
@@ -38,7 +39,7 @@ public class ItemController {
    * Accepts optional keyword, page, and size parameters.
    */
   @GetMapping("/search")
-  public Page<ItemDto> searchItems(
+  public ItemSearchResponse searchItems(
       @ModelAttribute ItemSearchFilter filter,
       @RequestParam(defaultValue = "publishedAt") String sortField,
       @RequestParam(defaultValue = "desc") String sortDir,
