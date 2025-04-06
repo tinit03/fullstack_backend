@@ -14,7 +14,7 @@ public class UserMapper {
     dto.setFullName(user.getFirstName()+" "+user.getLastName());
     dto.setFirstName(user.getFirstName());
     dto.setLastName(user.getLastName());
-    dto.setProfilePicture(ImageMapper.toProfileDto(user.getProfileImage()));
+    dto.setProfilePicture(ImageMapper.toDto(user.getProfileImage()));
     return dto;
   }
 

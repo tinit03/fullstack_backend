@@ -5,7 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ImageProfileDto {
+public class ImageItemDto {
   private String url;
+  private String caption;
   private String publicId;
 }

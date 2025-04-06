@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemSearchFilter;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemSearchResponse;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemStatusUpdate;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
@@ -37,15 +39,17 @@ public class ItemController {
    * Accepts optional keyword, page, and size parameters.
    */
   @GetMapping("/search")
-  public Page<ItemDto> searchItems(
-      @RequestParam(value = "keyword", required = false) String keyword,
+  public ItemSearchResponse searchItems(
+      @ModelAttribute ItemSearchFilter filter,
+      @RequestParam(defaultValue = "publishedAt") String sortField,
+      @RequestParam(defaultValue = "desc") String sortDir,
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size,
       @AuthenticationPrincipal User user) {
 
-    Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
-    return itemService.searchItems(keyword, pageable, user);
-
+    Sort sort = SortUtil.buildSort(sortField,sortDir);
+    Pageable pageable = PageRequest.of(page, size, sort);
+    return itemService.searchItems(filter, pageable, user);
   }
 
   /**
@@ -63,7 +67,7 @@ public class ItemController {
   ) {
     Sort sort = SortUtil.buildSort(sortField,sortDir);
     Pageable pageable = PageRequest.of(page, size, sort);
-    return itemService.getAllItems(pageable,status, user);
+    return itemService.getAllItems(pageable,user,status);
 
   }
 
@@ -124,7 +128,6 @@ public class ItemController {
   )
   {
     Sort sort = SortUtil.buildSort(sortField,sortDir);
-
     Pageable pageable = PageRequest.of(page, size, sort);
     Page<ItemDto> itemPage = itemService.getItemsBySeller(user,status, pageable);
     return itemPage;

@@ -1,5 +1,6 @@
   package org.ntnu.idi.idatt2105.fant.org.fantorg.factory;
 
+  import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.CategoryCreateDto;
   import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.CategoryDto;
   import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.SubCategoryDto;
   import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
@@ -30,8 +31,8 @@
       }
       return sub;
     }
-    public static CategoryDto createCategoryDto(String name) {
-      CategoryDto dto = new CategoryDto();
+    public static CategoryCreateDto createCategoryDto(String name) {
+      CategoryCreateDto dto = new CategoryCreateDto();
       dto.setName(name);
       return dto;
     }

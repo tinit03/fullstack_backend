@@ -74,9 +74,12 @@ public class LoadData implements CommandLineRunner {
 
     // 2. Create parent category
     Category parentCategory = new Category();
+    Image clothesImage = new Image();
+    clothesImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1743697236/clothes-hanger-svgrepo-com_lnddra.svg");
+    clothesImage.setPublicId("clothes-hanger-svgrepo-com_lnddra");
+    parentCategory.setImage(clothesImage);
     parentCategory.setCategoryName("Clothes");
     categoryRepository.save(parentCategory);
-
     // 3. Create subcategory (e.g. Jackets)
     Category subCategory = new Category();
     subCategory.setCategoryName("Jackets");
@@ -90,6 +93,10 @@ public class LoadData implements CommandLineRunner {
 
     // === PARENT CATEGORY: Electronics ===
     Category electronics = new Category();
+    Image imageElectronics = new Image();
+    imageElectronics.setPublicId("computer-svgrepo-com_gz7m1c");
+    imageElectronics.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1743697442/computer-svgrepo-com_gz7m1c.svg");
+    electronics.setImage(imageElectronics);
     electronics.setCategoryName("Electronics");
     categoryRepository.save(electronics);
 
@@ -105,6 +112,10 @@ public class LoadData implements CommandLineRunner {
 
     // === PARENT CATEGORY: Sports ===
     Category sports = new Category();
+    Image imageSport = new Image();
+    imageSport.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1743698155/ymlpxut6wpax101shhqw.svg");
+    imageSport.setPublicId("ymlpxut6wpax101shhqw");
+    sports.setImage(imageSport);
     sports.setCategoryName("Sports");
     categoryRepository.save(sports);
 
@@ -168,6 +179,82 @@ public class LoadData implements CommandLineRunner {
     imageRepository.saveAll(images1);
     item1.setImages(images1);
 
+
+    // === Additional Items ===
+    Item dessertItem = new Item();
+    dessertItem.setTitle("Delicious Dessert");
+    dessertItem.setDescription("Sweet and tasty dessert for food lovers");
+    dessertItem.setSubCategory(laptops); // Place under an existing subcategory
+    dessertItem.setPrice(new BigDecimal("99.99"));
+    dessertItem.setPublishedAt(LocalDateTime.now().minusDays(2));
+    dessertItem.setLocation(new Location("0150", "Oslo", "Oslo", "59.9139", "10.7522"));
+    dessertItem.setTags(List.of("dessert", "sweet", "food"));
+    dessertItem.setSeller(user);
+    dessertItem.setListingType(ListingType.DIRECT);
+    dessertItem.setStatus(Status.ACTIVE);
+    dessertItem.setCondition(Condition.NEW);
+    dessertItem.setForSale(true);
+    itemRepository.save(dessertItem);
+
+    Item sheepItem = new Item();
+    sheepItem.setTitle("Wooly Sheep");
+    sheepItem.setDescription("Friendly sheep available for petting or wool");
+    sheepItem.setSubCategory(balls); // Example category
+    sheepItem.setPrice(new BigDecimal("3000"));
+    sheepItem.setPublishedAt(LocalDateTime.now().minusDays(1));
+    sheepItem.setLocation(new Location("5000", "Vestland", "Bergen", "60.39299", "5.32415"));
+    sheepItem.setTags(List.of("sheep", "wool", "animal"));
+    sheepItem.setSeller(userB);
+    sheepItem.setListingType(ListingType.BID);
+    sheepItem.setStatus(Status.ACTIVE);
+    sheepItem.setCondition(Condition.GOOD);
+    sheepItem.setForSale(true);
+    itemRepository.save(sheepItem);
+
+    Item shoesItem = new Item();
+    shoesItem.setTitle("Sporty Shoes");
+    shoesItem.setDescription("Durable and stylish shoes for running and gym");
+    shoesItem.setSubCategory(shoes);
+    shoesItem.setPrice(new BigDecimal("399.99"));
+    shoesItem.setPublishedAt(LocalDateTime.now().minusHours(5));
+    shoesItem.setLocation(new Location("6000", "Møre og Romsdal", "Ålesund", "62.4722", "6.1499"));
+    shoesItem.setTags(List.of("shoes", "sports", "running"));
+    shoesItem.setSeller(userA);
+    shoesItem.setListingType(ListingType.DIRECT);
+    shoesItem.setStatus(Status.ACTIVE);
+    shoesItem.setCondition(Condition.NEW);
+    shoesItem.setForSale(true);
+    itemRepository.save(shoesItem);
+
+    Item bikeItem = new Item();
+    bikeItem.setTitle("Mountain Bike");
+    bikeItem.setDescription("Used mountain bike in great condition");
+    bikeItem.setSubCategory(bikes);
+    bikeItem.setPrice(new BigDecimal("1200"));
+    bikeItem.setPublishedAt(LocalDateTime.now().minusDays(4));
+    bikeItem.setLocation(new Location("7000", "Trøndelag", "Trondheim", "63.4305", "10.3951"));
+    bikeItem.setTags(List.of("bike", "mountain", "cycling"));
+    bikeItem.setSeller(userA);
+    bikeItem.setListingType(ListingType.BID);
+    bikeItem.setStatus(Status.ACTIVE);
+    bikeItem.setCondition(Condition.ACCEPTABLE);
+    bikeItem.setForSale(true);
+    itemRepository.save(bikeItem);
+
+    // === Images for new items ===
+    List<Image> newImages = new ArrayList<>();
+    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1742651143/samples/food/dessert.jpg", "samples/food/dessert", "Yummy dessert", dessertItem));
+    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1742651143/samples/sheep.jpg", "samples/sheep", "Wooly sheep", sheepItem));
+    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1742651144/samples/ecommerce/shoes.png", "samples/ecommerce/shoes", "Sporty shoes", shoesItem));
+    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1742651144/samples/bike.jpg", "samples/bike", "Mountain bike", bikeItem));
+    imageRepository.saveAll(newImages);
+
+    dessertItem.setImages(List.of(newImages.get(0)));
+    sheepItem.setImages(List.of(newImages.get(1)));
+    shoesItem.setImages(List.of(newImages.get(2)));
+    bikeItem.setImages(List.of(newImages.get(3)));
+
+    itemRepository.saveAll(List.of(dessertItem, sheepItem, shoesItem, bikeItem));
     // 5: Create test chat room
     String chatId = chatRoomServiceImpl.getChatRoomId(userA.getEmail(), userB.getEmail(), item.getItemId(), true).orElseThrow();
     ChatMessage chatMessage = ChatMessage.builder()

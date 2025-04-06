@@ -7,6 +7,5 @@ import lombok.Setter;
 @Setter
 public class ImageDto {
   private String url;
-  private String caption;
   private String publicId;
 }
