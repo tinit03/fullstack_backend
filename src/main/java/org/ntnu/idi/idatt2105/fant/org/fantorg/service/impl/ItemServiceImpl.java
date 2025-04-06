@@ -17,6 +17,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemSearchFilter;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemSearchResponse;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.item.ItemNotFoundException;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
@@ -35,6 +36,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BookmarkService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BringService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.CloudinaryService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ItemService;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.specification.ItemFacetCountUtil;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.specification.ItemSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +63,8 @@ public class ItemServiceImpl implements ItemService {
   private final BringService bringService;
 
   private final Logger logger = LoggerFactory.getLogger(ItemServiceImpl.class);
+  private final ItemFacetCountUtil facetUtil;
+
 
   @Override
   public Item createItem(ItemCreateDto dto, User seller) {
@@ -254,44 +258,29 @@ public class ItemServiceImpl implements ItemService {
   }
 
   @Override
-  public Page<ItemDto> searchItems(
-      ItemSearchFilter itemSearchFilter,
+  public ItemSearchResponse searchItems(
+      ItemSearchFilter filter,
       Pageable pageable,
       User user
   ) {
-    Specification<Item> spec = ItemSpecification.hasStatus(Status.ACTIVE);
-    if (itemSearchFilter.getKeyword()!= null && !itemSearchFilter.getKeyword().isBlank()) {
-      String[] tokens = itemSearchFilter.getKeyword().toLowerCase().split(" ");
-      for (String token : tokens) {
-        spec = spec.and(ItemSpecification.hasKeyWordInAnyField(token));
-      }
-    } if (itemSearchFilter.getCategoryId() != null) {
-      spec = spec.and(ItemSpecification.hasCategory(itemSearchFilter.getCategoryId()));
-    }
-    if (itemSearchFilter.getSubCategoryId() != null) {
-      spec = spec.and(ItemSpecification.hasSubCategory(itemSearchFilter.getSubCategoryId()));
-    }
-    if (itemSearchFilter.getCondition()!= null) {
-      spec = spec.and(ItemSpecification.hasCondition(itemSearchFilter.getCondition()));
-    }
-    if (itemSearchFilter.getCounty()!= null && !itemSearchFilter.getCounty().isBlank()) {
-      spec = spec.and(ItemSpecification.isInCounty(itemSearchFilter.getCounty()));
-    }
-    Double min = itemSearchFilter.getMinPrice();
-    Double max = itemSearchFilter.getMaxPrice();
+    Specification<Item> fullSpec = buildItemSpec(filter, null);
 
-    if (min != null || max != null) {
-      BigDecimal minPrice = min != null ? BigDecimal.valueOf(min) : null;
-      BigDecimal maxPrice = max != null ? BigDecimal.valueOf(max) : null;
-      spec = spec.and(ItemSpecification.hasPriceBetween(minPrice, maxPrice));
-    }
-    if (itemSearchFilter.getType() != null) {
-      spec = spec.and(ItemSpecification.hasListingType(itemSearchFilter.getType()));
-    }
-
-    Page<Item> items = itemRepository.findAll(spec, pageable);
+    Page<Item> items = itemRepository.findAll(fullSpec, pageable);
     Page<ItemDto> dto = items.map(ItemMapper::toItemDto);
-    return markDtosWithBookmarkStatus(dto,user);
+    dto = markDtosWithBookmarkStatus(dto,user);
+    ItemSearchResponse response = new ItemSearchResponse();
+    response.setItems(dto);
+    response.setConditionFacet(facetUtil.getEnumFacetCounts(
+        buildItemSpec(filter, "condition"), "condition", Condition.class));
+    response.setListingTypeFacet(facetUtil.getEnumFacetCounts(
+        buildItemSpec(filter, "listingType"), "listingType", ListingType.class));
+    response.setCountyFacet(facetUtil.getStringFacetCounts(
+        buildItemSpec(filter, "county"), "location.county"));
+    response.setCategoryFacet(facetUtil.getLongFacetCounts(
+        buildItemSpec(filter, "category"), "subCategory.parentCategory.id"));
+    response.setSubCategoryFacet(facetUtil.getLongFacetCounts(
+        buildItemSpec(filter, "subCategory"), "subCategory.id"));
+    return response;
   }
 
   @Override
@@ -315,5 +304,48 @@ public class ItemServiceImpl implements ItemService {
       dto.setIsBookmarked(bookmarkedIds.contains(dto.getId()));
     }
     return dtos;
+  }
+
+  private Specification<Item> buildItemSpec(ItemSearchFilter filter, String excludeField) {
+    Specification<Item> spec = ItemSpecification.hasStatus(Status.ACTIVE);
+
+    if (!"keyword".equals(excludeField) && filter.getKeyword() != null && !filter.getKeyword().isBlank()) {
+      String[] tokens = filter.getKeyword().toLowerCase().split(" ");
+      for (String token : tokens) {
+        spec = spec.and(ItemSpecification.hasKeyWordInAnyField(token));
+      }
+    }
+
+    if (!"category".equals(excludeField) && filter.getCategoryId() != null && !filter.getCategoryId().isEmpty()) {
+      spec = spec.and(ItemSpecification.hasCategoryIn(filter.getCategoryId()));
+    }
+
+    if (!"subCategory".equals(excludeField) && filter.getSubCategoryId() != null && !filter.getSubCategoryId().isEmpty()) {
+      spec = spec.and(ItemSpecification.hasSubCategoryIn(filter.getSubCategoryId()));
+    }
+
+    if (!"condition".equals(excludeField) && filter.getCondition() != null && !filter.getCondition().isEmpty()) {
+      spec = spec.and(ItemSpecification.hasConditionIn(filter.getCondition()));
+    }
+
+    if (!"county".equals(excludeField) && filter.getCounty() != null && !filter.getCounty().isEmpty()) {
+      spec = spec.and(ItemSpecification.isInCounties(filter.getCounty()));
+    }
+
+    if (!"price".equals(excludeField)) {
+      Double min = filter.getMinPrice();
+      Double max = filter.getMaxPrice();
+      if (min != null || max != null) {
+        BigDecimal minPrice = min != null ? BigDecimal.valueOf(min) : null;
+        BigDecimal maxPrice = max != null ? BigDecimal.valueOf(max) : null;
+        spec = spec.and(ItemSpecification.hasPriceBetween(minPrice, maxPrice));
+      }
+    }
+
+    if (!"listingType".equals(excludeField) && filter.getType() != null && !filter.getType().isEmpty()) {
+      spec = spec.and(ItemSpecification.hasListingTypeIn(filter.getType()));
+    }
+
+    return spec;
   }
 }
