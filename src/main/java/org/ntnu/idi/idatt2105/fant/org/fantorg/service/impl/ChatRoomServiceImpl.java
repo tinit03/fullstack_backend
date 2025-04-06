@@ -2,6 +2,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -102,24 +103,32 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     chatRooms.forEach(chatRoom -> {
       Item item = itemService.getItemById(chatRoom.getItem().getItemId());
       User recipient = userService.findByEmail(chatRoom.getRecipient().getEmail());
-      ChatMessage lastMessage = chatMessageRepository.findBySenderAndRecipientAndItem(sender, recipient, item).getLast();
-      //log.info("got message {}", lastMessage.getContent());
-      //log.info("creating dto");
-      ChatDto chat =
-          ChatDto.builder()
-              .lastMessageContent(lastMessage.getContent())
-              .lastMessageTimestamp(lastMessage.getTimestamp())
-              .lastSenderId(lastMessage.getSender().getEmail())
-              .senderId(senderId)
-              .recipientId(recipient.getEmail())
-              .itemId(item.getItemId())
-              .status(item.getStatus())
-              .image(null)
-              .itemTitle(item.getTitle())
-              .recipientProfilePic(null)
-              .build();
-      chats.add(chat);
-      //log.info("finish creating dto");
+      List<ChatMessage> messages;
+      ChatMessage lastMessage;
+      messages = chatMessageRepository.findBySenderAndRecipientAndItem(sender, recipient, item);
+      if (messages.isEmpty()) {
+        messages = chatMessageRepository.findBySenderAndRecipientAndItem(recipient, sender, item);
+      }
+      if (!messages.isEmpty()) {
+        lastMessage = messages.getLast();
+        //log.info("got message {}", lastMessage.getContent());
+        //log.info("creating dto");
+        ChatDto chat =
+            ChatDto.builder()
+                .lastMessageContent(lastMessage.getContent())
+                .lastMessageTimestamp(lastMessage.getTimestamp())
+                .lastSenderId(lastMessage.getSender().getEmail())
+                .senderId(senderId)
+                .recipientId(recipient.getEmail())
+                .itemId(item.getItemId())
+                .status(item.getStatus())
+                .image(null)
+                .itemTitle(item.getTitle())
+                .recipientProfilePic(null)
+                .build();
+        chats.add(chat);
+        //log.info("finish creating dto");
+      }
     });
     return chats;
   }
