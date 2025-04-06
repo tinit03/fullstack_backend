@@ -10,11 +10,11 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 @Setter
 public class ItemSearchFilter {
   private String keyword;
-  private List<Long> categoryId;
-  private List<Long> subCategoryId;
-  private List<Condition> condition;
-  private List<String> county;
+  private String categoryId;
+  private String subCategoryId;
+  private String condition;
+  private String county;
   private Double minPrice;
   private Double maxPrice;
-  private List<ListingType> type;
+  private String type;
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -316,34 +317,56 @@ public class ItemServiceImpl implements ItemService {
       }
     }
 
-    if (!"category".equals(excludeField) && filter.getCategoryId() != null && !filter.getCategoryId().isEmpty()) {
-      spec = spec.and(ItemSpecification.hasCategoryIn(filter.getCategoryId()));
+    if (!"category".equals(excludeField) && filter.getCategoryId() != null && !filter.getCategoryId().isBlank()) {
+      List<Long> categoryIds = Arrays.stream(filter.getCategoryId().split(","))
+          .map(String::trim)
+          .filter(s -> !s.isBlank())
+          .map(Long::parseLong)
+          .toList();
+      spec = spec.and(ItemSpecification.hasCategoryIn(categoryIds));
     }
 
-    if (!"subCategory".equals(excludeField) && filter.getSubCategoryId() != null && !filter.getSubCategoryId().isEmpty()) {
-      spec = spec.and(ItemSpecification.hasSubCategoryIn(filter.getSubCategoryId()));
+    if (!"subCategory".equals(excludeField) && filter.getSubCategoryId() != null && !filter.getSubCategoryId().isBlank()) {
+      List<Long> subCategoryIds = Arrays.stream(filter.getSubCategoryId().split(","))
+          .map(String::trim)
+          .filter(s -> !s.isBlank())
+          .map(Long::parseLong)
+          .toList();
+      spec = spec.and(ItemSpecification.hasSubCategoryIn(subCategoryIds));
     }
 
-    if (!"condition".equals(excludeField) && filter.getCondition() != null && !filter.getCondition().isEmpty()) {
-      spec = spec.and(ItemSpecification.hasConditionIn(filter.getCondition()));
+    if (!"condition".equals(excludeField) && filter.getCondition() != null && !filter.getCondition().isBlank()) {
+      List<Condition> conditions = Arrays.stream(filter.getCondition().split(","))
+          .map(String::trim)
+          .filter(s -> !s.isBlank())
+          .map(String::toUpperCase)
+          .map(Condition::valueOf)
+          .toList();
+      spec = spec.and(ItemSpecification.hasConditionIn(conditions));
     }
 
-    if (!"county".equals(excludeField) && filter.getCounty() != null && !filter.getCounty().isEmpty()) {
-      spec = spec.and(ItemSpecification.isInCounties(filter.getCounty()));
+    if (!"county".equals(excludeField) && filter.getCounty() != null && !filter.getCounty().isBlank()) {
+      List<String> counties = Arrays.stream(filter.getCounty().split(","))
+          .map(String::trim)
+          .filter(s -> !s.isBlank())
+          .toList();
+      spec = spec.and(ItemSpecification.isInCounties(counties));
     }
 
     if (!"price".equals(excludeField)) {
-      Double min = filter.getMinPrice();
-      Double max = filter.getMaxPrice();
-      if (min != null || max != null) {
-        BigDecimal minPrice = min != null ? BigDecimal.valueOf(min) : null;
-        BigDecimal maxPrice = max != null ? BigDecimal.valueOf(max) : null;
-        spec = spec.and(ItemSpecification.hasPriceBetween(minPrice, maxPrice));
-      }
+      BigDecimal min = filter.getMinPrice() != null ? BigDecimal.valueOf(filter.getMinPrice()) : null;
+      BigDecimal max = filter.getMaxPrice() != null ? BigDecimal.valueOf(filter.getMaxPrice()) : null;
+      spec = spec.and(ItemSpecification.hasPriceBetween(min, max));
     }
 
-    if (!"listingType".equals(excludeField) && filter.getType() != null && !filter.getType().isEmpty()) {
-      spec = spec.and(ItemSpecification.hasListingTypeIn(filter.getType()));
+    if (!"listingType".equals(excludeField) && filter.getType() != null && !filter.getType().isBlank()) {
+      List<ListingType> types = Arrays.stream(filter.getType().split(","))
+          .map(String::trim)
+          .filter(s -> !s.isBlank())
+          .map(String::toUpperCase)
+          .map(ListingType::valueOf)
+          .toList();
+      spec = spec.and(ItemSpecification.hasListingTypeIn(types));
     }
 
     return spec;
