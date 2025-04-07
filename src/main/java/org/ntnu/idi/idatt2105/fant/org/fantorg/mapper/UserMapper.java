@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatProfileDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 
 public class UserMapper {
@@ -19,10 +20,13 @@ public class UserMapper {
   }
 
   public static ChatProfileDto toChatProfileDto(User user) {
-   return ChatProfileDto.builder()
-       .url("test")
-       .fullName(user.getFirstName() + " " + user.getLastName())
-       .build();
+    ChatProfileDto dto = new ChatProfileDto();
+    dto.setFullName(user.getFirstName() + " " + user.getLastName());
+
+    if (user.getProfileImage() != null) {
+      dto.setUrl(ImageMapper.toDto(user.getProfileImage()).getUrl());
+    }
+    return dto;
   }
 
   public static List<UserDto> toDtoList(List<User> users) {
