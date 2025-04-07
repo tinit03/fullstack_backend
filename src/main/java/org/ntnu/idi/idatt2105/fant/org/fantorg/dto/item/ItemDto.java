@@ -38,4 +38,5 @@ public class ItemDto {
   private boolean forSale;
   private List<ImageItemDto> images;
   private Boolean isBookmarked = false;
+  private Boolean isOwner = false;
 }

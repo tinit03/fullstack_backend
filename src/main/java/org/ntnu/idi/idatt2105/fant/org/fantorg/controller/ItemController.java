@@ -67,7 +67,7 @@ public class ItemController {
   ) {
     Sort sort = SortUtil.buildSort(sortField,sortDir);
     Pageable pageable = PageRequest.of(page, size, sort);
-    return itemService.getAllItems(pageable,user,status);
+    return itemService.getAllItems(pageable,status,user);
 
   }
 
