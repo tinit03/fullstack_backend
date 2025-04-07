@@ -273,8 +273,8 @@ public class ItemServiceImpl implements ItemService {
     response.setItems(dto);
     response.setConditionFacet(facetUtil.getEnumFacetCounts(
         buildItemSpec(filter, "condition"), "condition", Condition.class));
-    response.setListingTypeFacet(facetUtil.getEnumFacetCounts(
-        buildItemSpec(filter, "listingType"), "listingType", ListingType.class));
+    response.setForSaleFacet(facetUtil.getBooleanFacetCounts(
+        buildItemSpec(filter, "forSale"), "forSale"));
     response.setCountyFacet(facetUtil.getStringFacetCounts(
         buildItemSpec(filter, "county"), "location.county"));
     response.setCategoryFacet(facetUtil.getLongFacetCounts(

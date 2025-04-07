@@ -2,6 +2,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.specification;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
@@ -10,6 +11,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -78,6 +80,23 @@ public class ItemFacetCountUtil {
       }
     }
     return result;
+  }
+
+  public Map<String, Long> getBooleanFacetCounts(Specification<Item> spec, String field) {
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Tuple> query = cb.createTupleQuery();
+    Root<Item> root = query.from(Item.class);
+
+    query.multiselect(
+        cb.selectCase().when(cb.isTrue(root.get(field)), "true").otherwise("false").alias("value"),
+        cb.count(root).alias("count")
+    ).where(spec.toPredicate(root, query, cb)).groupBy(root.get(field));
+
+    return entityManager.createQuery(query).getResultList().stream()
+        .collect(Collectors.toMap(
+            t -> t.get("value", String.class),
+            t -> t.get("count", Long.class)
+        ));
   }
 
   private <T> Path<T> getNestedPath(Root<?> root, String field) {
