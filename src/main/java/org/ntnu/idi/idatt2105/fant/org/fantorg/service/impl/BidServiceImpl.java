@@ -31,7 +31,6 @@ public class BidServiceImpl implements BidService {
   private final BidRepository bidRepository;
   private final ItemRepository itemRepository;
   private final OrderRepository orderRepository;
-
   private final NotificationService notificationService;
   @Override
   public BidDto placeBid(BidCreateDto dto, User bidder) {
@@ -66,9 +65,14 @@ public class BidServiceImpl implements BidService {
     }
     bid.setStatus(BidStatus.ACCEPTED);
     bidRepository.save(bid);
-
     Order order = buildOrder(bid.getItem(), bid.getBidder());
     Order savedOrder = orderRepository.save(order);
+    Map<String, String> args = Map.of(
+        "user", seller.getFirstName() + " " + seller.getLastName(),
+        "item", bid.getItem().getTitle()
+    );
+    String link = "/items/" + savedOrder.getItem().getItemId();
+    notificationService.send(bid.getBidder(), args, NotificationType.BID_ACCEPTED, link);
     return OrderMapper.toDto(savedOrder);
   }
 
