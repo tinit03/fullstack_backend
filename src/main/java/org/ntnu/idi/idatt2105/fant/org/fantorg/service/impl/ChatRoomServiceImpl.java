@@ -69,7 +69,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
    */
   private String createChatId(User sender, User recipient, Item item) {
     //log.info("Creatnig chatId");
-    String chatId = String.format("%s - %s - %s", sender.getEmail(), recipient.getEmail(), item.getItemId());
+    String chatId = String.format("%s_%s_%s", sender.getEmail(), recipient.getEmail(), item.getItemId());
 
     ChatRoom senderRecipient = ChatRoom
         .builder()
@@ -105,9 +105,11 @@ public class ChatRoomServiceImpl implements ChatRoomService {
       User recipient = userService.findByEmail(chatRoom.getRecipient().getEmail());
       List<ChatMessage> messages;
       ChatMessage lastMessage;
-      messages = chatMessageRepository.findBySenderAndRecipientAndItem(sender, recipient, item);
+      String chatId = String.format("%s_%s_%s", sender.getEmail(), recipient.getEmail(), item.getItemId());
+      messages = chatMessageRepository.findByChatId(chatId);
       if (messages.isEmpty()) {
-        messages = chatMessageRepository.findBySenderAndRecipientAndItem(recipient, sender, item);
+        chatId = String.format("%s_%s_%s", recipient.getEmail(), sender.getEmail(), item.getItemId());
+        messages = chatMessageRepository.findByChatId(chatId);
       }
       if (!messages.isEmpty()) {
         lastMessage = messages.getLast();
