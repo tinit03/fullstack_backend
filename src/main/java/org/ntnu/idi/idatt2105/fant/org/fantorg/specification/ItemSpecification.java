@@ -38,6 +38,10 @@ public class ItemSpecification {
     return (root, query, cb) -> cb.equal(root.get("seller"), seller);
   }
 
+  public static Specification<Item> hasNotSeller(User seller) {
+    return (root, query, cb) -> cb.notEqual(root.get("seller"), seller);
+  }
+
   public static Specification<Item> hasCategoryIn(List<Long> categoryIds) {
     return (root, query, cb) ->
         root.get("subCategory").get("parentCategory").get("id").in(categoryIds);

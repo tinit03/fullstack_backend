@@ -239,13 +239,18 @@ public class ItemServiceImpl implements ItemService {
     if(bookmarkService.isBookmarked(user,id)){
       dto.setIsBookmarked(true);
     }
+    if(user.getId().equals(item.getSeller().getId())){
+      dto.setIsOwner(true);
+    }
     return dto;
   }
 
   @Override
-  public Page<ItemDto> getAllItems(Pageable pageable, User user, Status status) {
+  public Page<ItemDto> getAllItems(Pageable pageable, Status status, User user) {
     Specification<Item> spec = Specification.where(null);
-    //Vanlig filtrering når status er satt til en verdi e.g. status=ACTIVE eller status=SOLD
+    if(user!=null){
+      spec = spec.and(ItemSpecification.hasNotSeller(user));
+    }
     if (status != null && status != Status.INACTIVE) {
       spec = spec.and(ItemSpecification.hasStatus(status));
     } else if (status==null) {
