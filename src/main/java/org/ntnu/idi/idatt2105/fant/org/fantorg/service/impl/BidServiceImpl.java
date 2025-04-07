@@ -3,6 +3,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.bid.BidCreateDto;
@@ -16,10 +17,12 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Order;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.BidStatus;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.NotificationType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.BidRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.OrderRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BidService;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.NotificationService;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,6 +32,7 @@ public class BidServiceImpl implements BidService {
   private final ItemRepository itemRepository;
   private final OrderRepository orderRepository;
 
+  private final NotificationService notificationService;
   @Override
   public BidDto placeBid(BidCreateDto dto, User bidder) {
     Item item = itemRepository.findById(dto.getItemId())
@@ -36,6 +40,11 @@ public class BidServiceImpl implements BidService {
     if(item.getListingType()!= ListingType.BID) {
       throw new IllegalArgumentException("Item listed is not biddable");
     }
+
+    Map<String, String> args = Map.of("user", bidder.getFirstName() +" "+bidder.getLastName()
+        , "item", item.getTitle());
+    String link = "/items/" + item.getItemId();
+    notificationService.send(item.getSeller(),args, NotificationType.NEW_BID,link);
     Bid bid = BidMapper.toBid(dto, item, bidder);
     Bid savedBid = bidRepository.save(bid);
     return BidMapper.toDto(savedBid);

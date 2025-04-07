@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageCreateDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageItemUploadDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
@@ -80,7 +80,7 @@ public class ItemServiceImpl implements ItemService {
       return savedItem;
     }
 
-    for (ImageCreateDto imgDto : dto.getImages()) {
+    for (ImageItemUploadDto imgDto : dto.getImages()) {
       try {
         Map<String, String> result = cloudinaryService.uploadBase64Image(imgDto.getUrl());
         Image image = new Image();
@@ -242,10 +242,14 @@ public class ItemServiceImpl implements ItemService {
     if(user!=null){
       spec = spec.and(ItemSpecification.hasNotSeller(user));
     }
-    if (status != null) {
+    if (status != null && status != Status.INACTIVE) {
       spec = spec.and(ItemSpecification.hasStatus(status));
-    }
-    Page<Item> pageItem = itemRepository.findAll(spec, pageable);
+    } else if (status==null) {
+      // Om det er ikke satt noe filter, så sender den alle aktive og solgte
+      spec = spec.and(ItemSpecification.hasStatusIn(Status.ACTIVE,Status.SOLD));
+    } else throw new IllegalArgumentException("Inactive items are private");
+
+    Page<Item> pageItem = itemRepository.findAll(spec,pageable);
     Page<ItemDto> pageDto = pageItem.map(ItemMapper::toItemDto);
     return markDtosWithBookmarkStatus(pageDto,user);
   }

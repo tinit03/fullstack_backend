@@ -4,15 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Review;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
@@ -41,7 +36,7 @@ public class ItemDto {
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   private Status status;
   private boolean forSale;
-  private List<ImageDto> images;
+  private List<ImageItemDto> images;
   private Boolean isBookmarked = false;
   private Boolean isOwner = false;
 }

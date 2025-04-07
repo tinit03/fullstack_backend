@@ -26,7 +26,9 @@ public class ItemSpecification {
   public static Specification<Item> hasStatus(Status status) {
     return (root, query, cb) -> cb.equal(root.get("status"), status);
   }
-
+  public static Specification<Item> hasStatusIn(Status... statuses) {
+    return (root, query, cb) -> root.get("status").in((Object[]) statuses);
+  }
   public static Specification<Item> hasSeller(User seller) {
     return (root, query, cb) -> cb.equal(root.get("seller"), seller);
   }

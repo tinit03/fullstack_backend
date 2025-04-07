@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,10 @@ public class Category {
   @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
   private List<Category> subCategories = new ArrayList<>();
 
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "image_id")
+  private Image image;
   // to check if it's a subcategory
   public boolean isLeaf() {
     return subCategories == null || subCategories.isEmpty();

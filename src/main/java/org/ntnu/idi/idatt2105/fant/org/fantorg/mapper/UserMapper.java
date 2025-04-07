@@ -2,9 +2,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.mapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 
 public class UserMapper {
@@ -15,7 +13,7 @@ public class UserMapper {
     dto.setFullName(user.getFirstName()+" "+user.getLastName());
     dto.setFirstName(user.getFirstName());
     dto.setLastName(user.getLastName());
-    dto.setProfilePicture(ImageMapper.toProfileDto(user.getProfileImage()));
+    dto.setProfilePicture(ImageMapper.toDto(user.getProfileImage()));
     return dto;
   }
 

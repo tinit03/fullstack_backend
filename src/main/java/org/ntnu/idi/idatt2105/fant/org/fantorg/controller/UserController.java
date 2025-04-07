@@ -3,17 +3,14 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageProfileUploadDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageUploadDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UpdatePasswordDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.UserMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +35,7 @@ public class UserController {
 
   @PostMapping("/profilePicture")
   public ResponseEntity<UserDto> uploadProfilePicture(
-      @RequestBody @Validated ImageProfileUploadDto dto,
+      @RequestBody @Validated ImageUploadDto dto,
       @AuthenticationPrincipal User user
   ) {
     User updatedUser = userService.updateProfilePicture(dto.getUrl(), user);
