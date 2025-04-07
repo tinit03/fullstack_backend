@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +36,18 @@ public class NotificationController {
   @PatchMapping("/{id}/read")
   public ResponseEntity<Void> markAsRead(@PathVariable Long id, @AuthenticationPrincipal User user) {
     notificationService.markAsRead(id, user);
+    return ResponseEntity.noContent().build();
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteNotification(@PathVariable Long id, @AuthenticationPrincipal User user){
+    notificationService.deleteNotification(id, user);
+    return ResponseEntity.noContent().build();
+  }
+
+  @DeleteMapping("/me")
+  public ResponseEntity<Void> deleteAllNotifications(@AuthenticationPrincipal User user) {
+    notificationService.deleteAll(user);
     return ResponseEntity.noContent().build();
   }
 }
