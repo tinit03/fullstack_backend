@@ -1,5 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,4 +23,6 @@ private String senderId;
   private Long itemId;
 
   private String content;
+
+  private LocalDateTime timestamp;
 }

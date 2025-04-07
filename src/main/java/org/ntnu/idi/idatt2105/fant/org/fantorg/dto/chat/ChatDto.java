@@ -24,7 +24,7 @@ public class ChatDto {
     private String recipientId;
     private long itemId;
     private Status status;
-    private ImageDto image;
+    private String image;
     private String itemTitle;
-    private ImageDto recipientProfilePic;
+    private String recipientProfilePic;
 }

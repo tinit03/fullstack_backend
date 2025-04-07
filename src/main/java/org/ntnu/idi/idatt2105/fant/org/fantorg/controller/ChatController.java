@@ -1,5 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,6 +74,7 @@ public class ChatController {
             .recipientId(savedMsgDto.getRecipientId())
             .itemId(savedMsgDto.getItemId())
             .content(savedMsgDto.getContent())
+            .timestamp(LocalDateTime.now())
             .build()
     );
     log.info("Sent to recipient");

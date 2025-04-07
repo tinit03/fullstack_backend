@@ -124,12 +124,17 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .recipientId(recipient.getEmail())
                 .itemId(item.getItemId())
                 .status(item.getStatus())
-                .image(null)
                 .itemTitle(item.getTitle())
-                .recipientProfilePic(null)
                 .build();
         chats.add(chat);
-        //log.info("finish creating dto");
+
+        if (!item.getImages().isEmpty()) {
+          chat.setImage(item.getImages().getFirst().getUrl());
+        }
+
+        if (recipient.getProfileImage() != null) {
+          chat.setRecipientProfilePic(recipient.getProfileImage().getUrl());
+        }
       }
     });
     return chats;
