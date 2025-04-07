@@ -359,14 +359,8 @@ public class ItemServiceImpl implements ItemService {
       spec = spec.and(ItemSpecification.hasPriceBetween(min, max));
     }
 
-    if (!"listingType".equals(excludeField) && filter.getType() != null && !filter.getType().isBlank()) {
-      List<ListingType> types = Arrays.stream(filter.getType().split(","))
-          .map(String::trim)
-          .filter(s -> !s.isBlank())
-          .map(String::toUpperCase)
-          .map(ListingType::valueOf)
-          .toList();
-      spec = spec.and(ItemSpecification.hasListingTypeIn(types));
+    if (!"forSale".equals(excludeField) && filter.getForSale() != null) {
+      spec = spec.and(ItemSpecification.hasForSale(filter.getForSale()));
     }
 
     return spec;

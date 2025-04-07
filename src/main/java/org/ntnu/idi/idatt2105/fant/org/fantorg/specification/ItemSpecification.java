@@ -74,7 +74,7 @@ public class ItemSpecification {
       }
     };
   }
-  public static Specification<Item> hasListingTypeIn(List<ListingType> types) {
-    return (root, query, cb) -> root.get("listingType").in(types);
+  public static Specification<Item> hasForSale(boolean forSale) {
+    return (root, query, cb) -> cb.equal(root.get("forSale"), forSale);
   }
 }
