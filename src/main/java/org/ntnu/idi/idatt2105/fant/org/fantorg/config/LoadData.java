@@ -19,6 +19,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +40,7 @@ public class LoadData implements CommandLineRunner {
    * @throws Exception on error
    */
   @Override
+  @Profile("test")
   public void run(String... args) throws Exception {
 
     // 1. Create test user
@@ -51,18 +53,18 @@ public class LoadData implements CommandLineRunner {
     userRepository.save(user);
 
     User a = new User();
-    a.setEmail("b@b");
+    a.setEmail("JohnDoe@mail.com");
     a.setPassword(passwordEncoder.encode("password"));
-    a.setFirstName("Test");
-    a.setLastName("User");
+    a.setFirstName("John");
+    a.setLastName("Doe");
     a.setRole(Role.USER);
     userRepository.save(a);
 
     User otherUser = new User();
-    otherUser.setEmail("a@a");
+    otherUser.setEmail("alicesmith@mail.com");
     otherUser.setPassword(passwordEncoder.encode("password"));
-    otherUser.setFirstName("Test");
-    otherUser.setLastName("User");
+    otherUser.setFirstName("Alice");
+    otherUser.setLastName("Smith");
     otherUser.setRole(Role.USER);
     userRepository.save(otherUser);
 
