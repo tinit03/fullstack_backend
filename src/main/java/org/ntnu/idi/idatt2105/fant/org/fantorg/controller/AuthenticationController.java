@@ -1,5 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.JwtTokenDto;
@@ -20,7 +21,9 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.service.PasswordResetService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.RefreshTokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -98,5 +101,18 @@ public class AuthenticationController {
     User user = refreshToken.getUser();
     String newAccessToken = jwtService.generateToken(user, 30); // 30 min access token
     return ResponseEntity.ok(new AuthenticationResponse(newAccessToken, requestToken));
+  }
+  @PreAuthorize("isAuthenticated()")
+  @PostMapping("/logout")
+  public ResponseEntity<String> logout(@AuthenticationPrincipal User user) {
+    if (user == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+    }
+    try {
+      userService.logout(user);
+      return ResponseEntity.ok("Logged out successfully");
+    } catch (EntityNotFoundException ex) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    }
   }
 }

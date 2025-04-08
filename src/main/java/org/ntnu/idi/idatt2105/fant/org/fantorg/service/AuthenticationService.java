@@ -46,4 +46,7 @@ public class AuthenticationService {
     String refreshToken = refreshTokenService.createToken(user).getToken();
     return new AuthenticationResponse(accessToken,refreshToken);
   }
+  public void logout(User user) {
+    refreshTokenService.revokeToken(user);
+  }
 }

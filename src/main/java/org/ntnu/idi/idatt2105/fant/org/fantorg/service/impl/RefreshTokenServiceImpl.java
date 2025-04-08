@@ -36,6 +36,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         .orElseThrow(() -> new EntityNotFoundException("Token not found"));
 
     if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+      refreshTokenRepository.delete(refreshToken);
       throw new IllegalArgumentException("Refresh token is expired");
     } else return refreshToken;
   }
