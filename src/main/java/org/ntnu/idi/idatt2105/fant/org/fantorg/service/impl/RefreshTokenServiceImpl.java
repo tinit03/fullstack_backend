@@ -2,6 +2,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.RefreshToken;
@@ -10,18 +11,31 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.RefreshTokenRepository
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.RefreshTokenService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
   private final RefreshTokenRepository refreshTokenRepository;
   @Override
+  @Transactional
   public RefreshToken createToken(User user) {
-    RefreshToken token = new RefreshToken();
-    token.setUser(user);
-    token.setToken(UUID.randomUUID().toString());
-    token.setExpiryDate(LocalDateTime.now().plusDays(7));
-    return refreshTokenRepository.save(token);
+    Optional<RefreshToken> existingTokenOpt = refreshTokenRepository.findByUser(user);
+
+    if (existingTokenOpt.isPresent()) {
+      RefreshToken existingToken = existingTokenOpt.get();
+      existingToken.setToken(UUID.randomUUID().toString());
+      existingToken.setExpiryDate(LocalDateTime.now().plusDays(7));
+      existingToken.setUsed(false);
+      return refreshTokenRepository.save(existingToken);
+    } else {
+      // Create and save a new refresh token if none exists
+      RefreshToken token = new RefreshToken();
+      token.setUser(user);
+      token.setToken(UUID.randomUUID().toString());
+      token.setExpiryDate(LocalDateTime.now().plusDays(7));
+      return refreshTokenRepository.save(token);
+    }
   }
 
   @Override
