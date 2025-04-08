@@ -14,6 +14,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.UserMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.RefreshTokenRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.CloudinaryService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ImageService;
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
   private final CloudinaryService cloudinaryService;
   private final ImageService imageService;
   private final PasswordEncoder passwordEncoder;
-  private final ImageRepository imageRepository;
+  private final RefreshTokenRepository tokenRepository;
 
   private final ReviewService reviewService;
 
