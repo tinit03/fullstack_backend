@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +47,7 @@ public class AuthenticationService {
     String refreshToken = refreshTokenService.createToken(user).getToken();
     return new AuthenticationResponse(accessToken,refreshToken);
   }
+  @Transactional
   public void logout(User user) {
     refreshTokenService.revokeToken(user);
   }
