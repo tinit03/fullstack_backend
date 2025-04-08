@@ -286,6 +286,8 @@ public class ItemServiceImpl implements ItemService {
         buildItemSpec(filter, "category"), "subCategory.parentCategory.id"));
     response.setSubCategoryFacet(facetUtil.getLongFacetCounts(
         buildItemSpec(filter, "subCategory"), "subCategory.id"));
+    response.setPublishedTodayFacet(facetUtil.getPublishedTodayFacetCounts(
+        buildItemSpec(filter, "onlyToday")));
     return response;
   }
 
@@ -366,6 +368,10 @@ public class ItemServiceImpl implements ItemService {
 
     if (!"forSale".equals(excludeField) && filter.getForSale() != null) {
       spec = spec.and(ItemSpecification.hasForSale(filter.getForSale()));
+    }
+
+    if (!"onlyToday".equals(excludeField) && filter.getOnlyToday() != null) {
+      spec = spec.and(ItemSpecification.isPublishedToday());
     }
 
     return spec;

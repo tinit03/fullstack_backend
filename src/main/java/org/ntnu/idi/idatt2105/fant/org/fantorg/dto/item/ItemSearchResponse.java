@@ -15,4 +15,5 @@ public class ItemSearchResponse {
   private Map<String, Long> countyFacet;
   private Map<Long, Long> categoryFacet;
   private Map<Long, Long> subCategoryFacet;
+  private Map<String, Long> publishedTodayFacet;
 }

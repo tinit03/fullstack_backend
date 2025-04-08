@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
+import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -96,6 +97,26 @@ public class ItemFacetCountUtil {
         .collect(Collectors.toMap(
             t -> t.get("value", String.class),
             t -> t.get("count", Long.class)
+        ));
+  }
+  public Map<String, Long> getPublishedTodayFacetCounts(Specification<Item> spec) {
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Tuple> query = cb.createTupleQuery();
+    Root<Item> root = query.from(Item.class);
+
+    query.multiselect(
+            root.get("publishedAt").alias("publishedAt"),
+            cb.count(root).alias("count")
+        ).where(spec.toPredicate(root, query, cb))
+        .groupBy(root.get("publishedAt"));
+
+    // Process results
+    LocalDateTime todayStart = LocalDateTime.now().toLocalDate().atStartOfDay();
+
+    return entityManager.createQuery(query).getResultList().stream()
+        .collect(Collectors.groupingBy(
+            t -> t.get("publishedAt", LocalDateTime.class).isAfter(todayStart) ? "true" : "false",
+            Collectors.summingLong(t -> t.get("count", Long.class))
         ));
   }
 

@@ -3,6 +3,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.specification;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
@@ -80,5 +81,13 @@ public class ItemSpecification {
   }
   public static Specification<Item> hasForSale(boolean forSale) {
     return (root, query, cb) -> cb.equal(root.get("forSale"), forSale);
+  }
+
+  public static Specification<Item> isPublishedToday() {
+    return (root, query, cb) -> {
+      LocalDateTime startOfDay = LocalDateTime.now().toLocalDate().atStartOfDay();
+      LocalDateTime endOfDay = startOfDay.plusDays(1);
+      return cb.between(root.get("publishedAt"), startOfDay, endOfDay);
+    };
   }
 }
