@@ -269,25 +269,19 @@ public class ItemServiceImpl implements ItemService {
       Pageable pageable,
       User user
   ) {
-    Specification<Item> fullSpec = buildItemSpec(filter, null);
-    if(user!=null) fullSpec = fullSpec.and(ItemSpecification.hasNotSeller(user));
+    Specification<Item> baseSpec = buildItemSpec(filter, null);
+    Specification<Item> fullSpec = (user != null) ? baseSpec.and(ItemSpecification.hasNotSeller(user)) : baseSpec;
     Page<Item> items = itemRepository.findAll(fullSpec, pageable);
     Page<ItemDto> dto = items.map(ItemMapper::toItemDto);
     dto = markDtosWithBookmarkStatus(dto,user);
     ItemSearchResponse response = new ItemSearchResponse();
     response.setItems(dto);
-    response.setConditionFacet(facetUtil.getEnumFacetCounts(
-        buildItemSpec(filter, "condition"), "condition", Condition.class));
-    response.setForSaleFacet(facetUtil.getBooleanFacetCounts(
-        buildItemSpec(filter, "forSale"), "forSale"));
-    response.setCountyFacet(facetUtil.getStringFacetCounts(
-        buildItemSpec(filter, "county"), "location.county"));
-    response.setCategoryFacet(facetUtil.getLongFacetCounts(
-        buildItemSpec(filter, "category"), "subCategory.parentCategory.id"));
-    response.setSubCategoryFacet(facetUtil.getLongFacetCounts(
-        buildItemSpec(filter, "subCategory"), "subCategory.id"));
-    response.setPublishedTodayFacet(facetUtil.getPublishedTodayFacetCounts(
-        buildItemSpec(filter, "onlyToday")));
+    response.setConditionFacet(facetUtil.getEnumFacetCounts(fullSpec, "condition", Condition.class));
+    response.setForSaleFacet(facetUtil.getBooleanFacetCounts(fullSpec, "forSale"));
+    response.setCountyFacet(facetUtil.getStringFacetCounts(fullSpec, "location.county"));
+    response.setCategoryFacet(facetUtil.getLongFacetCounts(fullSpec, "subCategory.parentCategory.id"));
+    response.setSubCategoryFacet(facetUtil.getLongFacetCounts(fullSpec, "subCategory.id"));
+    response.setPublishedTodayFacet(facetUtil.getPublishedTodayFacetCounts(fullSpec));
     return response;
   }
 
