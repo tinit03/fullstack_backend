@@ -45,10 +45,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
   }
 
   @Override
+  @Transactional
   public RefreshToken validateToken(String token) {
     RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
         .orElseThrow(() -> new EntityNotFoundException("Token not found"));
-
     if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
       refreshTokenRepository.delete(refreshToken);
       throw new IllegalArgumentException("Refresh token is expired");

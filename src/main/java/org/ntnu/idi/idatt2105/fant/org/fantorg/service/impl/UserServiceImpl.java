@@ -17,10 +17,12 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.CloudinaryService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ImageService;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.RefreshTokenService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ReviewService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +35,8 @@ public class UserServiceImpl implements UserService {
   private final ImageRepository imageRepository;
 
   private final ReviewService reviewService;
+
+  private final RefreshTokenService refreshTokenService;
   @Override
   public User findByEmail(String email) {
     return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
@@ -75,12 +79,28 @@ public class UserServiceImpl implements UserService {
     userRepository.save(user);
   }
 
+  @Override
+  @Transactional
+  public void deleteUser(Long userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException(userId));
+
+    refreshTokenService.revokeToken(user);
+
+    if (user.getProfileImage() != null) {
+      try {
+        imageService.deleteImage(user.getProfileImage());
+      } catch (IOException ex) {
+        throw new IllegalArgumentException("Failed to delete image", ex);
+      }
+    }
+    userRepository.delete(user);
+  }
   public UserDto mapUser(User user){
     UserDto dto = UserMapper.toDto(user);
     dto.setAverageRating(reviewService.getAverageRatingForSeller(user));
     dto.setTotalReviews(reviewService.getReviewCountForSeller(user));
     return dto;
   }
-
 
 }
