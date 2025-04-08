@@ -270,7 +270,7 @@ public class ItemServiceImpl implements ItemService {
       User user
   ) {
     Specification<Item> fullSpec = buildItemSpec(filter, null);
-
+    if(user!=null) fullSpec = fullSpec.and(ItemSpecification.hasNotSeller(user));
     Page<Item> items = itemRepository.findAll(fullSpec, pageable);
     Page<ItemDto> dto = items.map(ItemMapper::toItemDto);
     dto = markDtosWithBookmarkStatus(dto,user);
@@ -316,7 +316,6 @@ public class ItemServiceImpl implements ItemService {
 
   private Specification<Item> buildItemSpec(ItemSearchFilter filter, String excludeField) {
     Specification<Item> spec = ItemSpecification.hasStatus(Status.ACTIVE);
-
     if (!"keyword".equals(excludeField) && filter.getKeyword() != null && !filter.getKeyword().isBlank()) {
       String[] tokens = filter.getKeyword().toLowerCase().split(" ");
       for (String token : tokens) {

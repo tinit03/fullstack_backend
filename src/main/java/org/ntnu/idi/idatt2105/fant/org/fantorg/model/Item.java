@@ -33,7 +33,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 @Getter
 @Setter
 @AllArgsConstructor
-@Table(name = "\"Items\"")
+@Table(name = "items")
 public class Item {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,9 +65,11 @@ public class Item {
   private ListingType listingType;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "item_status")
   private Status status;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "item_condition")
   private Condition condition;
 
   private boolean forSale;
