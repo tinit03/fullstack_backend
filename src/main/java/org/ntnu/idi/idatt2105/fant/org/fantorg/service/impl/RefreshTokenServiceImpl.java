@@ -58,6 +58,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
   @Override
   public void revokeToken(User user) {
     refreshTokenRepository.deleteByUser(user);
+    refreshTokenRepository.flush();
   }
 
   @Scheduled(cron = "0 0 3 * * ?") // Every day at 3AM
