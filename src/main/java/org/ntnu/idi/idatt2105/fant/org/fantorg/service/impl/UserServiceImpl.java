@@ -30,10 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
-  private final CloudinaryService cloudinaryService;
   private final ImageService imageService;
   private final PasswordEncoder passwordEncoder;
-  private final RefreshTokenRepository tokenRepository;
 
   private final ReviewService reviewService;
 

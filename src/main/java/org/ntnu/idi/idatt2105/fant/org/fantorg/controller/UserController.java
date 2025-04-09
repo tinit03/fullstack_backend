@@ -14,6 +14,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,6 +31,7 @@ public class UserController {
 
   private final UserService userService;
   @GetMapping("/users")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<List<UserDto>> findConnectedUsers() {
     return ResponseEntity.ok(userService.findAll());
   }
