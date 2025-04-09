@@ -36,6 +36,7 @@ public class ItemMapper {
         .ifPresent(userDto -> {
           dto.setSellerFullName(userDto.getFullName());
           dto.setSellerId(userDto.getId());
+          dto.setSellerPicture(userDto.getProfilePicture().getUrl());
         });
     dto.setImages(ImageMapper.toDtoList(item.getImages()));
     return dto;
