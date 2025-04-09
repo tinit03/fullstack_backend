@@ -10,6 +10,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,6 +47,6 @@ public class ChatMessage {
 
   @NotNull
   @Column(nullable = false)
-  private Date timestamp;
+  private LocalDateTime timestamp;
 }
 

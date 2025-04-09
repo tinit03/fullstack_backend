@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UpdatePasswordDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatProfileDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.user.UserNotFoundException;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ImageMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.UserMapper;
@@ -102,4 +103,10 @@ public class UserServiceImpl implements UserService {
     return dto;
   }
 
+
+
+  public ChatProfileDto findChatProfile(String email) {
+    User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+    return UserMapper.toChatProfileDto(user);
+  }
 }
