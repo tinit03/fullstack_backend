@@ -17,6 +17,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
 
 @Getter
 @Setter
@@ -44,6 +45,8 @@ public class ChatMessage {
   private String content;
 
   private String chatId;
+
+  private MessageType type;
 
   @NotNull
   @Column(nullable = false)
