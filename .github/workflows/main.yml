@@ -21,7 +21,7 @@ jobs:
           java-version: 21
 
       - name: Unit Tests
-        run: mvn -B test --file pom.xml
+        run: mvn -B verify --file pom.xml
 
       - name: Build app
         run: mvn -B clean package --file pom.xml
