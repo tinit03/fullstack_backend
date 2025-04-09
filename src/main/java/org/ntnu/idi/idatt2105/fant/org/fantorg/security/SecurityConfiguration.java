@@ -58,13 +58,18 @@ public class SecurityConfiguration {
                         authorize ->
                                 authorize
                                         .requestMatchers(
-                                                "/forgotPassword/**",
-                                                "/auth/**",
-                                                "/swagger-ui/**",
-                                                "/categories/**",
-                                                "ws/**",
-                                                "/items/**",
-                                                "/v3/api-docs/**")
+                                            "/forgotPassword/**",
+                                            "/auth/**",
+                                            "/categories/**",
+                                            "ws/**",
+                                            "/items/**",
+                                            "/swagger-ui/**",
+                                            "/v3/api-docs/**",
+                                            "/h2-console/**",
+                                            "/v3/api-docs/",
+                                            "swagger-ui.html",
+                                            "/webjars/**"
+                                            )
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())
