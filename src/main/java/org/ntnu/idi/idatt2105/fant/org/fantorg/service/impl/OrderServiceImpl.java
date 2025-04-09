@@ -2,6 +2,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderDto;
@@ -32,6 +33,12 @@ public class OrderServiceImpl implements OrderService {
 
     Order savedOrder = orderRepository.save(order);
     return OrderMapper.toDto(savedOrder);
+  }
+
+  @Override
+  public List<OrderDto> getAllOrders() {
+    List<Order> orders = orderRepository.findAll();
+    return orders.stream().map(OrderMapper::toDto).toList();
   }
 
 
