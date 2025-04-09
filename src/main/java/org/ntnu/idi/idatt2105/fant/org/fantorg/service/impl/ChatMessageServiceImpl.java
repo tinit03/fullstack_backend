@@ -1,6 +1,7 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl;
 
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageCreateDto;
@@ -10,8 +11,10 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ChatMessageMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatMessage;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.NotificationType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatMessageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ChatMessageService;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.NotificationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +29,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
   private final UserServiceImpl userService;
   private final ChatRoomServiceImpl chatRoomService;
   private final ItemServiceImpl itemService;
+  private final NotificationService notificationService;
 
   @Override
   public ChatMessageDto save(ChatMessageCreateDto msgDto) {
@@ -45,6 +49,13 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     chatMessageRepository.save(chatMessage);
 
     //log.info("ChatId: {}", chatId);
+    Map<String, String> args = Map.of("user", recipient.getFirstName() +" "+recipient.getLastName()
+        , "item", item.getTitle());
+    // todo: fix
+    String link = "/items/" + item.getItemId();
+    notificationService.send(item.getSeller(),args, NotificationType.NEW_BID,link);
+    notificationService.send(item.getSeller(),args, NotificationType.MESSAGE_RECEIVED,link);
+    log.info("ChatId: {}", chatId);
 
     return ChatMessageMapper.toDto(chatMessage);
     }

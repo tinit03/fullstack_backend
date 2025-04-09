@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.bid.BidCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.bid.BidDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.BidMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.OrderMapper;
@@ -22,6 +23,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.BidRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.OrderRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BidService;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ChatMessageService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.NotificationService;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,8 @@ public class BidServiceImpl implements BidService {
   private final ItemRepository itemRepository;
   private final OrderRepository orderRepository;
   private final NotificationService notificationService;
+  private final ChatMessageService chatMessageService;
+
   @Override
   public BidDto placeBid(BidCreateDto dto, User bidder) {
     Item item = itemRepository.findById(dto.getItemId())
@@ -44,6 +48,13 @@ public class BidServiceImpl implements BidService {
         , "item", item.getTitle());
     String link = "/items/" + item.getItemId();
     notificationService.send(item.getSeller(),args, NotificationType.NEW_BID,link);
+    // todo fix:
+    chatMessageService.save(ChatMessageCreateDto.builder()
+            .senderId(bidder.getEmail())
+            .recipientId("get owner for iem")
+            .itemId(item.getItemId())
+            .content("blablabla")
+        .build());
     Bid bid = BidMapper.toBid(dto, item, bidder);
     Bid savedBid = bidRepository.save(bid);
     return BidMapper.toDto(savedBid);
