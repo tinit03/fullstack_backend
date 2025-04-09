@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
 
 @Getter
 @Setter
@@ -29,4 +30,6 @@ public class ChatMessageDto {
   private String content;
 
   private LocalDateTime timestamp;
+
+  private MessageType type;
 }

@@ -12,6 +12,9 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatMessageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ChatMessageService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,11 +50,13 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     }
 
   @Override
-  public List<ChatMessageDto> findChatMessages(String senderId, String recipientId, Long itemId) {
+  public Page<ChatMessageDto> findChatMessages(String senderId, String recipientId, Long itemId, Pageable pageable) {
 
     String chatId = chatRoomService.getChatRoomId(senderId, recipientId, itemId, false)
         .orElseThrow(() -> new ChatRoomNotFoundException(senderId + " " + recipientId + " " + itemId));
     List<ChatMessage> messages = chatMessageRepository.findByChatId(chatId);
-    return messages.stream().map(ChatMessageMapper::toDto).toList();
+    int start = (int) pageable.getOffset();
+    int end = Math.min((start + pageable.getPageSize()), messages.size());
+    return new PageImpl<>(messages.stream().map(ChatMessageMapper::toDto).toList().subList(start, end), pageable, messages.size());
   }
 }

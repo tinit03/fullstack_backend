@@ -14,6 +14,9 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatMessageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatRoomRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ChatRoomService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -95,7 +98,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     return chatId;
   }
 
-  public List<ChatDto> getChats(String senderId) {
+  public Page<ChatDto> getChats(String senderId, Pageable pageable) {
     List<ChatDto> chats = new ArrayList<>();
     User sender = userService.findByEmail(senderId);
     List<ChatRoom> chatRooms = chatRoomRepository.findChatRoomsBySender(sender);
@@ -137,6 +140,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         }
       }
     });
-    return chats;
+    int start = (int) pageable.getOffset();
+    int end = Math.min((start + pageable.getPageSize()), chats.size());
+
+    return new PageImpl<>(chats.subList(start, end), pageable, chats.size());
   }
 }

@@ -12,6 +12,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Role;
@@ -415,6 +416,7 @@ public class LoadData implements CommandLineRunner {
         .content("first message")
         .chatId(chatId)
         .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+        .type(MessageType.NORMAL)
         .build();
 
     chatMessageRepository.save(chatMessage);
@@ -427,6 +429,7 @@ public class LoadData implements CommandLineRunner {
         .content("other message")
         .chatId(otherChatId)
         .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+        .type(MessageType.BID)
         .build();
 
     chatMessageRepository.save(otherChatMessage);
@@ -439,6 +442,7 @@ public class LoadData implements CommandLineRunner {
         .content("antother messgae")
         .chatId(anotherChatId)
         .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+        .type(MessageType.PURCHASE)
         .build();
 
     chatMessageRepository.save(antotherChatMessage);
