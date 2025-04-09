@@ -31,6 +31,7 @@ public class ChatMessageMapper {
         .chatId(chatId)
         .content(chatMessageDto.getContent())
         .timestamp(LocalDateTime.now())
+        .type(chatMessageDto.getType() == null ? MessageType.NORMAL : chatMessageDto.getType())
         .build();
   }
 }
