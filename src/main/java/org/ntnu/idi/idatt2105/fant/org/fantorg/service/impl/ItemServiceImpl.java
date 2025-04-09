@@ -127,7 +127,7 @@ public class ItemServiceImpl implements ItemService {
     existing.setCondition(updatedItem.getCondition());
     existing.setTags(updatedItem.getTags());
     existing.setForSale(updatedItem.isForSale());
-
+    if(updatedItem.getImages()==null) return itemRepository.save(existing);
     // Step 1: Upload new base64 images first and enrich DTO
     // Basically går gjennom alle bildene som har blitt lastet opp fra frontend.
     List<Image> newImages = new ArrayList<>();
@@ -271,17 +271,38 @@ public class ItemServiceImpl implements ItemService {
   ) {
     Specification<Item> baseSpec = buildItemSpec(filter, null);
     Specification<Item> fullSpec = (user != null) ? baseSpec.and(ItemSpecification.hasNotSeller(user)) : baseSpec;
+
     Page<Item> items = itemRepository.findAll(fullSpec, pageable);
     Page<ItemDto> dto = items.map(ItemMapper::toItemDto);
-    dto = markDtosWithBookmarkStatus(dto,user);
+    dto = markDtosWithBookmarkStatus(dto, user);
+
     ItemSearchResponse response = new ItemSearchResponse();
     response.setItems(dto);
-    response.setConditionFacet(facetUtil.getEnumFacetCounts(fullSpec, "condition", Condition.class));
-    response.setForSaleFacet(facetUtil.getBooleanFacetCounts(fullSpec, "forSale"));
-    response.setCountyFacet(facetUtil.getStringFacetCounts(fullSpec, "location.county"));
-    response.setCategoryFacet(facetUtil.getLongFacetCounts(fullSpec, "subCategory.parentCategory.id"));
-    response.setSubCategoryFacet(facetUtil.getLongFacetCounts(fullSpec, "subCategory.id"));
-    response.setPublishedTodayFacet(facetUtil.getPublishedTodayFacetCounts(fullSpec));
+
+    // Only exclude each respective field for that facet
+    Specification<Item> specForCondition = buildItemSpec(filter, "condition");
+    Specification<Item> specForForSale = buildItemSpec(filter, "forSale");
+    Specification<Item> specForCounty = buildItemSpec(filter, "county");
+    Specification<Item> specForCategory = buildItemSpec(filter, "category");
+    Specification<Item> specForSubCategory = buildItemSpec(filter, "subCategory");
+    Specification<Item> specForToday = buildItemSpec(filter, "onlyToday");
+
+    if (user != null) {
+      specForCondition = specForCondition.and(ItemSpecification.hasNotSeller(user));
+      specForForSale = specForForSale.and(ItemSpecification.hasNotSeller(user));
+      specForCounty = specForCounty.and(ItemSpecification.hasNotSeller(user));
+      specForCategory = specForCategory.and(ItemSpecification.hasNotSeller(user));
+      specForSubCategory = specForSubCategory.and(ItemSpecification.hasNotSeller(user));
+      specForToday = specForToday.and(ItemSpecification.hasNotSeller(user));
+    }
+
+    response.setConditionFacet(facetUtil.getEnumFacetCounts(specForCondition, "condition", Condition.class));
+    response.setForSaleFacet(facetUtil.getBooleanFacetCounts(specForForSale, "forSale"));
+    response.setCountyFacet(facetUtil.getStringFacetCounts(specForCounty, "location.county"));
+    response.setCategoryFacet(facetUtil.getLongFacetCounts(specForCategory, "subCategory.parentCategory.id"));
+    response.setSubCategoryFacet(facetUtil.getLongFacetCounts(specForSubCategory, "subCategory.id"));
+    response.setPublishedTodayFacet(facetUtil.getPublishedTodayFacetCounts(specForToday));
+
     return response;
   }
 
