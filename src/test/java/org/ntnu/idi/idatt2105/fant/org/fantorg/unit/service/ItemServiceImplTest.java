@@ -27,6 +27,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.BookmarkRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
@@ -55,6 +56,9 @@ public class ItemServiceImplTest {
 
   @Mock
   private CloudinaryService cloudinaryService;
+
+  @Mock
+  private BookmarkRepository bookmarkRepository;
 
   @Mock
   private BookmarkService bookmarkService;
