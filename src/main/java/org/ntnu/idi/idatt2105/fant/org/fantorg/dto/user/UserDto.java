@@ -1,10 +1,8 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user;
 
-import java.util.List;
-import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageDto;
 
 @Setter
 @Getter
@@ -12,9 +10,9 @@ public class UserDto {
   private Long id;
   private String email;
   private String fullName;
-  private String address;
-  private String number;
-  private List<ItemDto> ownItems;
-  private Set<ItemDto> bookmarkedItems;
-
+  private String firstName;
+  private String lastName;
+  private ImageDto profilePicture;
+  private double averageRating;
+  private long totalReviews;
 }

@@ -1,4 +1,4 @@
-package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user;
+package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.authentication;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

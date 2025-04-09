@@ -1,3 +1,19 @@
 spring:
+  config:
+    import: optional:classpath:application-secret.yml
   application:
     name: Fant.org
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
+springdoc:
+  api-docs:
+    path: /api-docs

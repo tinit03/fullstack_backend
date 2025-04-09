@@ -10,9 +10,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Profile("test")
 public class ApplicationNoSecurity {
 
-  @Bean
-  public WebSecurityCustomizer webSecurityCustomizer() {
-    return (web) -> web.ignoring()
-        .requestMatchers(new AntPathRequestMatcher("/**"));
-  }
+//  @Bean
+//  public WebSecurityCustomizer webSecurityCustomizer() {
+//    return (web) -> web.ignoring()
+//        .requestMatchers(new AntPathRequestMatcher("/**"));
+//  }
 }

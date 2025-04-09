@@ -1,0 +1,14 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fant-org:latest
+    container_name: fant.org
+    restart: always
+    ports:
+      - '8080:8080'
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true

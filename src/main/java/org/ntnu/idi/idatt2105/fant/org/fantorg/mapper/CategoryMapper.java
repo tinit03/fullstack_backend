@@ -3,6 +3,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.mapper;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.CategoryDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.SubCategoryCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.SubCategoryDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
 
@@ -12,7 +13,7 @@ public class CategoryMapper {
     CategoryDto dto = new CategoryDto();
     dto.setName(category.getCategoryName());
     dto.setId(category.getCategoryId());
-
+    dto.setImage(ImageMapper.toDto(category.getImage()));
     List<SubCategoryDto> subDtos = category.getSubCategories()
         .stream()
         .map(CategoryMapper::toSubCategoryDto)
@@ -26,6 +27,7 @@ public class CategoryMapper {
     CategoryDto dto = new CategoryDto();
     dto.setName(category.getCategoryName());
     dto.setId(category.getCategoryId());
+    dto.setImage(ImageMapper.toDto(category.getImage()));
     return dto;
   }
   // maps only sub-categories
@@ -45,7 +47,7 @@ public class CategoryMapper {
     return category;
   }
 
-  public static Category toSubCategory(SubCategoryDto dto,Category parentCategory){
+  public static Category toSubCategory(SubCategoryCreateDto dto,Category parentCategory){
     Category subcategory = new Category();
     subcategory.setCategoryName(dto.getName());
     subcategory.setParentCategory(parentCategory);

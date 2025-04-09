@@ -5,10 +5,15 @@ import java.util.Optional;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemSearchFilter;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemSearchResponse;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemStatusUpdate;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ItemService;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.specification.SortUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,15 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/items")
@@ -42,15 +39,17 @@ public class ItemController {
    * Accepts optional keyword, page, and size parameters.
    */
   @GetMapping("/search")
-  public Page<ItemDto> searchItems(
-      @RequestParam(value = "keyword", required = false) String keyword,
+  public ItemSearchResponse searchItems(
+      @ModelAttribute ItemSearchFilter filter,
+      @RequestParam(defaultValue = "publishedAt") String sortField,
+      @RequestParam(defaultValue = "desc") String sortDir,
       @RequestParam(value = "page", defaultValue = "0") int page,
-      @RequestParam(value = "size", defaultValue = "10") int size) {
+      @RequestParam(value = "size", defaultValue = "10") int size,
+      @AuthenticationPrincipal User user) {
 
-    Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
-    Page<Item> itemsPage = itemService.searchItems(keyword, pageable);
-
-    return itemsPage.map(ItemMapper::toItemDto);
+    Sort sort = SortUtil.buildSort(sortField,sortDir);
+    Pageable pageable = PageRequest.of(page, size, sort);
+    return itemService.searchItems(filter, pageable, user);
   }
 
   /**
@@ -60,11 +59,16 @@ public class ItemController {
   @GetMapping
   public Page<ItemDto> getAllItems(
       @RequestParam(value = "page", defaultValue = "0") int page,
-      @RequestParam(value = "size", defaultValue = "10") int size
+      @RequestParam(value = "size", defaultValue = "10") int size,
+      @RequestParam(defaultValue = "publishedAt") String sortField,
+      @RequestParam(defaultValue = "desc") String sortDir,
+      @RequestParam(defaultValue = "ACTIVE") Status status,
+      @AuthenticationPrincipal User user
   ) {
-    Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
-    Page<Item> itemsPage = itemService.getAllItems(pageable);
-    return itemsPage.map(ItemMapper::toItemDto);
+    Sort sort = SortUtil.buildSort(sortField,sortDir);
+    Pageable pageable = PageRequest.of(page, size, sort);
+    return itemService.getAllItems(pageable,status,user);
+
   }
 
   /**
@@ -72,10 +76,9 @@ public class ItemController {
    * Returns detailed information for a single item.
    */
   @GetMapping("/{id}")
-  public ResponseEntity<ItemDto> getItemDetail(@PathVariable Long id) {
-    Item item = itemService.getItemById(id);
-    ItemDto detailDto = ItemMapper.toItemDto(item);
-    return ResponseEntity.ok(detailDto);
+  public ResponseEntity<ItemDto> getItemDetail(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    ItemDto dto = itemService.getItemByIdBookmarked(id,user);
+    return ResponseEntity.ok(dto);
   }
 
   @PostMapping
@@ -93,6 +96,7 @@ public class ItemController {
     return ResponseEntity.noContent().build();
   }
 
+
   @PutMapping("/{itemId}")
   public ResponseEntity<ItemDto> updateItem(
       @PathVariable Long itemId,
@@ -101,5 +105,31 @@ public class ItemController {
     Item updated = itemService.updateItem(itemId, dto, user);
     ItemDto updatedDto = ItemMapper.toItemDto(updated);
     return ResponseEntity.ok(updatedDto);
+  }
+
+  @PutMapping("/{itemId}/status")
+  public ResponseEntity<ItemDto> updateStatus(
+      @PathVariable Long itemId,
+      @Valid @RequestBody ItemStatusUpdate status,
+      @AuthenticationPrincipal User user) {
+    Item updated = itemService.changeStatus(itemId,status.getStatus(),user);
+    ItemDto updatedDto = ItemMapper.toItemDto(updated);
+    return ResponseEntity.ok(updatedDto);
+  }
+
+  @GetMapping("/me")
+  public Page<ItemDto> getOwnItems(
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size,
+      @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
+      @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+      @RequestParam(value = "status", required = false) Status status,
+      @AuthenticationPrincipal User user
+  )
+  {
+    Sort sort = SortUtil.buildSort(sortField,sortDir);
+    Pageable pageable = PageRequest.of(page, size, sort);
+    Page<ItemDto> itemPage = itemService.getItemsBySeller(user,status, pageable);
+    return itemPage;
   }
 }

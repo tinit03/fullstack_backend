@@ -1,8 +1,9 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.service;
 
 import lombok.RequiredArgsConstructor;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserLoginDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserRegisterDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.authentication.AuthenticationResponse;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.authentication.UserLoginDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.authentication.UserRegisterDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Role;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,29 +22,33 @@ public class AuthenticationService {
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
-  public void registerUser(UserRegisterDto dto) {
+  private final RefreshTokenService refreshTokenService;
+  public AuthenticationResponse registerUser(UserRegisterDto dto) {
     if(userRepository.existsByEmail(dto.getEmail())){
       throw new IllegalArgumentException("Email already in use!");
     }
-
     User user = new User();
     user.setRole(Role.USER);
     user.setEmail(dto.getEmail());
     user.setPassword(passwordEncoder.encode(dto.getPassword()));
     user.setFirstName(dto.getFirstName());
     user.setLastName(dto.getLastName());
-    user.setAddress(dto.getAddress());
-
     userRepository.save(user);
+    return authenticateAndGenerateToken(new UserLoginDto(dto.getEmail(),dto.getPassword()));
   }
-  public String authenticateAndGenerateToken(UserLoginDto loginRequest) {
+  public AuthenticationResponse authenticateAndGenerateToken(UserLoginDto loginRequest) {
     Authentication authentication = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
             loginRequest.getEmail(), loginRequest.getPassword()
         )
     );
-
     User user = (User) authentication.getPrincipal();
-    return jwtService.generateToken(user, 30);
+    String accessToken = jwtService.generateToken(user,30);
+    String refreshToken = refreshTokenService.createToken(user).getToken();
+    return new AuthenticationResponse(accessToken,refreshToken);
+  }
+  @Transactional
+  public void logout(User user) {
+    refreshTokenService.revokeToken(user);
   }
 }

@@ -1,8 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -10,8 +8,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageCreateDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageEditDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
@@ -27,9 +23,6 @@ public class ItemEditDto {
   @Size(max = 2048, message = "Full description must be under 2048 characters")
   private String description;
 
-  //Actually if the seller chooses to give away the item, it should be able to 0
-  @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
-  @Digits(integer = 10, fraction = 2, message = "Price format is invalid")
   private BigDecimal price;
 
   private List<@NotBlank(message = "Tags cannot be blank") String> tags;

@@ -10,5 +10,6 @@ RUN mvn -f pom.xml package -DskipTests
 FROM openjdk:21-jdk
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+COPY src/main/resources/*.yml /app/config/
 EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]

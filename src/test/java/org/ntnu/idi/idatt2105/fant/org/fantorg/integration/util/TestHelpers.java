@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.JwtTokenDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.CategoryDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.SubCategoryDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserLoginDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserRegisterDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.authentication.UserLoginDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.authentication.UserRegisterDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -37,7 +37,6 @@ public class TestHelpers {
     registerDto.setPassword(password);
     registerDto.setFirstName(firstName);
     registerDto.setLastName(lastName);
-    registerDto.setAddress(address);
 
     ResponseEntity<Void> response = restTemplate.postForEntity(baseUrl + "/auth/register", registerDto, Void.class);
     if (response.getStatusCode() != HttpStatus.OK && response.getStatusCode() != HttpStatus.CONFLICT) {

@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageCreateDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageItemUploadDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
@@ -42,13 +42,13 @@ public class ItemCreateDto {
   @NotNull
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   private ListingType listingType;
-  @NotNull
+
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   private Status status;
   @NotNull
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   private Condition condition;
-  private List<ImageCreateDto> images;
+  private List<ImageItemUploadDto> images;
   private boolean forSale;
 
 }
