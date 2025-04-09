@@ -33,7 +33,6 @@ import org.springframework.test.web.servlet.MvcResult;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-
 public class BookmarkIT {
 
   @Autowired
@@ -62,24 +61,23 @@ public class BookmarkIT {
 
   @BeforeEach
   public void setUp() {
-    // Clean-up before each test.
+    // Clean-up before each test
     bookmarkRepository.deleteAll();
     itemRepository.deleteAll();
     userRepository.deleteAll();
     categoryRepository.deleteAll();
 
-    // Create a parent category.
+
     Category parentCategory = new Category();
     parentCategory.setCategoryName("Parent Category");
     parentCategory = categoryRepository.save(parentCategory);
 
-    // Create a sub category (child)
+
     Category subCategory = new Category();
     subCategory.setCategoryName("Sub Category");
     subCategory.setParentCategory(parentCategory);
     subCategory = categoryRepository.save(subCategory);
 
-    // Create a seller user.
     seller = new User();
     seller.setFirstName("Seller");
     seller.setLastName("User");
@@ -88,7 +86,6 @@ public class BookmarkIT {
     seller.setRole(Role.USER);
     seller = userRepository.save(seller);
 
-    // Create a buyer user.
     buyer = new User();
     buyer.setFirstName("Buyer");
     buyer.setLastName("User");
@@ -98,7 +95,6 @@ public class BookmarkIT {
     buyer = userRepository.save(buyer);
     System.out.println("Buyer ID: " + buyer.getId());
 
-    // Create an item for the seller.
     item = new Item();
     item.setTitle("Test Item");
     item.setDescription("A test item");
@@ -112,13 +108,13 @@ public class BookmarkIT {
 
   @Test
   public void testBookmarkItem() throws Exception {
-    // Buyer bookmarks the item.
+    // Buyer bookmarks the item
     mockMvc.perform(post("/bookmark/{itemId}", item.getItemId())
             .with(user(buyer)))
         .andExpect(status().isOk());
 
 
-    // Verify by fetching bookmarked items.
+    // Verify by fetching bookmarked items
     MvcResult result = mockMvc.perform(get("/bookmark/me")
             .with(user(buyer))
             .param("page", "0")
@@ -127,19 +123,18 @@ public class BookmarkIT {
         .andExpect(status().isOk())
         .andReturn();
 
-    // Check the JSON response contains the item title.
     String jsonResponse = result.getResponse().getContentAsString();
     assertThat(jsonResponse).contains("Test Item");
   }
 
   @Test
   public void testRemoveBookmark() throws Exception {
-    // First, bookmark the item.
+    // First bookmark the item.
     mockMvc.perform(post("/bookmark/{itemId}", item.getItemId())
             .with(user(buyer)))
         .andExpect(status().isOk());
 
-    // Now, remove the bookmark.
+    // After remove the bookmark.
     mockMvc.perform(delete("/bookmark/{itemId}", item.getItemId())
             .with(user(buyer)))
         .andExpect(status().isNoContent());
@@ -147,12 +142,12 @@ public class BookmarkIT {
 
   @Test
   public void testGetBookmarkedItems() throws Exception {
-    // Bookmark the item first.
+    // Bookmark the item first
     mockMvc.perform(post("/bookmark/{itemId}", item.getItemId())
             .with(user(buyer)))
         .andExpect(status().isOk());
 
-    // Retrieve the bookmarked items.
+    // Retrieve the bookmarked items
     MvcResult result = mockMvc.perform(get("/bookmark/me")
             .with(user(buyer))
             .param("page", "0")
@@ -161,7 +156,7 @@ public class BookmarkIT {
         .andExpect(status().isOk())
         .andReturn();
 
-    // Check the response contains the correct item data.
+    // Check the response contains the correct item
     String jsonResponse = result.getResponse().getContentAsString();
     assertThat(jsonResponse).contains("Test Item");
   }
