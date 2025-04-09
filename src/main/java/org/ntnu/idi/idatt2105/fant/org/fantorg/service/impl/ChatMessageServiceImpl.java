@@ -26,7 +26,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
   @Override
   public ChatMessageDto save(ChatMessageCreateDto msgDto) {
-    log.info("Getting chatId from ChatMessageServiceImpl");
+    //log.info("Getting chatId from ChatMessageServiceImpl");
 
     String chatId = chatRoomService
         .getChatRoomId(msgDto.getSenderId(), msgDto.getRecipientId(), msgDto.getItemId(), true)
@@ -41,7 +41,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     ChatMessage chatMessage = ChatMessageMapper.toEntity(msgDto, sender, recipient, item, chatId);
     chatMessageRepository.save(chatMessage);
 
-    log.info("ChatId: {}", chatId);
+    //log.info("ChatId: {}", chatId);
 
     return ChatMessageMapper.toDto(chatMessage);
     }
