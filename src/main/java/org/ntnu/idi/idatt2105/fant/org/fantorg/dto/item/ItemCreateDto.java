@@ -42,7 +42,7 @@ public class ItemCreateDto {
   @NotNull
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   private ListingType listingType;
-  @NotNull
+
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   private Status status;
   @NotNull

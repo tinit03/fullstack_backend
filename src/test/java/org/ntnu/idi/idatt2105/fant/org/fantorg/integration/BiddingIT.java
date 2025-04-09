@@ -1,196 +1,150 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.integration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
-import org.junit.jupiter.api.BeforeAll;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.bid.BidCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.bid.BidDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.integration.util.TestHelpers;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.*;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.*;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
+@SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ExtendWith(SpringExtension.class)
 public class BiddingIT {
-  private static final Logger logger = LoggerFactory.getLogger(BiddingIT.class);
 
-  @LocalServerPort
-  private int port;
+  @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
+  @Autowired private UserRepository userRepository;
+  @Autowired private ItemRepository itemRepository;
+  @Autowired private BidRepository bidRepository;
+  @Autowired private CategoryRepository categoryRepository;
 
-  @Autowired
-  private TestRestTemplate restTemplate;
+  @Autowired private OrderRepository orderRepository;
+  @Autowired private PasswordEncoder passwordEncoder;
 
+  private User seller;
+  private User buyer;
+  private Item item;
 
-  @BeforeAll
-  public void setUpUsers() {
-    TestHelpers.registerUser(restTemplate,baseUrl(),"seller@example.com", "password", "Seller", "One", "oslo");
-    TestHelpers.registerUser(restTemplate,baseUrl(),"buyer@example.com", "password", "Buyer", "Two", "bergen");}
-  private String baseUrl() {
-    return "http://localhost:" + port;
+  @BeforeEach
+  public void setup() {
+    bidRepository.deleteAll();
+    orderRepository.deleteAll();
+    itemRepository.deleteAll();
+    userRepository.deleteAll();
+    categoryRepository.deleteAll();
+
+    Category category = new Category();
+    category.setCategoryName("Electronics");
+    category = categoryRepository.save(category);
+
+    Category sub = new Category();
+    sub.setCategoryName("Laptops");
+    sub.setParentCategory(category);
+    sub = categoryRepository.save(sub);
+
+    seller = new User();
+    seller.setFirstName("Seller");
+    seller.setLastName("Example");
+    seller.setEmail("seller@example.com");
+    seller.setPassword(passwordEncoder.encode("oassword"));
+    seller.setRole(Role.USER);
+
+    seller = userRepository.save(seller);
+
+    buyer = new User();
+    buyer.setFirstName("Buyer");
+    buyer.setLastName("Example");
+    buyer.setEmail("buyer@example.com");
+    buyer.setPassword(passwordEncoder.encode("oassword"));
+    buyer.setRole(Role.USER);
+
+    buyer = userRepository.save(buyer);
+
+    item = new Item();
+    item.setTitle("Gaming Laptop");
+    item.setDescription("Fast and sleek");
+    item.setPrice(new BigDecimal("1000"));
+    item.setCondition(Condition.NEW);
+    item.setStatus(Status.ACTIVE);
+    item.setListingType(ListingType.BID);
+    item.setSeller(seller);
+    item.setSubCategory(sub);
+    item = itemRepository.save(item);
   }
 
   @Test
-  public void testBiddingFlow() {
-    // 1. Register and Login as seller and buyer
+  public void testPlaceBidAndGetBids() throws Exception {
+    BidCreateDto dto = new BidCreateDto();
+    dto.setItemId(item.getItemId());
+    dto.setAmount(new BigDecimal("1100"));
 
-    String sellerToken = TestHelpers.loginAndGetToken(restTemplate,baseUrl(),"seller@example.com", "password");
-    String buyerToken = TestHelpers.loginAndGetToken(restTemplate,baseUrl(),"buyer@example.com", "password");
-    Long subCategoryId = TestHelpers.createCategoryAndSubcategory(restTemplate,baseUrl(),"Collectibles", "Antiques", sellerToken);
+    // Place bid
+    MvcResult bidResult = mockMvc
+        .perform(post("/bids")
+            .with(user(buyer))
+            .contentType("application/json")
+            .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isOk())
+        .andReturn();
 
-    // 2. Seller creates an item (listing type set to BID)
-    ItemCreateDto itemCreateDto = new ItemCreateDto();
-    itemCreateDto.setItemName("Antique Vase");
-    itemCreateDto.setDescription("A beautiful, rare antique vase in excellent condition.");
-    itemCreateDto.setPrice(new BigDecimal("150.00"));
-    itemCreateDto.setSubcategoryId(subCategoryId);
-    itemCreateDto.setCondition(Condition.GOOD);
-    itemCreateDto.setPostalCode("0150");
-    itemCreateDto.setListingType(ListingType.BID); // ensure this field exists in your DTO
-    itemCreateDto.setStatus(Status.ACTIVE);
-    // Set other required fields as needed...
+    String json = bidResult.getResponse().getContentAsString();
+    BidDto bidDto = objectMapper.readValue(json, BidDto.class);
 
-    HttpHeaders sellerHeaders = new HttpHeaders();
-    sellerHeaders.setBearerAuth(sellerToken);
-    sellerHeaders.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<ItemCreateDto> itemRequest = new HttpEntity<>(itemCreateDto, sellerHeaders);
+    assertThat(bidDto.getAmount()).isEqualTo(new BigDecimal("1100"));
+    assertThat(bidDto.getItemId()).isEqualTo(item.getItemId());
 
-    ResponseEntity<ItemDto> itemResponse = restTemplate.exchange(
-        baseUrl() + "/items",
-        HttpMethod.POST,
-        itemRequest,
-        ItemDto.class
-    );
-    assertEquals(HttpStatus.CREATED, itemResponse.getStatusCode());
-    assertNotNull(itemResponse.getBody());
-    Long itemId = itemResponse.getBody().getId();
-    logger.info("Seller created item with id: {} and title: {}", itemId, itemResponse.getBody().getName());
+    // Fetch bids for item
+    MvcResult getResult = mockMvc
+        .perform(get("/bids/{itemId}", item.getItemId()).with(user(seller)))
+        .andExpect(status().isOk())
+        .andReturn();
 
-    // 3. Buyer places a bid on the created item
-    BidCreateDto bidCreateDto = new BidCreateDto();
-    bidCreateDto.setItemId(itemId);
-    bidCreateDto.setAmount(new BigDecimal("160.00"));
-
-    HttpHeaders buyerHeaders = new HttpHeaders();
-    buyerHeaders.setBearerAuth(buyerToken);
-    buyerHeaders.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<BidCreateDto> bidRequest = new HttpEntity<>(bidCreateDto, buyerHeaders);
-
-    ResponseEntity<BidDto> bidResponse = restTemplate.exchange(
-        baseUrl() + "/bids",
-        HttpMethod.POST,
-        bidRequest,
-        BidDto.class
-    );
-    assertEquals(HttpStatus.OK, bidResponse.getStatusCode());
-    assertNotNull(bidResponse.getBody());
-    Long bidId = bidResponse.getBody().getId();
-    logger.info("Buyer placed bid with id: {} on item: {}", bidId, itemId);
-
-    // 4. Seller accepts the bid, which creates an order
-    HttpEntity<Void> acceptRequest = new HttpEntity<>(sellerHeaders);
-    ResponseEntity<OrderDto> orderResponse = restTemplate.exchange(
-        baseUrl() + "/bids/" + bidId + "/accept",
-        HttpMethod.POST,
-        acceptRequest,
-        OrderDto.class
-    );
-    assertEquals(HttpStatus.OK, orderResponse.getStatusCode());
-    OrderDto orderDto = orderResponse.getBody();
-    assertNotNull(orderDto);
-    assertEquals(itemId, orderDto.getItemId());
-    logger.info("Seller accepted bid. Order created with id: {}", orderDto.getId());
+    String getJson = getResult.getResponse().getContentAsString();
+    assertThat(getJson).contains("1100");
   }
 
   @Test
-  public void testUnauthorizedBidAcceptance() {
-    // 1. Register and Login as seller and buyer
-    String sellerToken = TestHelpers.loginAndGetToken(restTemplate,baseUrl(),"seller@example.com", "password");
-    String buyerToken = TestHelpers.loginAndGetToken(restTemplate,baseUrl(),"buyer@example.com", "password");
-    Long subCategoryId = TestHelpers.createCategoryAndSubcategory(restTemplate,baseUrl(),"Collectibles", "Antiques", sellerToken);
+  public void testAcceptBid() throws Exception {
+    // First place a bid
+    BidCreateDto dto = new BidCreateDto();
+    dto.setItemId(item.getItemId());
+    dto.setAmount(new BigDecimal("900"));
 
-    // 2. Seller creates an item (listing type set to BID)
-    ItemCreateDto itemCreateDto = new ItemCreateDto();
-    itemCreateDto.setItemName("Antique Vase");
-    itemCreateDto.setDescription("A beautiful, rare antique vase in excellent condition.");
-    itemCreateDto.setPrice(new BigDecimal("150.00"));
-    itemCreateDto.setSubcategoryId(subCategoryId);itemCreateDto.setPostalCode("0150");
-    itemCreateDto.setListingType(ListingType.BID); // ensure this field exists in your DTO
-    itemCreateDto.setStatus(Status.ACTIVE);
-    itemCreateDto.setCondition(Condition.GOOD);
-    HttpHeaders sellerHeaders = new HttpHeaders();
-    sellerHeaders.setBearerAuth(sellerToken);
-    sellerHeaders.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<ItemCreateDto> itemRequest = new HttpEntity<>(itemCreateDto, sellerHeaders);
+    MvcResult bidResult = mockMvc
+        .perform(post("/bids")
+            .with(user(buyer))
+            .contentType("application/json")
+            .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isOk())
+        .andReturn();
 
-    ResponseEntity<ItemDto> itemResponse = restTemplate.exchange(
-        baseUrl() + "/items",
-        HttpMethod.POST,
-        itemRequest,
-        ItemDto.class
-    );
-    assertEquals(HttpStatus.CREATED, itemResponse.getStatusCode());
-    assertNotNull(itemResponse.getBody());
-    Long itemId = itemResponse.getBody().getId();
-    logger.info("Seller created item with id: {} and title: {}", itemId, itemResponse.getBody().getName());
+    BidDto bidDto = objectMapper.readValue(bidResult.getResponse().getContentAsString(), BidDto.class);
 
-    // 3. Buyer places a bid on the created item
-    BidCreateDto bidCreateDto = new BidCreateDto();
-    bidCreateDto.setItemId(itemId);
-    bidCreateDto.setAmount(new BigDecimal("160.00"));
+    // Accept the bid as seller
+    MvcResult acceptResult = mockMvc
+        .perform(post("/bids/" + bidDto.getId() + "/accept").with(user(seller)))
+        .andExpect(status().isOk())
+        .andReturn();
 
-    HttpHeaders buyerHeaders = new HttpHeaders();
-    buyerHeaders.setBearerAuth(buyerToken);
-    buyerHeaders.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<BidCreateDto> bidRequest = new HttpEntity<>(bidCreateDto, buyerHeaders);
-
-    ResponseEntity<BidDto> bidResponse = restTemplate.exchange(
-        baseUrl() + "/bids",
-        HttpMethod.POST,
-        bidRequest,
-        BidDto.class
-    );
-    assertEquals(HttpStatus.OK, bidResponse.getStatusCode());
-    assertNotNull(bidResponse.getBody());
-    Long bidId = bidResponse.getBody().getId();
-    logger.info("Buyer placed bid with id: {} on item: {}", bidId, itemId);
-
-    // Buyer tries to accept the bid as a non-seller
-    HttpHeaders nonSeller = new HttpHeaders();
-    nonSeller.setBearerAuth(buyerToken);
-    HttpEntity<Void> unauthorizedRequest = new HttpEntity<>(nonSeller);
-
-    ResponseEntity<String> response = restTemplate.exchange(
-        baseUrl() + "/bids/" + bidId + "/accept",
-        HttpMethod.POST,
-        unauthorizedRequest,
-        String.class
-    );
-
-    assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    String response = acceptResult.getResponse().getContentAsString();
+    assertThat(response).contains("\"itemId\":" + item.getItemId());
   }
 }

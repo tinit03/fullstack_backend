@@ -28,13 +28,14 @@ public class BookmarkServiceImpl implements BookmarkService {
 
   @Override
   public void bookmarkItem(User user, Long itemId) {
-    User managedUser = userRepository.findById(user.getId())
-        .orElseThrow(()-> new UserNotFoundException(itemId));
+
     Item item = itemRepository.findById(itemId)
         .orElseThrow(() -> new ItemNotFoundException(itemId));
     if(Objects.equals(item.getSeller().getId(), user.getId())){
       throw new IllegalArgumentException("The user shouldn't be able to bookmark their own item!");
     }
+    User managedUser = userRepository.findById(user.getId())
+        .orElseThrow(()-> new UserNotFoundException(itemId));
     if(bookmarkRepository.existsByUserAndItem(managedUser,item)){
       throw new IllegalArgumentException("The item is already bookmarked!");
     }

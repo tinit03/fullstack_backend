@@ -75,4 +75,10 @@ public class Item {
   private boolean forSale;
   @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Image> images = new ArrayList<>();
+
+  @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Bid> bids = new ArrayList<>();
+
+  @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Bookmark> bookmarks = new ArrayList<>();
 }
