@@ -125,17 +125,82 @@ public class LoadData implements CommandLineRunner {
     balls.setParentCategory(sports);
     categoryRepository.save(balls);
 
-    // 4. Create test item in subcategory
+    Image booksImage = new Image();
+    booksImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1744108933/ctxhoaldixtbr7jlsnwg.svg");
+    booksImage.setPublicId("ctxhoaldixtbr7jlsnwg");
+    Category books = new Category();
+    books.setCategoryName("Books");
+    books.setImage(booksImage);
+    categoryRepository.save(books);
+
+    Category fiction = new Category();
+    fiction.setCategoryName("Fiction");
+    fiction.setParentCategory(books);
+    categoryRepository.save(fiction);
+
+    Image furnitureImage = new Image();
+    furnitureImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1744108930/uhdqgdilcpgrojap0nor.svg");
+    furnitureImage.setPublicId("uhdqgdilcpgrojap0nor");
+    Category furniture = new Category();
+    furniture.setCategoryName("Furniture");
+    furniture.setImage(furnitureImage);
+    categoryRepository.save(furniture);
+
+    Category chairs = new Category();
+    chairs.setCategoryName("Chairs");
+    chairs.setParentCategory(furniture);
+    categoryRepository.save(chairs);
+
+    Image toysImage = new Image();
+    toysImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1744109544/uuaa9dnsdsvyoedrncrt.svg");
+    toysImage.setPublicId("uuaa9dnsdsvyoedrncrt");
+    Category toys = new Category();
+    toys.setCategoryName("Toys");
+    toys.setImage(toysImage);
+    categoryRepository.save(toys);
+
+    Category actionFigures = new Category();
+    actionFigures.setCategoryName("Action Figures");
+    actionFigures.setParentCategory(toys);
+    categoryRepository.save(actionFigures);
+
+    Image appliancesImage = new Image();
+    appliancesImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1744109547/dnhcpvfffwih5vk1rrg4.svg");
+    appliancesImage.setPublicId("dnhcpvfffwih5vk1rrg4");
+    Category appliances = new Category();
+    appliances.setCategoryName("Home Appliances");
+    appliances.setImage(appliancesImage);
+    categoryRepository.save(appliances);
+
+    Category fridges = new Category();
+    fridges.setCategoryName("Refrigerators");
+    fridges.setParentCategory(appliances);
+    categoryRepository.save(fridges);
+
+    Image vehiclesImage = new Image();
+    vehiclesImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1744109550/folw0fsqqyqs5pnrkp9y.svg");
+    vehiclesImage.setPublicId("folw0fsqqyqs5pnrkp9y");
+    Category vehicles = new Category();
+    vehicles.setCategoryName("Vehicles");
+    vehicles.setImage(vehiclesImage);
+    categoryRepository.save(vehicles);
+
+    Category cars = new Category();
+    cars.setCategoryName("Cars");
+    cars.setParentCategory(vehicles);
+    categoryRepository.save(cars);
+
+
     Item item = new Item();
     item.setTitle("Winter Jacket");
     item.setDescription("Insulated winter jacket in great condition");
     item.setSubCategory(subCategory); // Set to subcategory
-    item.setPrice(new BigDecimal("499.99"));
+    item.setPrice(new BigDecimal("0"));
     item.setPublishedAt(LocalDateTime.now());
     item.setLocation(new Location("7010", "Trøndelag","Trondheim", "63.4305", "10.3951"));
     item.setTags(List.of("jacket", "winter", "clothes"));
     item.setSeller(user);
-    item.setListingType(ListingType.BID);
+    item.setListingType(ListingType.CONTACT);
     item.setStatus(Status.ACTIVE);
     item.setCondition(Condition.ACCEPTABLE);
     item.setForSale(false);
@@ -145,12 +210,12 @@ public class LoadData implements CommandLineRunner {
     item1.setTitle("Cat");
     item1.setDescription("Super cool cat");
     item1.setSubCategory(balls); // Set to subcategory
-    item1.setPrice(new BigDecimal("1500"));
+    item1.setPrice(new BigDecimal("0"));
     item1.setPublishedAt(LocalDateTime.now());
     item1.setLocation(new Location("7010", "Trøndelag","Trondheim", "63.4305", "10.3951"));
     item1.setTags(List.of("animal", "cat", "feline"));
     item1.setSeller(user);
-    item1.setListingType(ListingType.BID);
+    item1.setListingType(ListingType.CONTACT);
     item1.setStatus(Status.ACTIVE);
     item1.setCondition(Condition.ACCEPTABLE);
     item1.setForSale(false);
@@ -237,18 +302,102 @@ public class LoadData implements CommandLineRunner {
     bikeItem.setForSale(true);
     itemRepository.save(bikeItem);
 
+    Item book = new Item();
+    book.setTitle("Fantastic Novel");
+    book.setDescription("A gripping fictional tale");
+    book.setSubCategory(fiction);
+    book.setPrice(new BigDecimal("19.99"));
+    book.setPublishedAt(LocalDateTime.now().minusHours(1));
+    book.setLocation(new Location("0000", "Oslo", "Oslo", "59.9139", "10.7522"));
+    book.setTags(List.of("book", "fiction", "novel"));
+    book.setSeller(user);
+    book.setListingType(ListingType.DIRECT);
+    book.setStatus(Status.ACTIVE);
+    book.setCondition(Condition.NEW);
+    book.setForSale(true);
+    itemRepository.save(book);
+
+    Item chair = new Item();
+    chair.setTitle("Ergonomic Chair");
+    chair.setDescription("Comfortable and stylish chair");
+    chair.setSubCategory(chairs);
+    chair.setPrice(new BigDecimal("89.99"));
+    chair.setPublishedAt(LocalDateTime.now().minusHours(2));
+    chair.setLocation(new Location("1111", "Oslo", "Oslo", "59.9139", "10.7522"));
+    chair.setTags(List.of("chair", "furniture", "comfort"));
+    chair.setSeller(otherUser);
+    chair.setListingType(ListingType.DIRECT);
+    chair.setStatus(Status.ACTIVE);
+    chair.setCondition(Condition.LIKE_NEW);
+    chair.setForSale(true);
+    itemRepository.save(chair);
+
+    Item figures = new Item();
+    figures.setTitle("Action Figure Set");
+    figures.setDescription("Collectible action figures for enthusiasts");
+    figures.setSubCategory(actionFigures);
+    figures.setPrice(new BigDecimal("59.99"));
+    figures.setPublishedAt(LocalDateTime.now().minusHours(3));
+    figures.setLocation(new Location("2222", "Oslo", "Oslo", "59.9139", "10.7522"));
+    figures.setTags(List.of("action", "toys", "figures"));
+    figures.setSeller(a);
+    figures.setListingType(ListingType.DIRECT);
+    figures.setStatus(Status.ACTIVE);
+    figures.setCondition(Condition.NEW);
+    figures.setForSale(true);
+    itemRepository.save(figures);
+
+    Item fridge = new Item();
+    fridge.setTitle("Modern Refrigerator");
+    fridge.setDescription("Energy-efficient and spacious refrigerator");
+    fridge.setSubCategory(fridges);
+    fridge.setPrice(new BigDecimal("799.99"));
+    fridge.setPublishedAt(LocalDateTime.now().minusDays(1));
+    fridge.setLocation(new Location("3333", "Oslo", "Oslo", "59.9139", "10.7522"));
+    fridge.setTags(List.of("fridge", "appliance", "kitchen"));
+    fridge.setSeller(otherUser);
+    fridge.setListingType(ListingType.DIRECT);
+    fridge.setStatus(Status.ACTIVE);
+    fridge.setCondition(Condition.LIKE_NEW);
+    fridge.setForSale(true);
+    itemRepository.save(fridge);
+
+    Item car = new Item();
+    car.setTitle("Electric Car");
+    car.setDescription("Latest model electric car with modern features");
+    car.setSubCategory(cars);
+    car.setPrice(new BigDecimal("29999.99"));
+    car.setPublishedAt(LocalDateTime.now().minusDays(2));
+    car.setLocation(new Location("4444", "Oslo", "Oslo", "59.9139", "10.7522"));
+    car.setTags(List.of("car", "electric", "vehicle"));
+    car.setSeller(user);
+    car.setListingType(ListingType.BID);
+    car.setStatus(Status.ACTIVE);
+    car.setCondition(Condition.NEW);
+    car.setForSale(true);
+    itemRepository.save(car);
+
     // === Images for new items ===
     List<Image> newImages = new ArrayList<>();
     newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1742651143/samples/food/dessert.jpg", "samples/food/dessert", "Yummy dessert", dessertItem));
     newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1742651143/samples/sheep.jpg", "samples/sheep", "Wooly sheep", sheepItem));
     newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1742651144/samples/ecommerce/shoes.png", "samples/ecommerce/shoes", "Sporty shoes", shoesItem));
     newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1742651144/samples/bike.jpg", "samples/bike", "Mountain bike", bikeItem));
+    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744111775/llyfzr98jt9os9xjfk9e.jpg", "llyfzr98jt9os9xjfk9e", "Catcher in the rye", book));
+    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744111895/iexwpih72nkt0j89qvvu.jpg", "iexwpih72nkt0j89qvvu", "Black ergonomic Chair", chair));
+    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744112006/ybrvxvud75ok5z1ped0l.png", "ybrvxvud75ok5z1ped0l", "Cool action figure", figures));
+    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744112148/qfvpj9qafdqtjnffskwf.jpg", "qfvpj9qafdqtjnffskwf", "Modern Refrigerator", fridge));
+    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744112263/rmxgjymbt92xbfmq8doq.png", "rmxgjymbt92xbfmq8doq", "Electric Car Image", car));
     imageRepository.saveAll(newImages);
 
     dessertItem.setImages(List.of(newImages.get(0)));
     sheepItem.setImages(List.of(newImages.get(1)));
     shoesItem.setImages(List.of(newImages.get(2)));
     bikeItem.setImages(List.of(newImages.get(3)));
+    book.setImages(List.of(newImages.get(4)));
+    figures.setImages(List.of(newImages.get(5)));
+    fridge.setImages(List.of(newImages.get(6)));
+    car.setImages(List.of(newImages.get(7)));
 
     itemRepository.saveAll(List.of(dessertItem, sheepItem, shoesItem, bikeItem));
     System.out.println("Inserted test data.");
