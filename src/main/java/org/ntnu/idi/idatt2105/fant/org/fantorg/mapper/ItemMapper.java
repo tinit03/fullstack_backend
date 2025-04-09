@@ -36,6 +36,9 @@ public class ItemMapper {
         .ifPresent(userDto -> {
           dto.setSellerFullName(userDto.getFullName());
           dto.setSellerId(userDto.getId());
+          if(userDto.getProfilePicture()!=null){
+            dto.setSellerPicture(userDto.getProfilePicture().getUrl());
+          }
         });
     dto.setImages(ImageMapper.toDtoList(item.getImages()));
     return dto;
@@ -48,7 +51,7 @@ public class ItemMapper {
     item.setPrice(dto.getPrice());
     item.setListingType(dto.getListingType());
     item.setCondition(dto.getCondition());
-    item.setStatus(Status.ACTIVE);
+    item.setStatus(dto.getStatus());
     if (dto.getTags() != null && !dto.getTags().isEmpty()) {
       item.setTags(dto.getTags());
     } else {

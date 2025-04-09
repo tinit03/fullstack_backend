@@ -10,6 +10,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.CategoryMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Category;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.CategoryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,31 +21,31 @@ public class CategoryController {
   public CategoryController(CategoryService categoryService){
     this.categoryService = categoryService;
   }
-
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryCreateDto dto) {
     Category saved = categoryService.createCategory(dto);
     return ResponseEntity.ok(CategoryMapper.toCategoryDto(saved));
   }
-
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping("/sub")
   public ResponseEntity<CategoryDto> createSubCategory(@Valid @RequestBody SubCategoryCreateDto dto) {
     Category saved = categoryService.createSubCategory(dto);
     return ResponseEntity.ok(CategoryMapper.toCategoryDto(saved));
   }
-
+  @PreAuthorize("hasRole('ADMIN')")
   @PutMapping("/{id}")
   public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryCreateDto categoryDto) {
     Category updated = categoryService.updateCategory(id,categoryDto);
     return ResponseEntity.ok(CategoryMapper.toCategoryDto(updated));
   }
-
+  @PreAuthorize("hasRole('ADMIN')")
   @PutMapping("/sub/{id}")
   public ResponseEntity<SubCategoryDto> updateSubCategory(@PathVariable Long id, @Valid @RequestBody SubCategoryDto subCategoryDto) {
     Category updatedSub = categoryService.updateSubCategory(id, subCategoryDto);
     return ResponseEntity.ok(CategoryMapper.toSubCategoryDto(updatedSub));
   }
-
+  @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
     categoryService.deleteCategory(id);

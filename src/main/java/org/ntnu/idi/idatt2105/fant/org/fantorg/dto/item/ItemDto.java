@@ -29,6 +29,7 @@ public class ItemDto {
   private LocalDateTime publishedAt;
   private Long sellerId;         // om vi ønsker å henvise bruker til selgerens brukerside
   private String sellerFullName; // om vi ønsker å vise selger sin brukernavn
+  private String sellerPicture;
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   private ListingType listingType;
   @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -38,4 +39,5 @@ public class ItemDto {
   private boolean forSale;
   private List<ImageItemDto> images;
   private Boolean isBookmarked = false;
+  private Boolean isOwner = false;
 }

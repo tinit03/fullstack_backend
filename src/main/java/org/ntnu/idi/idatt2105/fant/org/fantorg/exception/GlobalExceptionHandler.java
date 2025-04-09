@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.messaging.MessagingException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -101,6 +102,12 @@ public class GlobalExceptionHandler {
     logError(ex);
     String msg = createErrorResponseMsg(ex);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
+  }
+
+  @ExceptionHandler(AuthorizationDeniedException.class)
+  public ResponseEntity<String> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+    logError(ex);
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
   }
 
     /*

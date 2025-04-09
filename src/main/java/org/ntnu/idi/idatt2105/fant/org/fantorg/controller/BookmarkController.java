@@ -8,6 +8,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BookmarkService;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.specification.SortUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,12 +49,10 @@ public class BookmarkController {
       @AuthenticationPrincipal User user,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size,
-      @RequestParam(name = "date", defaultValue = "desc") String sortDir
+      @RequestParam(defaultValue = "bookmarkedAt") String sortField,
+      @RequestParam(defaultValue = "desc") String sortDir
   ) {
-
-    Sort sort = sortDir.equalsIgnoreCase("asc")
-        ? Sort.by("bookmarkedAt").ascending()
-        : Sort.by("bookmarkedAt").descending();
+    Sort sort = SortUtil.buildSort(sortField,sortDir);
 
     Pageable pageable = PageRequest.of(page, size, sort);
     Page<Item> pagedItems = bookmarkService.getBookmarkedItems(user, pageable);

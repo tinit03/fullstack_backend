@@ -1,6 +1,8 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.notification.NotificationDto;
@@ -52,5 +54,20 @@ public class NotificationServiceImpl implements NotificationService {
     notificationRepository.save(notification);
   }
 
+  @Override
+  public void deleteNotification(Long id, User user){
+    Notification notification = notificationRepository.findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
+    if (!notification.getRecipient().getId().equals(user.getId())) {
+      throw new SecurityException("You can only delete your own notifications");
+    }
+    notificationRepository.delete(notification);
+  }
+
+  @Override
+  public void deleteAll(User user) {
+    List<Notification> userNotifications = notificationRepository.findByRecipient(user);
+    notificationRepository.deleteAll(userNotifications);
+  }
 
 }

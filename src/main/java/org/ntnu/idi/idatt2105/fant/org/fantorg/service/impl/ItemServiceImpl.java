@@ -127,7 +127,7 @@ public class ItemServiceImpl implements ItemService {
     existing.setCondition(updatedItem.getCondition());
     existing.setTags(updatedItem.getTags());
     existing.setForSale(updatedItem.isForSale());
-
+    if(updatedItem.getImages()==null) return itemRepository.save(existing);
     // Step 1: Upload new base64 images first and enrich DTO
     // Basically går gjennom alle bildene som har blitt lastet opp fra frontend.
     List<Image> newImages = new ArrayList<>();
@@ -239,13 +239,18 @@ public class ItemServiceImpl implements ItemService {
     if(bookmarkService.isBookmarked(user,id)){
       dto.setIsBookmarked(true);
     }
+    if(user.getId().equals(item.getSeller().getId())){
+      dto.setIsOwner(true);
+    }
     return dto;
   }
 
   @Override
-  public Page<ItemDto> getAllItems(Pageable pageable, User user, Status status) {
+  public Page<ItemDto> getAllItems(Pageable pageable, Status status, User user) {
     Specification<Item> spec = Specification.where(null);
-    //Vanlig filtrering når status er satt til en verdi e.g. status=ACTIVE eller status=SOLD
+    if(user!=null){
+      spec = spec.and(ItemSpecification.hasNotSeller(user));
+    }
     if (status != null && status != Status.INACTIVE) {
       spec = spec.and(ItemSpecification.hasStatus(status));
     } else if (status==null) {
@@ -264,23 +269,40 @@ public class ItemServiceImpl implements ItemService {
       Pageable pageable,
       User user
   ) {
-    Specification<Item> fullSpec = buildItemSpec(filter, null);
+    Specification<Item> baseSpec = buildItemSpec(filter, null);
+    Specification<Item> fullSpec = (user != null) ? baseSpec.and(ItemSpecification.hasNotSeller(user)) : baseSpec;
 
     Page<Item> items = itemRepository.findAll(fullSpec, pageable);
     Page<ItemDto> dto = items.map(ItemMapper::toItemDto);
-    dto = markDtosWithBookmarkStatus(dto,user);
+    dto = markDtosWithBookmarkStatus(dto, user);
+
     ItemSearchResponse response = new ItemSearchResponse();
     response.setItems(dto);
-    response.setConditionFacet(facetUtil.getEnumFacetCounts(
-        buildItemSpec(filter, "condition"), "condition", Condition.class));
-    response.setListingTypeFacet(facetUtil.getEnumFacetCounts(
-        buildItemSpec(filter, "listingType"), "listingType", ListingType.class));
-    response.setCountyFacet(facetUtil.getStringFacetCounts(
-        buildItemSpec(filter, "county"), "location.county"));
-    response.setCategoryFacet(facetUtil.getLongFacetCounts(
-        buildItemSpec(filter, "category"), "subCategory.parentCategory.id"));
-    response.setSubCategoryFacet(facetUtil.getLongFacetCounts(
-        buildItemSpec(filter, "subCategory"), "subCategory.id"));
+
+    // Only exclude each respective field for that facet
+    Specification<Item> specForCondition = buildItemSpec(filter, "condition");
+    Specification<Item> specForForSale = buildItemSpec(filter, "forSale");
+    Specification<Item> specForCounty = buildItemSpec(filter, "county");
+    Specification<Item> specForCategory = buildItemSpec(filter, "category");
+    Specification<Item> specForSubCategory = buildItemSpec(filter, "subCategory");
+    Specification<Item> specForToday = buildItemSpec(filter, "onlyToday");
+
+    if (user != null) {
+      specForCondition = specForCondition.and(ItemSpecification.hasNotSeller(user));
+      specForForSale = specForForSale.and(ItemSpecification.hasNotSeller(user));
+      specForCounty = specForCounty.and(ItemSpecification.hasNotSeller(user));
+      specForCategory = specForCategory.and(ItemSpecification.hasNotSeller(user));
+      specForSubCategory = specForSubCategory.and(ItemSpecification.hasNotSeller(user));
+      specForToday = specForToday.and(ItemSpecification.hasNotSeller(user));
+    }
+
+    response.setConditionFacet(facetUtil.getEnumFacetCounts(specForCondition, "condition", Condition.class));
+    response.setForSaleFacet(facetUtil.getBooleanFacetCounts(specForForSale, "forSale"));
+    response.setCountyFacet(facetUtil.getStringFacetCounts(specForCounty, "location.county"));
+    response.setCategoryFacet(facetUtil.getLongFacetCounts(specForCategory, "subCategory.parentCategory.id"));
+    response.setSubCategoryFacet(facetUtil.getLongFacetCounts(specForSubCategory, "subCategory.id"));
+    response.setPublishedTodayFacet(facetUtil.getPublishedTodayFacetCounts(specForToday));
+
     return response;
   }
 
@@ -309,7 +331,6 @@ public class ItemServiceImpl implements ItemService {
 
   private Specification<Item> buildItemSpec(ItemSearchFilter filter, String excludeField) {
     Specification<Item> spec = ItemSpecification.hasStatus(Status.ACTIVE);
-
     if (!"keyword".equals(excludeField) && filter.getKeyword() != null && !filter.getKeyword().isBlank()) {
       String[] tokens = filter.getKeyword().toLowerCase().split(" ");
       for (String token : tokens) {
@@ -359,14 +380,12 @@ public class ItemServiceImpl implements ItemService {
       spec = spec.and(ItemSpecification.hasPriceBetween(min, max));
     }
 
-    if (!"listingType".equals(excludeField) && filter.getType() != null && !filter.getType().isBlank()) {
-      List<ListingType> types = Arrays.stream(filter.getType().split(","))
-          .map(String::trim)
-          .filter(s -> !s.isBlank())
-          .map(String::toUpperCase)
-          .map(ListingType::valueOf)
-          .toList();
-      spec = spec.and(ItemSpecification.hasListingTypeIn(types));
+    if (!"forSale".equals(excludeField) && filter.getForSale() != null) {
+      spec = spec.and(ItemSpecification.hasForSale(filter.getForSale()));
+    }
+
+    if (!"onlyToday".equals(excludeField) && filter.getOnlyToday() != null) {
+      spec = spec.and(ItemSpecification.isPublishedToday());
     }
 
     return spec;

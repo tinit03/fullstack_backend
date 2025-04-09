@@ -29,8 +29,10 @@ public class CategoryServiceImpl implements CategoryService {
   public Category createCategory(CategoryCreateDto dto) {
     Category category = new Category();
     category.setCategoryName(dto.getName());
-    String url = dto.getImage().getUrl();
-    handleCategoryImage(category,url);
+    if(dto.getImage()!=null){
+      String url = dto.getImage().getUrl();
+      handleCategoryImage(category,url);
+    }
     return categoryRepository.save(category);
   }
 
@@ -85,6 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
     if ((imageUrl == null || imageUrl.isBlank()) || !imageUrl.startsWith("http")) {
       category.setImage(null);
       categoryRepository.save(category); // Unlink image first
+      return;
     }
     Image newImage = imageService.updateImage(imageUrl, category.getImage());
     category.setImage(newImage);

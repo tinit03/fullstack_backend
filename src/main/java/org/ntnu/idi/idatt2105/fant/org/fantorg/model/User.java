@@ -3,6 +3,7 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.*;
@@ -87,16 +88,23 @@ public class User implements UserDetails {
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
-    @OneToMany(mappedBy = "seller")
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Item> items;
 
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Bookmark> bookmarks = new HashSet<>();    @OneToOne
+    private Set<Bookmark> bookmarks = new HashSet<>();
+
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications = new ArrayList<>();
+    @OneToOne
     @JoinColumn(name = "profile_image_id")
     private Image profileImage;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private RefreshToken refreshToken;
+
     // Let email behave like username
     @Override
     public String getUsername() {

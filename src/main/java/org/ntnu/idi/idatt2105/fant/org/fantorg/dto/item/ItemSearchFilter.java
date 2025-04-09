@@ -16,5 +16,6 @@ public class ItemSearchFilter {
   private String county;
   private Double minPrice;
   private Double maxPrice;
-  private String type;
+  private Boolean forSale;
+  private Boolean onlyToday;
 }

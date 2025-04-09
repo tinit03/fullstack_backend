@@ -10,6 +10,6 @@ public interface UserService {
   User findByEmail(String email);
   List<UserDto> findAll();
   User updateProfilePicture(String url, User user);
-
   void updatePassword(User user, UpdatePasswordDto dto);
+  void deleteUser(Long id);
 }
