@@ -62,7 +62,7 @@ public class SecurityConfiguration {
                                                 "/auth/**",
                                                 "/swagger-ui/**",
                                                 "/categories/**",
-                                                //Skal endre det senere, for testing
+                                                "ws/**",
                                                 "/items/**",
                                                 "/v3/api-docs/**")
                                         .permitAll()

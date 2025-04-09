@@ -10,6 +10,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatNotification;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatProfileDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatRoom;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatRoomRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatMessageServiceImpl;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatRoomServiceImpl;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,25 +37,25 @@ public class ChatController {
   private final UserServiceImpl userServiceImpl;
   private final ChatRoomServiceImpl chatRoomService;
 
-  @GetMapping("/chats/{senderId}")
+  @GetMapping("/chats")
   public ResponseEntity<List<ChatDto>> getUserChats(
-      @PathVariable("senderId") String senderId
+      @AuthenticationPrincipal User user
   ) {
-    log.info("Received GET request for /chats/{}", senderId);
-    List<ChatDto> chats = chatRoomService.getChats(senderId);
-    log.info("Returning result for /chats/{}", senderId);
+    log.info("Received GET request for /chats/{}", user.getEmail());
+    List<ChatDto> chats = chatRoomService.getChats(user.getEmail());
+    log.info("Returning result for /chats/{}", user.getEmail());
     log.info("senderId: {}", chats.getFirst().getSenderId());
     return ResponseEntity.ok(chats);
   }
 
-  @GetMapping("/messages/{itemId}/{senderId}/{recipientId}")
+  @GetMapping("/messages/{itemId}/{recipientId}")
   public ResponseEntity<List<ChatMessageDto>> findChatMessages(
       @PathVariable("itemId") Long itemId,
-      @PathVariable("senderId") String senderId,
+      @AuthenticationPrincipal User user,
       @PathVariable("recipientId") String recipientId
   ) {
-    log.info("Received GET request for /messages/{}/{}/{}", itemId, senderId, recipientId);
-    List<ChatMessageDto> messages = chatMessageService.findChatMessages(senderId, recipientId, itemId);
+    log.info("Received GET request for /messages/{}/{}/{}", itemId, user.getEmail(), recipientId);
+    List<ChatMessageDto> messages = chatMessageService.findChatMessages(user.getEmail(), recipientId, itemId);
     log.info("messages: {}", messages);
     return ResponseEntity.ok(messages);
   }
@@ -81,11 +83,7 @@ public class ChatController {
   }
 
   @GetMapping("/chat/recipient/{recipientId}")
-  public ChatProfileDto getRecipientInfo(@PathVariable String recipientId) {
+  public ChatProfileDto getRecipientInfo(@PathVariable String recipientId, @AuthenticationPrincipal User user) {
     return userServiceImpl.findChatProfile(recipientId);
-  }
-  @GetMapping("/getChats")
-  public List<ChatRoom> getChatRooms() {
-    return chatRoomRepository.findAll();
   }
 }
