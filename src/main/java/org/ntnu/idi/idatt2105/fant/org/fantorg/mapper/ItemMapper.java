@@ -51,7 +51,7 @@ public class ItemMapper {
     item.setPrice(dto.getPrice());
     item.setListingType(dto.getListingType());
     item.setCondition(dto.getCondition());
-    item.setStatus(Status.ACTIVE);
+    item.setStatus(dto.getStatus());
     if (dto.getTags() != null && !dto.getTags().isEmpty()) {
       item.setTags(dto.getTags());
     } else {
