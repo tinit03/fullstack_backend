@@ -15,6 +15,11 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatRoomRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatMessageServiceImpl;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatRoomServiceImpl;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.UserServiceImpl;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.specification.SortUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -23,6 +28,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -38,24 +44,34 @@ public class ChatController {
   private final ChatRoomServiceImpl chatRoomService;
 
   @GetMapping("/chats")
-  public ResponseEntity<List<ChatDto>> getUserChats(
-      @AuthenticationPrincipal User user
+  public ResponseEntity<Page<ChatDto>> getUserChats(
+      @AuthenticationPrincipal User user,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(defaultValue = "lastMessageTimestamp") String sortField,
+      @RequestParam(defaultValue = "asc") String sortDir
   ) {
     log.info("Received GET request for /chats/{}", user.getEmail());
-    List<ChatDto> chats = chatRoomService.getChats(user.getEmail());
+
+    Sort sort = SortUtil.buildSort(sortField,sortDir);
+    Pageable pageable = PageRequest.of(page, size, sort);
+
+    Page<ChatDto> chats = chatRoomService.getChats(user.getEmail(), pageable);
     log.info("Returning result for /chats/{}", user.getEmail());
-    log.info("senderId: {}", chats.getFirst().getSenderId());
     return ResponseEntity.ok(chats);
   }
 
   @GetMapping("/messages/{itemId}/{recipientId}")
-  public ResponseEntity<List<ChatMessageDto>> findChatMessages(
+  public ResponseEntity<Page<ChatMessageDto>> findChatMessages(
       @PathVariable("itemId") Long itemId,
       @AuthenticationPrincipal User user,
-      @PathVariable("recipientId") String recipientId
+      @PathVariable("recipientId") String recipientId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "50") int size
   ) {
     log.info("Received GET request for /messages/{}/{}/{}", itemId, user.getEmail(), recipientId);
-    List<ChatMessageDto> messages = chatMessageService.findChatMessages(user.getEmail(), recipientId, itemId);
+    Pageable pageable = PageRequest.of(page, size);
+    Page<ChatMessageDto> messages = chatMessageService.findChatMessages(user.getEmail(), recipientId, itemId, pageable);
     log.info("messages: {}", messages);
     return ResponseEntity.ok(messages);
   }
