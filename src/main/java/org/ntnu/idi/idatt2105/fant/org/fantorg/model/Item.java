@@ -81,4 +81,10 @@ public class Item {
 
   @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Bookmark> bookmarks = new ArrayList<>();
+
+  @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ChatMessage> chatMessages = new ArrayList<>();
+
+  @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ChatRoom> chatRooms = new ArrayList<>();
 }
