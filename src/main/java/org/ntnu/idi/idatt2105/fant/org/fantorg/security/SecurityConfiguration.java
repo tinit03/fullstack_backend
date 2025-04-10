@@ -26,10 +26,18 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
- * Configuration class for security settings. Whitelists certain url's. The rest
- * are blacklisted and return a status code 403 FORBIDDEN when accessed without authentication.
+ * Configuration class for security settings in the application. This class defines
+ * the security filter chain, authentication provider, and other relevant security
+ * mechanisms such as JWT authorization, password encoding, and cross-origin request handling.
  *
- * @author Harry Xu
+ * <p>It defines the following key features:</p>
+ * <ul>
+ *     <li>Whitelisting specific URLs (such as login, password reset, and API documentation)</li>
+ *     <li>JWT Authorization filter setup to ensure security and authentication for other requests</li>
+ *     <li>Password encoding using BCryptPasswordEncoder</li>
+ *     <li>Handling CORS (Cross-Origin Resource Sharing) configuration for local development</li>
+ * </ul>
+ *
  * @version 1.0
  */
 @Configuration
@@ -42,21 +50,28 @@ public class SecurityConfiguration {
     private final UserDetailsService userDetailsService;
 
     /**
-     * Configures security filter chain.
+     * Configures the security filter chain for HTTP requests.
      *
-     * @param http
-     *            HttpSecurity object
-     * @return SecurityFilterChain object
-     * @throws Exception
-     *             If an error occurs during configuration
+     * <p>This method sets up the following security measures:</p>
+     * <ul>
+     *     <li>Disables CSRF protection</li>
+     *     <li>Enables CORS with default settings</li>
+     *     <li>Defines authorized HTTP request matchers (such as open APIs for authentication and documentation)</li>
+     *     <li>Enforces authentication for all other requests</li>
+     *     <li>Disables session creation, ensuring stateless authentication</li>
+     *     <li>Injects a custom JWT filter for authorization</li>
+     * </ul>
+     *
+     * @param http HttpSecurity object for configuring HTTP security settings
+     * @return SecurityFilterChain configured security filter chain
+     * @throws Exception if an error occurs during security configuration
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
             .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(
-                        authorize ->
-                                authorize
+                        authorize -> authorize
                                         .requestMatchers(
                                             "/forgotPassword/**",
                                             "/auth/**",
@@ -80,11 +95,24 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    /**
+     * Provides the password encoder used to encode passwords.
+     *
+     * <p>This method returns a BCryptPasswordEncoder instance for encoding passwords.</p>
+     *
+     * @return PasswordEncoder instance for encoding passwords
+     */
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Configures the authentication provider to use the custom user details service
+     * and the BCrypt password encoder.
+     *
+     * @return AuthenticationProvider configured to authenticate users based on a custom user details service and password encoder
+     */
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -93,11 +121,26 @@ public class SecurityConfiguration {
         return provider;
     }
 
+    /**
+     * Configures the authentication manager for the application.
+     *
+     * @param config AuthenticationConfiguration object for configuring the authentication manager
+     * @return AuthenticationManager instance used to manage authentication in the application
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    /**
+     * Configures the CORS (Cross-Origin Resource Sharing) settings.
+     *
+     * <p>This method sets up the allowed origin patterns, HTTP methods, headers, and credentials
+     * to enable CORS for local development and testing.</p>
+     *
+     * @return CorsConfigurationSource configuration for handling CORS requests
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
