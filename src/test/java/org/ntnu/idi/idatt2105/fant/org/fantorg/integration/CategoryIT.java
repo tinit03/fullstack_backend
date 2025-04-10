@@ -10,6 +10,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Role;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
 import org.junit.jupiter.api.TestInstance;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.OrderRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -50,14 +51,16 @@ public class CategoryIT {
   @Autowired
   private ItemRepository itemRepository;
 
+  @Autowired
+  OrderRepository orderRepository;
+
   private User admin;
 
   private User user;
 
-
-
   @BeforeEach
   public void setUp() {
+    orderRepository.deleteAll();
     itemRepository.deleteAll();
     categoryRepository.deleteAll();
     userRepository.deleteAll();

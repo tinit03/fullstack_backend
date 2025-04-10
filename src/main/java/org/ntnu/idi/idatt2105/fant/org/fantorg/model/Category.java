@@ -41,6 +41,9 @@ public class Category {
   @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
   private List<Category> subCategories = new ArrayList<>();
 
+  @OneToMany(mappedBy = "subCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Item> items = new ArrayList<>();
+
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "image_id")
