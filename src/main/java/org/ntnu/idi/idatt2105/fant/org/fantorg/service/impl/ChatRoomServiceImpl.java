@@ -1,5 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -47,7 +48,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     User recipient  = userService.findByEmail(recipientId);
     Item item = itemService.getItemById(itemId);
 
-
     return chatRoomRepository.findBySenderAndRecipientAndItem(sender, recipient, item)
         .map(ChatRoom::getChatId)
         .or(() -> {
@@ -94,55 +94,57 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     chatRoomRepository.save(senderRecipient);
     chatRoomRepository.save(recipientSender);
 
-    //log.info("FInished saving chat rooms");
+    //log.info("Finished saving chat rooms");
     return chatId;
   }
 
+  public void newEntry(List<String> chatIds) {
+    List<ChatRoom> chatRooms = chatRoomRepository.findByChatIdIn(chatIds);
+    LocalDateTime newEntryTime = LocalDateTime.now();
+    for (ChatRoom chatRoom : chatRooms) {
+      chatRoom.setLastEntry(newEntryTime);
+      chatRoomRepository.save(chatRoom);
+    }
+  }
+
   public Page<ChatDto> getChats(String senderId, Pageable pageable) {
-    List<ChatDto> chats = new ArrayList<>();
     User sender = userService.findByEmail(senderId);
-    List<ChatRoom> chatRooms = chatRoomRepository.findChatRoomsBySender(sender);
-    //log.info("starting loop");
-    chatRooms.forEach(chatRoom -> {
+    Page<ChatRoom> chatRooms = chatRoomRepository.findChatRoomsBySender(sender, pageable);
+
+    Page<ChatDto> chatDtoPage = chatRooms.map(chatRoom -> {
       Item item = itemService.getItemById(chatRoom.getItem().getItemId());
       User recipient = userService.findByEmail(chatRoom.getRecipient().getEmail());
-      List<ChatMessage> messages;
-      ChatMessage lastMessage;
       String chatId = String.format("%s_%s_%s", sender.getEmail(), recipient.getEmail(), item.getItemId());
-      messages = chatMessageRepository.findByChatId(chatId);
+      List<ChatMessage> messages = chatMessageRepository.findByChatId(chatId);
+
       if (messages.isEmpty()) {
         chatId = String.format("%s_%s_%s", recipient.getEmail(), sender.getEmail(), item.getItemId());
         messages = chatMessageRepository.findByChatId(chatId);
       }
-      if (!messages.isEmpty()) {
-        lastMessage = messages.getLast();
-        //log.info("got message {}", lastMessage.getContent());
-        //log.info("creating dto");
-        ChatDto chat =
-            ChatDto.builder()
-                .lastMessageContent(lastMessage.getContent())
-                .lastMessageTimestamp(lastMessage.getTimestamp())
-                .lastSenderId(lastMessage.getSender().getEmail())
-                .senderId(senderId)
-                .recipientId(recipient.getEmail())
-                .itemId(item.getItemId())
-                .status(item.getStatus())
-                .itemTitle(item.getTitle())
-                .build();
-        chats.add(chat);
 
-        if (!item.getImages().isEmpty()) {
-          chat.setImage(item.getImages().getFirst().getUrl());
-        }
+      ChatMessage lastMessage = messages.getLast();
+      log.warn(messages.getLast().toString());
 
-        if (recipient.getProfileImage() != null) {
-          chat.setRecipientProfilePic(recipient.getProfileImage().getUrl());
-        }
+      ChatDto chat = ChatDto.builder()
+              .lastMessageContent(lastMessage.getContent())
+              .lastMessageTimestamp(lastMessage.getTimestamp())
+              .lastSenderId(lastMessage.getSender().getEmail())
+              .senderId(senderId)
+              .recipientId(recipient.getEmail())
+              .itemId(item.getItemId())
+              .status(item.getStatus())
+              .itemTitle(item.getTitle())
+              .build();
+
+      if (!item.getImages().isEmpty()) {
+        chat.setImage(item.getImages().getFirst().getUrl());
       }
-    });
-    int start = (int) pageable.getOffset();
-    int end = Math.min((start + pageable.getPageSize()), chats.size());
 
-    return new PageImpl<>(chats.subList(start, end), pageable, chats.size());
+      if (recipient.getProfileImage() != null) {
+        chat.setRecipientProfilePic(recipient.getProfileImage().getUrl());
+      }
+      return chat;
+    });
+    return chatDtoPage;
   }
 }

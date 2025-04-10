@@ -9,6 +9,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.chat.ChatRoomNotFoundException;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ChatMessageMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatMessage;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatRoom;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.NotificationType;
@@ -33,19 +34,26 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
   @Override
   public ChatMessageDto save(ChatMessageCreateDto msgDto) {
-    //log.info("Getting chatId from ChatMessageServiceImpl");
 
-    String chatId = chatRoomService
+    String chatIdA = chatRoomService
         .getChatRoomId(msgDto.getSenderId(), msgDto.getRecipientId(), msgDto.getItemId(), true)
         .orElseThrow(
             () -> new ChatRoomNotFoundException(msgDto.getSenderId() + " " + msgDto.getRecipientId() + " " + msgDto.getItemId()));
 
+    String chatIdB = chatRoomService
+            .getChatRoomId(msgDto.getRecipientId(), msgDto.getSenderId(), msgDto.getItemId(), true)
+            .orElseThrow(
+                    () -> new ChatRoomNotFoundException(msgDto.getSenderId() + " " + msgDto.getRecipientId() + " " + msgDto.getItemId()));
+
+    List<String> chatIds = List.of(chatIdA, chatIdB);
+
+    chatRoomService.newEntry(chatIds);
 
     User sender = userService.findByEmail(msgDto.getSenderId());
     User recipient = userService.findByEmail(msgDto.getRecipientId());
     Item item = itemService.getItemById(msgDto.getItemId());
 
-    ChatMessage chatMessage = ChatMessageMapper.toEntity(msgDto, sender, recipient, item, chatId);
+    ChatMessage chatMessage = ChatMessageMapper.toEntity(msgDto, sender, recipient, item, chatIdA);
     chatMessageRepository.save(chatMessage);
 
     //log.info("ChatId: {}", chatId);
@@ -55,7 +63,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     String link = "/items/" + item.getItemId();
     notificationService.send(item.getSeller(),args, NotificationType.NEW_BID,link);
     notificationService.send(item.getSeller(),args, NotificationType.MESSAGE_RECEIVED,link);
-    log.info("ChatId: {}", chatId);
+    log.info("ChatId: {}", chatIdA);
 
     return ChatMessageMapper.toDto(chatMessage);
     }
