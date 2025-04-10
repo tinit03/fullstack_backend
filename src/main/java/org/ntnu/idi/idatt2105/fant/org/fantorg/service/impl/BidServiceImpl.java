@@ -50,7 +50,7 @@ public class BidServiceImpl implements BidService {
 
     Map<String, String> args = Map.of("user", bidder.getFirstName() +" "+bidder.getLastName()
         , "item", item.getTitle());
-    String link = "/items/" + item.getItemId();
+    String link = "/messages?itemId=" + item.getItemId() + "&recipientId=" + bidder.getEmail();
     notificationService.send(item.getSeller(),args, NotificationType.NEW_BID,link);
     Bid bid = BidMapper.toBid(dto, item, bidder);
     Bid savedBid = bidRepository.save(bid);
@@ -86,7 +86,7 @@ public class BidServiceImpl implements BidService {
         "user", seller.getFirstName() + " " + seller.getLastName(),
         "item", bid.getItem().getTitle()
     );
-    String link = "/items/" + savedOrder.getItem().getItemId();
+    String link = "/messages?itemId=" + savedOrder.getItem().getItemId() + "&recipientId=" + seller.getEmail();
     notificationService.send(bid.getBidder(), args, NotificationType.BID_ACCEPTED, link);
     chatMessageService.save(ChatMessageCreateDto.builder()
         .senderId(seller.getEmail())

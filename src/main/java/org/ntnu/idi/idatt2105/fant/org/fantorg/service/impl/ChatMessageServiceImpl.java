@@ -53,7 +53,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     if (MessageType.NORMAL == chatMessage.getType()) {
       Map<String, String> args = Map.of("user", sender.getFirstName() +" "+sender.getLastName(), "messageType", MessageType.NORMAL.toString());
-      notificationService.send(recipient,args, NotificationType.MESSAGE_RECEIVED, null);
+      String link = "/messages?itemId=" + item.getItemId() + "&recipientId=" + chatMessage.getSender().getEmail();
+      notificationService.send(recipient,args, NotificationType.MESSAGE_RECEIVED, link);
     }
 
     return ChatMessageMapper.toDto(chatMessage);
