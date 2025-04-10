@@ -39,7 +39,14 @@ public class BidController {
   @PostMapping("/{bidId}/accept")
   public ResponseEntity<OrderDto> acceptBid(@PathVariable Long bidId,
       @AuthenticationPrincipal User seller) {
-    OrderDto orderDto = bidService.acceptBid(bidId, seller);
+    OrderDto orderDto = bidService.acceptBid(bidId, seller, true);
+    return ResponseEntity.ok(orderDto);
+  }
+
+  @PostMapping("/{bidId}/reject")
+  public ResponseEntity<OrderDto> rejectBid(@PathVariable Long bidId,
+     @AuthenticationPrincipal User seller) {
+    OrderDto orderDto = bidService.acceptBid(bidId, seller, false);
     return ResponseEntity.ok(orderDto);
   }
 }

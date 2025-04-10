@@ -52,11 +52,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         .map(ChatRoom::getChatId)
         .or(() -> {
           if (createNewRoomIfExists) {
-            log.info("Chat room does not exist, creating a new one");
             String chatId = createChatId(sender, recipient, item);
             return Optional.of(chatId);
           }
-          log.info("Chat room does not exist");
           return Optional.empty();
         });
   }

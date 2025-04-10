@@ -72,7 +72,6 @@ public class ChatController {
     log.info("Received GET request for /messages/{}/{}/{}", itemId, user.getEmail(), recipientId);
     Pageable pageable = PageRequest.of(page, size);
     Page<ChatMessageDto> messages = chatMessageService.findChatMessages(user.getEmail(), recipientId, itemId, pageable);
-    log.info("messages: {}", messages);
     return ResponseEntity.ok(messages);
   }
 

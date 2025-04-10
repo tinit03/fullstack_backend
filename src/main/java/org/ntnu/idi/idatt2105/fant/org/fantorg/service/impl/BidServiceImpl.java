@@ -18,6 +18,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Order;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.BidStatus;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.NotificationType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.BidRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
@@ -43,20 +44,23 @@ public class BidServiceImpl implements BidService {
     if(item.getListingType()!= ListingType.BID) {
       throw new IllegalArgumentException("Item listed is not biddable");
     }
+    if (bidder == item.getSeller()) {
+      throw new IllegalArgumentException("You cannot place bidder who is seller");
+    }
 
     Map<String, String> args = Map.of("user", bidder.getFirstName() +" "+bidder.getLastName()
         , "item", item.getTitle());
     String link = "/items/" + item.getItemId();
     notificationService.send(item.getSeller(),args, NotificationType.NEW_BID,link);
-    // todo fix:
-    chatMessageService.save(ChatMessageCreateDto.builder()
-            .senderId(bidder.getEmail())
-            .recipientId("get owner for iem")
-            .itemId(item.getItemId())
-            .content("blablabla")
-        .build());
     Bid bid = BidMapper.toBid(dto, item, bidder);
     Bid savedBid = bidRepository.save(bid);
+    chatMessageService.save(ChatMessageCreateDto.builder()
+        .senderId(bidder.getEmail())
+        .recipientId(item.getSeller().getEmail())
+        .itemId(item.getItemId())
+        .type(MessageType.BID)
+        .content(savedBid.getId().toString())
+        .build());
     return BidMapper.toDto(savedBid);
   }
 
@@ -68,14 +72,14 @@ public class BidServiceImpl implements BidService {
         .collect(Collectors.toList());  }
 
   @Override
-  public OrderDto acceptBid(Long bidId, User seller) {
+  public OrderDto acceptBid(Long bidId, User seller, boolean accept) {
     Bid bid = bidRepository.findById(bidId)
         .orElseThrow(() -> new EntityNotFoundException("Bid is not found"));
     if(!bid.getItem().getSeller().getId().equals(seller.getId())) {
       throw new IllegalArgumentException("User is not authorized to accept this bid");
     }
-    bid.setStatus(BidStatus.ACCEPTED);
-    bidRepository.save(bid);
+    bid.setStatus(accept ? BidStatus.ACCEPTED : BidStatus.REJECTED);
+    Bid savedBid = bidRepository.save(bid);
     Order order = buildOrder(bid.getItem(), bid.getBidder());
     Order savedOrder = orderRepository.save(order);
     Map<String, String> args = Map.of(
@@ -84,6 +88,13 @@ public class BidServiceImpl implements BidService {
     );
     String link = "/items/" + savedOrder.getItem().getItemId();
     notificationService.send(bid.getBidder(), args, NotificationType.BID_ACCEPTED, link);
+    chatMessageService.save(ChatMessageCreateDto.builder()
+        .senderId(seller.getEmail())
+        .recipientId(savedBid.getBidder().getEmail())
+        .itemId(savedBid.getItem().getItemId())
+        .type(MessageType.STATUS_CHANGED)
+        .content(savedBid.getId().toString())
+        .build());
     return OrderMapper.toDto(savedOrder);
   }
 
