@@ -35,6 +35,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
   @Override
   public ChatMessageDto save(ChatMessageCreateDto msgDto) {
 
+    System.out.println(msgDto.getSenderId() + " " + msgDto.getType());
+
     String chatIdA = chatRoomService
         .getChatRoomId(msgDto.getSenderId(), msgDto.getRecipientId(), msgDto.getItemId(), true)
         .orElseThrow(
