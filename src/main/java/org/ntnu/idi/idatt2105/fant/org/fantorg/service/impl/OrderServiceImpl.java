@@ -32,10 +32,14 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public OrderDto createOrder(OrderCreateDto dto, User user) {
-    Item item = itemRepository.findById(dto.getItemId())
+    long itemId = dto.getItemId();
+
+    Item item = itemRepository.findById(itemId)
         .orElseThrow(() -> new EntityNotFoundException("Item not found"));
     if(item.getStatus()== Status.SOLD) throw new IllegalArgumentException("You cannot buy sold items");
+
     Order order = new Order();
+    order.setPrice(item.getPrice());
     order.setItem(item);
     order.setBuyer(user);
     order.setOrderDate(LocalDateTime.now());
@@ -44,15 +48,30 @@ public class OrderServiceImpl implements OrderService {
 
     Map<String, String> args = Map.of("user", savedOrder.getBuyer().getFirstName() +" "+savedOrder.getBuyer().getLastName()
         , "item", item.getTitle());
+
     String link = "/messages?itemId=" + item.getItemId() + "&recipientId=" + order.getBuyer().getEmail();
     notificationService.send(item.getSeller(),args, NotificationType.ITEM_SOLD,link);
+
     chatMessageService.save(ChatMessageCreateDto.builder()
         .senderId(savedOrder.getBuyer().getEmail())
         .recipientId(item.getSeller().getEmail())
+        .itemId(item.getItemId())
         .type(MessageType.PURCHASE)
-        .content(null)
+        .content(savedOrder.getId().toString())
         .build());
     return OrderMapper.toDto(savedOrder);
+  }
+
+  @Override
+  public OrderDto getOrderWithId(long orderId, User user){
+    Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new EntityNotFoundException("Item not found"));
+
+    if(user.getId().equals(order.getBuyer().getId()) || user.getId().equals(order.getItem().getSeller().getId())){
+      return OrderMapper.toDto(order);
+    }else {
+      throw new SecurityException("The user is not a part of the order");
+    }
   }
 
   @Override
