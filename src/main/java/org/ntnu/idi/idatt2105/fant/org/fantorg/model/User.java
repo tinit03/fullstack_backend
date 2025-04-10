@@ -54,7 +54,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String lastName;
 
-
     /**
      * Encrypted password for user authentication; cannot be null.
      */
@@ -70,12 +69,19 @@ public class User implements UserDetails {
     @Email
     private String email;
 
+    /**
+     * User's address, can be null.
+     */
     private String address;
 
+    /**
+     * User's phone number, can be null.
+     */
     private String number;
 
     /**
-     * A user's role. See {@link Role}
+     * A user's role. The role determines the user's level of access.
+     * See {@link Role} for available roles.
      */
     @NotNull
     @Column(nullable = false)
@@ -83,66 +89,136 @@ public class User implements UserDetails {
     private Role role;
 
     /**
-     * Granted authorities for user
-     * @return List of granted authorities given the role of the user.
+     * Returns the granted authorities for the user based on their role.
+     * This method integrates with Spring Security for role-based access control.
+     *
+     * @return a collection of granted authorities for the user's role.
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
+
+    /**
+     * One-to-many relationship between user and items that they have listed for sale.
+     * When a user is removed, the corresponding items are also removed due to cascade settings.
+     */
     @OneToMany(mappedBy = "seller", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Item> items;
 
+    /**
+     * One-to-many relationship between user and their bookmarks.
+     * When a user is removed, the corresponding bookmarks are also removed.
+     */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Bookmark> bookmarks = new HashSet<>();
 
+    /**
+     * One-to-many relationship between user and their notifications.
+     * When a user is removed, the corresponding notifications are also removed.
+     */
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications = new ArrayList<>();
 
+    /**
+     * One-to-many relationship between user and received chat messages.
+     * When a user is removed, the corresponding messages are also removed.
+     */
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> chatMessagesRecipient = new ArrayList<>();
 
+    /**
+     * One-to-many relationship between user and sent chat messages.
+     * When a user is removed, the corresponding messages are also removed.
+     */
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> chatMessagesSender = new ArrayList<>();
 
+    /**
+     * One-to-many relationship between user and the chat rooms they belong to as a recipient.
+     * When a user is removed, the corresponding chat rooms are also removed.
+     */
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoom> chatRoomRecipient = new ArrayList<>();
 
+    /**
+     * One-to-many relationship between user and the chat rooms they belong to as a sender.
+     * When a user is removed, the corresponding chat rooms are also removed.
+     */
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> chatRoomSender = new ArrayList<>();
 
+    /**
+     * A one-to-one relationship between a user and their profile image.
+     * The profile image is linked to the user, and can be updated or removed.
+     */
     @OneToOne
     @JoinColumn(name = "profile_image_id")
     private Image profileImage;
 
+    /**
+     * One-to-one relationship between user and their refresh token.
+     * This refresh token is used for session management and authentication.
+     */
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private RefreshToken refreshToken;
 
-    // Let email behave like username
+    /**
+     * Retrieves the username of the user. In this case, the email is used as the username.
+     * This method is required by the Spring Security {@link UserDetails} interface.
+     *
+     * @return the email address of the user.
+     */
     @Override
     public String getUsername() {
-        return this.email; //We would rather
+        return this.email;
     }
+
+    /**
+     * Always returns true, indicating that the account is not expired.
+     *
+     * @return true, as the account is always considered non-expired.
+     */
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    /**
+     * Always returns true, indicating that the account is not locked.
+     *
+     * @return true, as the account is always considered non-locked.
+     */
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    /**
+     * Always returns true, indicating that the credentials are not expired.
+     *
+     * @return true, as the credentials are always considered non-expired.
+     */
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    /**
+     * Always returns true, indicating that the account is enabled.
+     *
+     * @return true, as the account is always considered enabled.
+     */
     @Override
     public boolean isEnabled() {
         return true;
     }
 
+    /**
+     * Retrieves the password of the user. This method is required by the Spring Security {@link UserDetails} interface.
+     *
+     * @return the password of the user.
+     */
     @Override
     public String getPassword(){
         return password;
