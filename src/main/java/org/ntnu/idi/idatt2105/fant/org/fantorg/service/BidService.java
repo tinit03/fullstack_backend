@@ -9,5 +9,6 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 public interface BidService {
   BidDto placeBid(BidCreateDto dto, User bidder);
   List<BidDto> getBidsForItem(Long itemId);
-  OrderDto acceptBid(Long bidId, User seller);
+  OrderDto acceptBid(Long bidId, User seller, boolean accept);
+  BidDto getBidFromId(Long id, User user);
 }

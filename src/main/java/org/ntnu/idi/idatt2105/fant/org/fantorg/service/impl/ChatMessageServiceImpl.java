@@ -11,6 +11,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ChatMessageMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatMessage;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.NotificationType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatMessageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ChatMessageService;
@@ -33,32 +34,36 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
   @Override
   public ChatMessageDto save(ChatMessageCreateDto msgDto) {
-    //log.info("Getting chatId from ChatMessageServiceImpl");
 
-    String chatId = chatRoomService
+    String chatIdA = chatRoomService
         .getChatRoomId(msgDto.getSenderId(), msgDto.getRecipientId(), msgDto.getItemId(), true)
         .orElseThrow(
             () -> new ChatRoomNotFoundException(msgDto.getSenderId() + " " + msgDto.getRecipientId() + " " + msgDto.getItemId()));
 
+    String chatIdB = chatRoomService
+            .getChatRoomId(msgDto.getRecipientId(), msgDto.getSenderId(), msgDto.getItemId(), true)
+            .orElseThrow(
+                    () -> new ChatRoomNotFoundException(msgDto.getSenderId() + " " + msgDto.getRecipientId() + " " + msgDto.getItemId()));
+
+    List<String> chatIds = List.of(chatIdA, chatIdB);
+
+    chatRoomService.newEntry(chatIds);
 
     User sender = userService.findByEmail(msgDto.getSenderId());
     User recipient = userService.findByEmail(msgDto.getRecipientId());
     Item item = itemService.getItemById(msgDto.getItemId());
 
-    ChatMessage chatMessage = ChatMessageMapper.toEntity(msgDto, sender, recipient, item, chatId);
+    ChatMessage chatMessage = ChatMessageMapper.toEntity(msgDto, sender, recipient, item, chatIdA);
     chatMessageRepository.save(chatMessage);
 
-    //log.info("ChatId: {}", chatId);
-    Map<String, String> args = Map.of("user", recipient.getFirstName() +" "+recipient.getLastName()
-        , "item", item.getTitle());
-    // todo: fix
-    String link = "/items/" + item.getItemId();
-    notificationService.send(item.getSeller(),args, NotificationType.NEW_BID,link);
-    notificationService.send(item.getSeller(),args, NotificationType.MESSAGE_RECEIVED,link);
-    log.info("ChatId: {}", chatId);
+    if (MessageType.NORMAL == chatMessage.getType()) {
+      Map<String, String> args = Map.of("user", sender.getFirstName() +" "+sender.getLastName(), "messageType", MessageType.NORMAL.toString());
+      String link = "/messages?itemId=" + item.getItemId() + "&recipientId=" + chatMessage.getSender().getEmail();
+      notificationService.send(recipient,args, NotificationType.MESSAGE_RECEIVED, link);
+    }
 
     return ChatMessageMapper.toDto(chatMessage);
-    }
+  }
 
   @Override
   public Page<ChatMessageDto> findChatMessages(String senderId, String recipientId, Long itemId, Pageable pageable) {
@@ -69,5 +74,14 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     int start = (int) pageable.getOffset();
     int end = Math.min((start + pageable.getPageSize()), messages.size());
     return new PageImpl<>(messages.stream().map(ChatMessageMapper::toDto).toList().subList(start, end), pageable, messages.size());
-  }
+ }
+
+ @Override
+  public ChatMessageDto saveNewBidMessage(ChatMessageCreateDto chatMessageCreateDto) {
+    if (chatMessageCreateDto.getType() != MessageType.BID) {
+      throw new IllegalArgumentException("The message type is not a bid: " + chatMessageCreateDto.getType());
+    }
+
+    return save(chatMessageCreateDto);
+ }
 }

@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @Entity
 @Getter
@@ -37,6 +39,8 @@ public class ChatRoom {
   @ManyToOne
   @JoinColumn(name = "item_id")
   private Item item;
+
+  private LocalDateTime lastEntry;
 
   private String chatId;
 }

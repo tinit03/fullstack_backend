@@ -12,4 +12,6 @@ public interface ChatMessageService {
   ChatMessageDto save(ChatMessageCreateDto msgDto);
 
   Page<ChatMessageDto> findChatMessages(String senderId, String recipientId, Long itemId, Pageable pageable);
+
+  ChatMessageDto saveNewBidMessage(ChatMessageCreateDto msgDto);
 }

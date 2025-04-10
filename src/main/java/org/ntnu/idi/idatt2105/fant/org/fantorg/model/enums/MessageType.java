@@ -4,4 +4,5 @@ public enum MessageType {
   NORMAL,
   BID,
   PURCHASE,
+  STATUS_CHANGED
 }

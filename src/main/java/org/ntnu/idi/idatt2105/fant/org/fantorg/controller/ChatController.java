@@ -48,8 +48,8 @@ public class ChatController {
       @AuthenticationPrincipal User user,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size,
-      @RequestParam(defaultValue = "lastMessageTimestamp") String sortField,
-      @RequestParam(defaultValue = "asc") String sortDir
+      @RequestParam(defaultValue = "lastEntry") String sortField,
+      @RequestParam(defaultValue = "desc") String sortDir
   ) {
     log.info("Received GET request for /chats/{}", user.getEmail());
 
@@ -72,7 +72,6 @@ public class ChatController {
     log.info("Received GET request for /messages/{}/{}/{}", itemId, user.getEmail(), recipientId);
     Pageable pageable = PageRequest.of(page, size);
     Page<ChatMessageDto> messages = chatMessageService.findChatMessages(user.getEmail(), recipientId, itemId, pageable);
-    log.info("messages: {}", messages);
     return ResponseEntity.ok(messages);
   }
 
