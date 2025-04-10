@@ -27,6 +27,31 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class is a Spring component that loads initial test data into the application
+ * when the application starts with the {@code test} profile.
+ * <p>
+ * It populates the database with:
+ * <ul>
+ *   <li>Users</li>
+ *   <li>Categories and subcategories</li>
+ *   <li>Items with metadata such as price, status, condition, etc.</li>
+ *   <li>Images associated with categories and items</li>
+ *   <li>Preconfigured item listings, including contact, bid, and direct sale types</li>
+ * </ul>
+ *
+ * This class helps ensure that the system has sample data to test and visualize the
+ * core functionalities like item listing, category browsing, and user interactions.
+ *
+ * Dependencies such as repositories and services are injected using constructor
+ * injection (enabled by {@link lombok.RequiredArgsConstructor}).
+ *
+ * This component is only active when the {@code test} profile is active.
+ *
+ * @see org.springframework.boot.CommandLineRunner
+ * @see org.springframework.context.annotation.Profile
+ * @author Tini Tran and Harry Xu
+ */
 @Component
 @RequiredArgsConstructor
 public class LoadData implements CommandLineRunner {
@@ -41,14 +66,22 @@ public class LoadData implements CommandLineRunner {
 
 
   /**
-   * Callback used to run the bean.
+   * Populates the application with test data including:
+   * <ul>
+   *   <li>Users: test user, John Doe, Alice Smith</li>
+   *   <li>Categories: Parent and subcategories like Clothes, Electronics, Sports, etc.</li>
+   *   <li>Items: Example items under various categories, with various conditions and listing types</li>
+   *   <li>Images: Assigned to both categories and items for visual representation</li>
+   * </ul>
    *
-   * @param args incoming main method arguments
-   * @throws Exception on error
+   * This method is only invoked when the Spring Boot application is run with the "test" profile.
+   * It uses JPA repositories to persist entities to the database.
+   *
+   * @param args Application arguments (unused)
    */
   @Override
   @Profile("test")
-  public void run(String... args) throws Exception {
+  public void run(String... args) {
 
     // 1. Create test user
     User user = new User();
