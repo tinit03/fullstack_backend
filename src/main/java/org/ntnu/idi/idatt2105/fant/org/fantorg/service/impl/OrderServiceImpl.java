@@ -49,6 +49,7 @@ public class OrderServiceImpl implements OrderService {
     chatMessageService.save(ChatMessageCreateDto.builder()
         .senderId(savedOrder.getBuyer().getEmail())
         .recipientId(item.getSeller().getEmail())
+        .itemId(item.getItemId())
         .type(MessageType.PURCHASE)
         .content(null)
         .build());
