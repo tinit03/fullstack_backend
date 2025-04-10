@@ -20,6 +20,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementation of {@link ChatRoomService}, responsible for managing chat rooms between users,
+ * creating new chat connections, retrieving user-specific chat lists, and maintaining timestamps.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -31,14 +35,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
   private final ChatMessageRepository chatMessageRepository;
 
   /**
-   * Method for finding a chat room from the sender, recipient and item. If it does not
-   * exist, the flag determines whether a new one should be created.
+   * Retrieves an existing chat room ID between two users regarding a specific item.
+   * If not found and {@code createNewRoomIfExists} is {@code true}, creates a new chat room.
    *
-   * @param senderId Mail of the sender.
-   * @param recipientId Recipient of message.
-   * @param itemId Identifier of the item of the seller
-   * @param createNewRoomIfExists Flag for whether a new room should be created
-   * @return
+   * @param senderId               The sender's email address.
+   * @param recipientId            The recipient's email address.
+   * @param itemId                 The item ID involved in the conversation.
+   * @param createNewRoomIfExists  Whether to create a new chat room if none is found.
+   * @return An {@link Optional} containing the chat ID, or empty if not found and creation is disabled.
    */
   @Override
   public Optional<String> getChatRoomId(String senderId, String recipientId, Long itemId,
@@ -96,6 +100,11 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     return chatId;
   }
 
+  /**
+   * Updates the {@code lastEntry} timestamp for all chat rooms matching the given chat IDs.
+   *
+   * @param chatIds List of chat room IDs to update.
+   */
   public void newEntry(List<String> chatIds) {
     List<ChatRoom> chatRooms = chatRoomRepository.findByChatIdIn(chatIds);
     LocalDateTime newEntryTime = LocalDateTime.now();
@@ -105,6 +114,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
   }
 
+  /**
+   * Retrieves a paginated list of chat rooms for a given sender, including metadata such as
+   * the last message content, timestamp, item details, and recipient profile info.
+   *
+   * @param senderId  The sender's email.
+   * @param pageable  The paging parameters.
+   * @return A {@link Page} of {@link ChatDto} representing the user's chat overview.
+   */
   public Page<ChatDto> getChats(String senderId, Pageable pageable) {
     User sender = userService.findByEmail(senderId);
     Page<ChatRoom> chatRooms = chatRoomRepository.findChatRoomsBySender(sender, pageable);

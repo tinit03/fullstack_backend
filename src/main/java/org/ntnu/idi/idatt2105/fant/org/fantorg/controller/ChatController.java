@@ -1,18 +1,20 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.SubCategoryDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatNotification;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatProfileDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatMessage;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatRoom;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatRoomRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatMessageServiceImpl;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -68,15 +71,20 @@ public class ChatController {
   @Operation(summary = "Get User Chats",
       description = "Retrieves a paginated list of chat conversations for the authenticated user, sorted by the specified field and direction.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Chats retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "Chats retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ChatDto.class))
+          }),
   })
   @GetMapping("/chats")
   public ResponseEntity<Page<ChatDto>> getUserChats(
-      @AuthenticationPrincipal User user,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size,
-      @RequestParam(defaultValue = "lastEntry") String sortField,
-      @RequestParam(defaultValue = "desc") String sortDir
+      @Parameter(description = "Authenticated user") @AuthenticationPrincipal User user,
+      @Parameter(description = "Page number") @RequestParam(defaultValue = "0") int page,
+      @Parameter(description = "page size") @RequestParam(defaultValue = "10") int size,
+      @Parameter(description = "sorting field") @RequestParam(defaultValue = "lastEntry") String sortField,
+      @Parameter(description = "sorting direction") @RequestParam(defaultValue = "desc") String sortDir
   ) {
     log.info("Received GET request for /chats/{}", user.getEmail());
     Sort sort = SortUtil.buildSort(sortField, sortDir);
@@ -99,15 +107,20 @@ public class ChatController {
   @Operation(summary = "Find Chat Messages",
       description = "Retrieves a paginated list of chat messages between the authenticated user and the specified recipient for a given item.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Chat messages retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "Chat messages retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ChatMessageDto.class))
+          }),
   })
   @GetMapping("/messages/{itemId}/{recipientId}")
   public ResponseEntity<Page<ChatMessageDto>> findChatMessages(
-      @PathVariable("itemId") Long itemId,
-      @AuthenticationPrincipal User user,
-      @PathVariable("recipientId") String recipientId,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "50") int size
+     @Parameter(description = "Identificator of item") @PathVariable("itemId") Long itemId,
+     @Parameter(description = "Authenticated user") @AuthenticationPrincipal User user,
+     @Parameter(description = "Recipient email") @PathVariable("recipientId") String recipientId,
+     @Parameter(description = "Page num") @RequestParam(defaultValue = "0") int page,
+     @Parameter(description = "Page size") @RequestParam(defaultValue = "50") int size
   ) {
     log.info("Received GET request for /messages/{}/{}/{}", itemId, user.getEmail(), recipientId);
     Pageable pageable = PageRequest.of(page, size);
@@ -153,10 +166,16 @@ public class ChatController {
   @Operation(summary = "Get Recipient Info",
       description = "Retrieves the chat profile information for a specified recipient.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Chat profile retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "Chat profile retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ChatProfileDto.class))
+          }),
   })
   @GetMapping("/chat/recipient/{recipientId}")
-  public ChatProfileDto getRecipientInfo(@PathVariable String recipientId, @AuthenticationPrincipal User user) {
+  public ChatProfileDto getRecipientInfo(
+      @Parameter(description = "Recipient mail") @PathVariable String recipientId, @AuthenticationPrincipal User user) {
     return userServiceImpl.findChatProfile(recipientId);
   }
 
@@ -171,10 +190,17 @@ public class ChatController {
       description = "Sends a chat to a seller, creating a new room if it does not exist, else uses the existing chat room"
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Chat sent successfully")
+      @ApiResponse(responseCode = "200", description = "Chat sent successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ChatMessageDto.class))
+          }),
   })
   @PostMapping("/chat")
-  public ResponseEntity<ChatMessageDto> contactSeller(@RequestBody ChatMessageCreateDto chatMessageCreateDto, @AuthenticationPrincipal User user) {
+  public ResponseEntity<ChatMessageDto> contactSeller(
+      @Parameter(description = "Chat message info") @RequestBody ChatMessageCreateDto chatMessageCreateDto,
+      @Parameter(description = "Authenticated user") @AuthenticationPrincipal User user) {
     chatMessageCreateDto.setSenderId(user.getEmail());
     ChatMessageDto savedMsgDto = chatMessageService.save(chatMessageCreateDto);
     messagingTemplate.convertAndSendToUser(savedMsgDto.getRecipientId(), "/queue/messages",

@@ -21,6 +21,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service implementation for handling chat message functionality, including saving messages,
+ * retrieving messages by chat room, and sending notifications.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -32,6 +36,13 @@ public class ChatMessageServiceImpl implements ChatMessageService {
   private final ItemServiceImpl itemService;
   private final NotificationService notificationService;
 
+  /**
+   * Saves a new chat message, sends a notification to the recipient, and links it to the correct chat room.
+   *
+   * @param msgDto The chat message data transfer object containing sender, recipient, and message content.
+   * @return The saved {@link ChatMessageDto}.
+   * @throws ChatRoomNotFoundException If the chat room for the given users and item doesn't exist.
+   */
   @Override
   public ChatMessageDto save(ChatMessageCreateDto msgDto) {
 
@@ -65,6 +76,16 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     return ChatMessageMapper.toDto(chatMessage);
   }
 
+  /**
+   * Retrieves paginated chat messages between two users regarding a specific item.
+   *
+   * @param senderId    The sender's email.
+   * @param recipientId The recipient's email.
+   * @param itemId      The ID of the item in context.
+   * @param pageable    The pagination information.
+   * @return A page of {@link ChatMessageDto} objects.
+   * @throws ChatRoomNotFoundException If the chat room does not exist.
+   */
   @Override
   public Page<ChatMessageDto> findChatMessages(String senderId, String recipientId, Long itemId, Pageable pageable) {
 
@@ -76,7 +97,14 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     return new PageImpl<>(messages.stream().map(ChatMessageMapper::toDto).toList().subList(start, end), pageable, messages.size());
  }
 
- @Override
+  /**
+   * Saves a new bid message. This method ensures that the message type is BID before saving.
+   *
+   * @param chatMessageCreateDto The bid message data transfer object.
+   * @return The saved {@link ChatMessageDto}.
+   * @throws IllegalArgumentException If the message type is not {@link MessageType#BID}.
+   */
+  @Override
   public ChatMessageDto saveNewBidMessage(ChatMessageCreateDto chatMessageCreateDto) {
     if (chatMessageCreateDto.getType() != MessageType.BID) {
       throw new IllegalArgumentException("The message type is not a bid: " + chatMessageCreateDto.getType());

@@ -1,7 +1,11 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.Optional;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
@@ -76,16 +80,21 @@ public class ItemController {
           + "The endpoint returns a paginated response matching the search filter."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Search completed successfully")
+      @ApiResponse(responseCode = "200", description = "Search completed successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ItemSearchResponse.class))
+          }),
   })
   @GetMapping("/search")
   public ItemSearchResponse searchItems(
-      @ModelAttribute ItemSearchFilter filter,
-      @RequestParam(defaultValue = "publishedAt") String sortField,
-      @RequestParam(defaultValue = "desc") String sortDir,
-      @RequestParam(value = "page", defaultValue = "0") int page,
-      @RequestParam(value = "size", defaultValue = "10") int size,
-      @AuthenticationPrincipal User user) {
+      @Parameter(description = "Filter of item") @ModelAttribute ItemSearchFilter filter,
+      @Parameter(description = "Sorting value") @RequestParam(defaultValue = "publishedAt") String sortField,
+      @Parameter(description = "Sortingdirection") @RequestParam(defaultValue = "desc") String sortDir,
+      @Parameter(description = "Page number") @RequestParam(value = "page", defaultValue = "0") int page,
+      @Parameter(description = "page size") @RequestParam(value = "size", defaultValue = "10") int size,
+      @Parameter(description = "Authenticated user") @AuthenticationPrincipal User user) {
 
     Sort sort = SortUtil.buildSort(sortField, sortDir);
     Pageable pageable = PageRequest.of(page, size, sort);
@@ -109,16 +118,21 @@ public class ItemController {
           + "Results are sorted by the specified field and direction."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Items retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "Items retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ItemDto.class))
+          }),
   })
   @GetMapping
   public Page<ItemDto> getAllItems(
-      @RequestParam(value = "page", defaultValue = "0") int page,
-      @RequestParam(value = "size", defaultValue = "10") int size,
-      @RequestParam(defaultValue = "publishedAt") String sortField,
-      @RequestParam(defaultValue = "desc") String sortDir,
-      @RequestParam(defaultValue = "ACTIVE") Status status,
-      @AuthenticationPrincipal User user
+      @Parameter(description = "Page num") @RequestParam(value = "page", defaultValue = "0") int page,
+      @Parameter(description = "Page size") @RequestParam(value = "size", defaultValue = "10") int size,
+      @Parameter(description = "Sorting value") @RequestParam(defaultValue = "publishedAt") String sortField,
+      @Parameter(description = "Sorting direction") @RequestParam(defaultValue = "desc") String sortDir,
+      @Parameter(description = "Item status") @RequestParam(defaultValue = "ACTIVE") Status status,
+      @Parameter(description = "Auth user") @AuthenticationPrincipal User user
   ) {
     Sort sort = SortUtil.buildSort(sortField, sortDir);
     Pageable pageable = PageRequest.of(page, size, sort);
@@ -138,12 +152,17 @@ public class ItemController {
           + "The endpoint includes bookmark status information for the authenticated user."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Item details retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "Item details retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ItemDto.class))
+          }),
   })
   @GetMapping("/{id}")
   public ResponseEntity<ItemDto> getItemDetail(
-      @PathVariable Long id,
-      @AuthenticationPrincipal User user
+     @Parameter(description = "Identificator of item") @PathVariable Long id,
+     @Parameter(description = "Authenticated user") @AuthenticationPrincipal User user
   ) {
     ItemDto dto = itemService.getItemByIdBookmarked(id, user);
     return ResponseEntity.ok(dto);
@@ -162,12 +181,17 @@ public class ItemController {
           + "Returns the created item details with HTTP status 201."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "Item created successfully")
+      @ApiResponse(responseCode = "201", description = "Item created successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ItemDto.class))
+          }),
   })
   @PostMapping
   public ResponseEntity<ItemDto> createItem(
-      @Valid @RequestBody ItemCreateDto dto,
-      @AuthenticationPrincipal User user
+     @Parameter(description = "Item creating info") @Valid @RequestBody ItemCreateDto dto,
+     @Parameter(description = "Authenticated user") @AuthenticationPrincipal User user
   ) {
     Item saved = itemService.createItem(dto, user);
     return ResponseEntity.status(HttpStatus.CREATED).body(ItemMapper.toItemDto(saved));
@@ -185,12 +209,12 @@ public class ItemController {
       description = "Deletes the item identified by the provided ID for the authenticated user."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "Item deleted successfully")
+      @ApiResponse(responseCode = "204", description = "Item deleted successfully", content=@Content)
   })
   @DeleteMapping("/{itemId}")
   public ResponseEntity<Void> deleteItem(
-      @PathVariable Long itemId,
-      @AuthenticationPrincipal User user
+      @Parameter(description = "Item identificator") @PathVariable Long itemId,
+      @Parameter(description = "Authenticated user") @AuthenticationPrincipal User user
   ) {
     itemService.deleteItem(itemId, user);
     return ResponseEntity.noContent().build();
@@ -209,13 +233,18 @@ public class ItemController {
       description = "Updates the item identified by the provided ID with new information."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Item updated successfully")
+      @ApiResponse(responseCode = "200", description = "Item updated successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ItemDto.class))
+          }),
   })
   @PutMapping("/{itemId}")
   public ResponseEntity<ItemDto> updateItem(
-      @PathVariable Long itemId,
-      @Valid @RequestBody ItemEditDto dto,
-      @AuthenticationPrincipal User user
+      @Parameter(description = "item identificator") @PathVariable Long itemId,
+      @Parameter(description = "Item editing info") @Valid @RequestBody ItemEditDto dto,
+      @Parameter(description = "authenticated user") @AuthenticationPrincipal User user
   ) {
     Item updated = itemService.updateItem(itemId, dto, user);
     ItemDto updatedDto = ItemMapper.toItemDto(updated);
@@ -235,13 +264,18 @@ public class ItemController {
       description = "Changes the status of the item identified by the provided ID using the specified status update data."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Item status updated successfully")
+      @ApiResponse(responseCode = "200", description = "Item status updated successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ItemDto.class))
+          }),
   })
   @PutMapping("/{itemId}/status")
   public ResponseEntity<ItemDto> updateStatus(
-      @PathVariable Long itemId,
-      @Valid @RequestBody ItemStatusUpdate status,
-      @AuthenticationPrincipal User user
+      @Parameter(description = "Item identificator") @PathVariable Long itemId,
+      @Parameter(description = "Item status") @Valid @RequestBody ItemStatusUpdate status,
+      @Parameter(description = "Authenticated user") @AuthenticationPrincipal User user
   ) {
     Item updated = itemService.changeStatus(itemId, status.getStatus(), user);
     ItemDto updatedDto = ItemMapper.toItemDto(updated);
@@ -265,16 +299,21 @@ public class ItemController {
           + "An optional status filter can be applied."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "User's own items retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "User's own items retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ItemDto.class))
+          }),
   })
   @GetMapping("/me")
   public Page<ItemDto> getOwnItems(
-      @RequestParam(value = "page", defaultValue = "0") int page,
-      @RequestParam(value = "size", defaultValue = "10") int size,
-      @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
-      @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
-      @RequestParam(value = "status", required = false) Status status,
-      @AuthenticationPrincipal User user
+      @Parameter(description = "page number") @RequestParam(value = "page", defaultValue = "0") int page,
+      @Parameter(description = "page size") @RequestParam(value = "size", defaultValue = "10") int size,
+      @Parameter(description = "sorting value") @RequestParam(value = "sortField", defaultValue = "publishedAt") String sortField,
+      @Parameter(description = "sorting direction") @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+      @Parameter(description = "Item status") @RequestParam(value = "status", required = false) Status status,
+      @Parameter(description = "Authenticated user") @AuthenticationPrincipal User user
   ) {
     Sort sort = SortUtil.buildSort(sortField, sortDir);
     Pageable pageable = PageRequest.of(page, size, sort);

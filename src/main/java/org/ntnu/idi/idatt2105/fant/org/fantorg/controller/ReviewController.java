@@ -1,9 +1,13 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.review.ReviewCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.review.ReviewDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
@@ -42,13 +46,18 @@ public class ReviewController {
       description = "Creates a review for a seller associated with a completed order."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Review created successfully")
+      @ApiResponse(responseCode = "200", description = "Review created successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = OrderDto.class))
+          }),
   })
   @PostMapping("/order/{orderId}")
   public ResponseEntity<Void> createReview(
-      @PathVariable Long orderId,
-      @AuthenticationPrincipal User currentUser,
-      @RequestBody ReviewCreateDto reviewCreateDto) {
+      @Parameter(description="Order identificator") @PathVariable Long orderId,
+      @Parameter(description="Authenticated user") @AuthenticationPrincipal User currentUser,
+      @Parameter(description="Review creating info") @RequestBody ReviewCreateDto reviewCreateDto) {
     reviewService.createReview(currentUser, orderId, reviewCreateDto);
     return ResponseEntity.ok().build();
   }
@@ -68,14 +77,19 @@ public class ReviewController {
           + "Reviews are sorted by creation date in the specified direction."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Reviews retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "Reviews retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = OrderDto.class))
+          }),
   })
   @GetMapping("/seller/{sellerId}")
   public ResponseEntity<Page<ReviewDto>> getReviewsForSeller(
-      @PathVariable Long sellerId,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size,
-      @RequestParam(name = "date", defaultValue = "desc") String sortDir
+      @Parameter(description="Seller identification") @PathVariable Long sellerId,
+      @Parameter(description="Page number") @RequestParam(defaultValue = "0") int page,
+      @Parameter(description="page size") @RequestParam(defaultValue = "10") int size,
+      @Parameter(description="sorting direction") @RequestParam(name = "date", defaultValue = "desc") String sortDir
   ) {
     Sort sort = sortDir.equalsIgnoreCase("asc")
         ? Sort.by("createdAt").ascending()

@@ -1,6 +1,9 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.persistence.EntityNotFoundException;
@@ -64,11 +67,11 @@ public class AuthenticationController {
       description = "Authenticates the user with provided credentials and returns a JWT access token. "
           + "The refresh token is set as an HttpOnly cookie.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Login successful"),
+      @ApiResponse(responseCode = "200", description = "Login successful", content=@Content),
       @ApiResponse(responseCode = "401", description = "Invalid credentials")
   })
   @PostMapping("/login")
-  public ResponseEntity<?> login(@Valid @RequestBody UserLoginDto loginRequest, HttpServletResponse response) {
+  public ResponseEntity<?> login(@Parameter(description = "DTO wrapping Email and password") @Valid @RequestBody UserLoginDto loginRequest, HttpServletResponse response) {
     try {
       AuthenticationResponse tokens = userService.authenticateAndGenerateToken(loginRequest);
       Cookie refreshCookie = new Cookie("refreshToken", tokens.getRefreshToken());
@@ -99,11 +102,11 @@ public class AuthenticationController {
       description = "Registers a new user and returns a JWT access token. "
           + "The refresh token is set as an HttpOnly cookie.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Registration successful"),
-      @ApiResponse(responseCode = "401", description = "Registration failed due to invalid data")
+      @ApiResponse(responseCode = "200", description = "Registration successful", content=@Content),
+      @ApiResponse(responseCode = "401", description = "Registration failed due to invalid data", content=@Content)
   })
   @PostMapping("/register")
-  public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDto registerDto, HttpServletResponse response) {
+  public ResponseEntity<?> register(@Parameter(description = "User information for registering") @Valid @RequestBody UserRegisterDto registerDto, HttpServletResponse response) {
     try {
       AuthenticationResponse token = userService.registerUser(registerDto);
       Cookie refreshCookie = new Cookie("refreshToken", token.getRefreshToken());
@@ -130,9 +133,14 @@ public class AuthenticationController {
    */
   @Operation(summary = "Forgot Password",
       description = "Generates a password reset token and sends an email with reset instructions to the user.")
-  @ApiResponse(responseCode = "200", description = "Password reset email sent")
+  @ApiResponse(responseCode = "200", description = "Password reset email sent",
+      content = {
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = String.class))
+  })
   @PostMapping("/forgot-password")
-  public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordDto dto) {
+  public ResponseEntity<String> forgotPassword(@Parameter(description = "Email of the sender") @Valid @RequestBody ForgotPasswordDto dto) {
     PasswordResetToken token = resetService.createTokenForUser(dto);
     emailService.sendPasswordResetEmail(dto.getEmail(), token.getToken());
     return ResponseEntity.ok("sent mail");
@@ -144,23 +152,31 @@ public class AuthenticationController {
    * @param token the password reset token to validate
    * @param email the email address associated with the reset token
    * @return a TokenValidDto indicating whether the token is valid and a corresponding message,
-   *         or a bad request with an error message if invalid.
+   * or a bad request with an error message if invalid.
    */
   @Operation(summary = "Validate Reset Token",
       description = "Validates the password reset token provided via query parameters, "
           + "ensuring it is valid for the provided email address.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Token is valid"),
-      @ApiResponse(responseCode = "400", description = "Invalid or expired token")
+      @ApiResponse(responseCode = "200", description = "Token is valid",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = TokenValidDto.class))
+          }),
+      @ApiResponse(responseCode = "400", description = "Invalid or expired token", content = @Content),
   })
   @GetMapping("/validate-reset-token")
   public ResponseEntity<TokenValidDto> validateResetToken(
-      @RequestParam("token") String token,
-      @RequestParam("email") String email) {
-    try {
+      @Parameter(description = "JWT token") @RequestParam("token") String token,
+      @Parameter(description = "Sender email") @RequestParam("email") String email)
+  {
+    try
+    {
       resetService.validateToken(token, email);
       return ResponseEntity.ok(new TokenValidDto(true, "Token is valid"));
-    } catch (IllegalArgumentException | IllegalStateException | SecurityException ex) {
+    } catch (IllegalArgumentException | IllegalStateException | SecurityException ex)
+    {
       return ResponseEntity.badRequest().body(new TokenValidDto(false, ex.getMessage()));
     }
   }
@@ -174,11 +190,16 @@ public class AuthenticationController {
   @Operation(summary = "Reset Password",
       description = "Resets the user's password using the provided token and new password.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Password successfully reset"),
-      @ApiResponse(responseCode = "400", description = "Invalid token or password reset error")
+      @ApiResponse(responseCode = "200", description = "Password successfully reset",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = String.class))
+          }),
+      @ApiResponse(responseCode = "400", description = "Invalid token or password reset error", content=@Content)
   })
   @PostMapping("/reset-password")
-  public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordDto dto) {
+  public ResponseEntity<String> resetPassword(@Parameter(description = "Reset password data") @RequestBody ResetPasswordDto dto) {
     try {
       resetService.resetPassword(dto);
       return ResponseEntity.ok("Password successfully reset");
@@ -197,8 +218,8 @@ public class AuthenticationController {
   @Operation(summary = "Refresh Token",
       description = "Generates a new access token using the refresh token provided in the cookies.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "New access token generated"),
-      @ApiResponse(responseCode = "401", description = "No refresh token provided or refresh token invalid")
+      @ApiResponse(responseCode = "200", description = "New access token generated", content=@Content),
+      @ApiResponse(responseCode = "401", description = "No refresh token provided or refresh token invalid", content=@Content)
   })
   @PostMapping("/refresh")
   public ResponseEntity<?> refreshToken(HttpServletRequest request) {
@@ -227,25 +248,34 @@ public class AuthenticationController {
   /**
    * Logs out the authenticated user by invalidating the refresh token and clearing its cookie.
    *
-   * @param user the currently authenticated user (obtained via Spring Security)
+   * @param user     the currently authenticated user (obtained via Spring Security)
    * @param response the HTTP servlet response used to clear the refresh token cookie
    * @return a response entity with a success message if logout is successful;
-   *         otherwise, an error response if the user is not authenticated or not found.
+   * otherwise, an error response if the user is not authenticated or not found.
    */
   @Operation(summary = "Logout",
       description = "Logs out the current user by invalidating the refresh token and clearing the cookie.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Logged out successfully"),
-      @ApiResponse(responseCode = "401", description = "User not authenticated"),
-      @ApiResponse(responseCode = "404", description = "User not found")
+      @ApiResponse(responseCode = "200", description = "Logged out successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = String.class))
+          }),
+      @ApiResponse(responseCode = "401", description = "User not authenticated", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
   })
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/logout")
-  public ResponseEntity<String> logout(@AuthenticationPrincipal User user, HttpServletResponse response) {
-    if (user == null) {
+  public ResponseEntity<String> logout(@Parameter(description = "The authenticated user") @AuthenticationPrincipal User user,
+                                       HttpServletResponse response)
+  {
+    if (user == null)
+    {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
     }
-    try {
+    try
+    {
       userService.logout(user);
       Cookie refreshCookie = new Cookie("refreshToken", null);
       refreshCookie.setHttpOnly(true);
@@ -254,7 +284,8 @@ public class AuthenticationController {
       refreshCookie.setMaxAge(0);
       response.addCookie(refreshCookie);
       return ResponseEntity.ok("Logged out successfully");
-    } catch (EntityNotFoundException ex) {
+    } catch (EntityNotFoundException ex)
+    {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
   }
