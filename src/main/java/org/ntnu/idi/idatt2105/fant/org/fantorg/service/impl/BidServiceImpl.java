@@ -72,13 +72,13 @@ public class BidServiceImpl implements BidService {
         .collect(Collectors.toList());  }
 
   @Override
-  public OrderDto acceptBid(Long bidId, User seller, boolean accept) {
+  public OrderDto acceptBid(Long bidId, User seller) {
     Bid bid = bidRepository.findById(bidId)
         .orElseThrow(() -> new EntityNotFoundException("Bid is not found"));
     if(!bid.getItem().getSeller().getId().equals(seller.getId())) {
       throw new IllegalArgumentException("User is not authorized to accept this bid");
     }
-    bid.setStatus(accept ? BidStatus.ACCEPTED : BidStatus.REJECTED);
+    bid.setStatus(BidStatus.ACCEPTED);
     Bid savedBid = bidRepository.save(bid);
     Order order = buildOrder(bid.getItem(), bid.getBidder());
     Order savedOrder = orderRepository.save(order);
@@ -96,6 +96,30 @@ public class BidServiceImpl implements BidService {
         .content(savedBid.getId().toString())
         .build());
     return OrderMapper.toDto(savedOrder);
+  }
+
+  @Override
+  public void rejectBid(Long bidId, User seller) {
+    Bid bid = bidRepository.findById(bidId)
+        .orElseThrow(() -> new EntityNotFoundException("Bid is not found"));
+    if(!bid.getItem().getSeller().getId().equals(seller.getId())) {
+      throw new IllegalArgumentException("User is not authorized to accept this bid");
+    }
+    bid.setStatus(BidStatus.REJECTED);
+    Bid savedBid = bidRepository.save(bid);
+    Map<String, String> args = Map.of(
+        "user", seller.getFirstName() + " " + seller.getLastName(),
+        "item", bid.getItem().getTitle()
+    );
+    String link = "/messages?itemId=" + savedBid.getItem().getItemId() + "&recipientId=" + seller.getEmail();
+    notificationService.send(savedBid.getBidder(), args, NotificationType.BID_ACCEPTED, link);
+    chatMessageService.save(ChatMessageCreateDto.builder()
+        .senderId(seller.getEmail())
+        .recipientId(savedBid.getBidder().getEmail())
+        .itemId(savedBid.getItem().getItemId())
+        .type(MessageType.STATUS_CHANGED)
+        .content(savedBid.getId().toString())
+        .build());
   }
 
   @Override

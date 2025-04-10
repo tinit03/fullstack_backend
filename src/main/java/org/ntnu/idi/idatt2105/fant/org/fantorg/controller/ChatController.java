@@ -101,7 +101,8 @@ public class ChatController {
   }
 
   @PostMapping("/chat")
-  public ResponseEntity<ChatMessageDto> contactSeller(@RequestBody ChatMessageCreateDto chatMessageCreateDto) {
+  public ResponseEntity<ChatMessageDto> contactSeller(@RequestBody ChatMessageCreateDto chatMessageCreateDto, @AuthenticationPrincipal User user) {
+    chatMessageCreateDto.setSenderId(user.getEmail());
     ChatMessageDto savedMsgDto = chatMessageService.save(chatMessageCreateDto);
     messagingTemplate.convertAndSendToUser(savedMsgDto.getRecipientId(), "/queue/messages",
         ChatNotification.builder()
