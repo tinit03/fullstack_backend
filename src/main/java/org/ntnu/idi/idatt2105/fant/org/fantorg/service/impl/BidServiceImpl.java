@@ -87,6 +87,16 @@ public class BidServiceImpl implements BidService {
     return OrderMapper.toDto(savedOrder);
   }
 
+  @Override
+  public BidDto getBidFromId(Long id, User user) {
+    Bid bid = bidRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Bid not found"));
+    if(bid.getBidder().getId() == user.getId() || bid.getItem().getSeller().getId() == user.getId()){
+      return BidMapper.toDto(bid);
+    } else{
+      throw new SecurityException("This user is unauthorized");
+    }
+  }
+
   private Order buildOrder(Item item, User buyer) {
     Order order = new Order();
     order.setItem(item);
