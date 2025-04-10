@@ -16,7 +16,6 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.NotificationType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatMessageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ChatMessageService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.NotificationService;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,23 +31,29 @@ public class ChatMessageServiceImpl implements ChatMessageService {
   private final ChatRoomServiceImpl chatRoomService;
   private final ItemServiceImpl itemService;
   private final NotificationService notificationService;
-  private final HttpMessageConverters messageConverters;
 
   @Override
   public ChatMessageDto save(ChatMessageCreateDto msgDto) {
-    //log.info("Getting chatId from ChatMessageServiceImpl");
 
-    String chatId = chatRoomService
+    String chatIdA = chatRoomService
         .getChatRoomId(msgDto.getSenderId(), msgDto.getRecipientId(), msgDto.getItemId(), true)
         .orElseThrow(
             () -> new ChatRoomNotFoundException(msgDto.getSenderId() + " " + msgDto.getRecipientId() + " " + msgDto.getItemId()));
 
+    String chatIdB = chatRoomService
+            .getChatRoomId(msgDto.getRecipientId(), msgDto.getSenderId(), msgDto.getItemId(), true)
+            .orElseThrow(
+                    () -> new ChatRoomNotFoundException(msgDto.getSenderId() + " " + msgDto.getRecipientId() + " " + msgDto.getItemId()));
+
+    List<String> chatIds = List.of(chatIdA, chatIdB);
+
+    chatRoomService.newEntry(chatIds);
 
     User sender = userService.findByEmail(msgDto.getSenderId());
     User recipient = userService.findByEmail(msgDto.getRecipientId());
     Item item = itemService.getItemById(msgDto.getItemId());
 
-    ChatMessage chatMessage = ChatMessageMapper.toEntity(msgDto, sender, recipient, item, chatId);
+    ChatMessage chatMessage = ChatMessageMapper.toEntity(msgDto, sender, recipient, item, chatIdA);
     chatMessageRepository.save(chatMessage);
 
     if (MessageType.NORMAL == chatMessage.getType()) {

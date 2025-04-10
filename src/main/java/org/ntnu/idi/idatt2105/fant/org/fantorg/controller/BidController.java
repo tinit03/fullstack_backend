@@ -36,6 +36,12 @@ public class BidController {
     return ResponseEntity.ok(bids);
   }
 
+  @GetMapping("/{bitId}")
+  public ResponseEntity<BidDto> getBidFromId(@PathVariable Long bidId, @AuthenticationPrincipal User user){
+    BidDto bid = bidService.getBidFromId(bidId, user);
+    return ResponseEntity.ok(bid);
+  }
+
   @PostMapping("/{bidId}/accept")
   public ResponseEntity<OrderDto> acceptBid(@PathVariable Long bidId,
       @AuthenticationPrincipal User seller) {

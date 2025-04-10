@@ -48,8 +48,8 @@ public class ChatController {
       @AuthenticationPrincipal User user,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size,
-      @RequestParam(defaultValue = "lastMessageTimestamp") String sortField,
-      @RequestParam(defaultValue = "asc") String sortDir
+      @RequestParam(defaultValue = "lastEntry") String sortField,
+      @RequestParam(defaultValue = "desc") String sortDir
   ) {
     log.info("Received GET request for /chats/{}", user.getEmail());
 
