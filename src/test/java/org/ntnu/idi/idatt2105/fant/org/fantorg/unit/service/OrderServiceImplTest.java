@@ -12,13 +12,19 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageCreateDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Order;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.OrderRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ChatMessageService;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.NotificationService;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatMessageServiceImpl;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.OrderServiceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.mockito.InjectMocks;
@@ -34,10 +40,17 @@ public class OrderServiceImplTest {
   @Mock
   private ItemRepository itemRepository;
 
+  @Mock
+  private NotificationService notificationService;
+
+  @Mock
+  private ChatMessageService chatMessageService;
+
   @InjectMocks
   private OrderServiceImpl orderService;
 
   private User buyer;
+  private User seller;
   private Item sampleItem;
 
   @BeforeEach
@@ -53,6 +66,9 @@ public class OrderServiceImplTest {
     sampleItem.setTitle("Sample Item");
     sampleItem.setDescription("A sample item description");
     sampleItem.setPrice(new BigDecimal(100));
+    seller = new User();
+    seller.setEmail("test@example.com");
+    sampleItem.setSeller(seller);
     // Set the item ID using ReflectionTestUtils.
     ReflectionTestUtils.setField(sampleItem, "itemId", 10L);
   }
@@ -73,6 +89,16 @@ public class OrderServiceImplTest {
       }
       return order;
     });
+
+    ChatMessageCreateDto chatMessageCreateDto = ChatMessageCreateDto.builder()
+        .senderId(buyer.getEmail())
+        .recipientId(seller.getEmail())
+        .itemId(sampleItem.getItemId())
+        .type(MessageType.PURCHASE)
+        .content(null)
+        .build();
+
+    when(chatMessageService.save(any(chatMessageCreateDto.getClass()))).thenReturn(null);
 
     OrderDto result = orderService.createOrder(orderCreateDto, buyer);
 
