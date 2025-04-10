@@ -9,6 +9,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatNotification;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatProfileDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatMessage;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatRoom;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatRoomRepository;
@@ -28,6 +29,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -95,6 +98,21 @@ public class ChatController {
             .build()
     );
     log.info("Sent to recipient");
+  }
+
+  @PostMapping("/chat")
+  public ResponseEntity<ChatMessageDto> contactSeller(@RequestBody ChatMessageCreateDto chatMessageCreateDto) {
+    ChatMessageDto savedMsgDto = chatMessageService.save(chatMessageCreateDto);
+    messagingTemplate.convertAndSendToUser(savedMsgDto.getRecipientId(), "/queue/messages",
+        ChatNotification.builder()
+            .senderId(savedMsgDto.getSenderId())
+            .recipientId(savedMsgDto.getRecipientId())
+            .itemId(savedMsgDto.getItemId())
+            .content(savedMsgDto.getContent())
+            .timestamp(LocalDateTime.now())
+            .build()
+    );
+    return ResponseEntity.ok(savedMsgDto);
   }
 
   @GetMapping("/chat/recipient/{recipientId}")
