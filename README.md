@@ -73,7 +73,7 @@ This will generate a ```target``` folder with test coverage data. You can now fi
 by navigating the folder structure: ```target -> site -> jacoco -> index.html```.
 
 This will open a page similar to this:
-![img.png](img.png)
+![img.png](src/main/resources/static/img.png)
 
 
 To only run unit tests run:
