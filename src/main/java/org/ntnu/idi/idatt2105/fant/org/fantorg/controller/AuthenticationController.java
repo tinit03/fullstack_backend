@@ -155,4 +155,8 @@ public class AuthenticationController {
     }
   }
 
+  @GetMapping("/username")
+  public ResponseEntity<String> getUsername(@AuthenticationPrincipal User user) {
+    return ResponseEntity.ok(user.getEmail());
+  }
 }

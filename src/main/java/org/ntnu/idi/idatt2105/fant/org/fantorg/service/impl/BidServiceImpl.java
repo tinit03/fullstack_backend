@@ -51,7 +51,7 @@ public class BidServiceImpl implements BidService {
     notificationService.send(item.getSeller(),args, NotificationType.NEW_BID,link);
     Bid bid = BidMapper.toBid(dto, item, bidder);
     Bid savedBid = bidRepository.save(bid);
-    chatMessageService.save(ChatMessageCreateDto.builder()
+    chatMessageService.send(ChatMessageCreateDto.builder()
         .senderId(bidder.getEmail())
         .recipientId(item.getSeller().getEmail())
         .itemId(item.getItemId())
@@ -91,7 +91,7 @@ public class BidServiceImpl implements BidService {
     );
     String link = "/messages?itemId=" + savedOrder.getItem().getItemId() + "&recipientId=" + seller.getEmail();
     notificationService.send(bid.getBidder(), args, NotificationType.BID_ACCEPTED, link);
-    chatMessageService.save(ChatMessageCreateDto.builder()
+    chatMessageService.send(ChatMessageCreateDto.builder()
         .senderId(seller.getEmail())
         .recipientId(savedBid.getBidder().getEmail())
         .itemId(savedBid.getItem().getItemId())
@@ -116,7 +116,7 @@ public class BidServiceImpl implements BidService {
     );
     String link = "/messages?itemId=" + savedBid.getItem().getItemId() + "&recipientId=" + seller.getEmail();
     notificationService.send(savedBid.getBidder(), args, NotificationType.BID_ACCEPTED, link);
-    chatMessageService.save(ChatMessageCreateDto.builder()
+    chatMessageService.send(ChatMessageCreateDto.builder()
         .senderId(seller.getEmail())
         .recipientId(savedBid.getBidder().getEmail())
         .itemId(savedBid.getItem().getItemId())
