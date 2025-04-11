@@ -7,11 +7,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.time.LocalDateTime;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.*;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatMessage;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatRoomRepository;
@@ -150,7 +148,6 @@ public class ChatController {
   @MessageMapping("/chat")
   public void processMessage(
       @Payload ChatMessageCreateDto messageDto, @AuthenticationPrincipal User user) {
-    System.out.println(user.getEmail());
     log.info("Received message for /chat");
     log.info("Received chat msg: '{}'", messageDto.getContent());
     log.info("Saving chat msg: '{}'...", messageDto.getContent());
@@ -201,7 +198,7 @@ public class ChatController {
   /**
    * Sends a message to the seller.
    *
-   * @param chatMessageCreateDto Message data.
+   * @param messageNewDto Message data.
    * @param user The authenticated user from JWT-token.
    * @return Response entity of the sent chat.
    */
@@ -222,10 +219,8 @@ public class ChatController {
       })
   @PostMapping("/chat/{itemId}")
   public ResponseEntity<ChatMessageDto> contactSeller(
-      @Parameter(description = "Chat message info") @RequestBody
-      ChatMessageNewDto messageNewDto,
-      @Parameter(description =  "Item id") @PathVariable
-          Long itemId,
+      @Parameter(description = "Chat message info") @RequestBody ChatMessageNewDto messageNewDto,
+      @Parameter(description = "Item id") @PathVariable Long itemId,
       @Parameter(description = "Authenticated user") @AuthenticationPrincipal User user) {
 
     ChatMessageCreateDto chatMessageCreateDto = new ChatMessageCreateDto();
