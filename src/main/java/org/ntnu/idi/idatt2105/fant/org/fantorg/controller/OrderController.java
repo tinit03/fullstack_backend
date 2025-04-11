@@ -1,7 +1,11 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.notification.NotificationDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
@@ -50,12 +54,17 @@ public class OrderController {
       description = "Creates a new order using the provided order details and authenticated user."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Order created successfully")
+      @ApiResponse(responseCode = "200", description = "Order created successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = OrderDto.class))
+          }),
   })
   @PostMapping("/create")
   public ResponseEntity<OrderDto> createOrder(
-      @Valid @RequestBody OrderCreateDto dto,
-      @AuthenticationPrincipal User user) {
+      @Parameter(description="Order creating dto") @Valid @RequestBody OrderCreateDto dto,
+      @Parameter(description="Authenticated user") @AuthenticationPrincipal User user) {
     return ResponseEntity.ok(orderService.createOrder(dto, user));
   }
 
@@ -69,7 +78,12 @@ public class OrderController {
       description = "Retrieves a list of all orders."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Orders retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "Orders retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = OrderDto.class))
+          }),
   })
   @GetMapping
   public ResponseEntity<List<OrderDto>> getOrders() {

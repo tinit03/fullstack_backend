@@ -13,25 +13,47 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-  @Entity
-  @Getter
-  @Setter
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @Table(name = "\"Orders\"")
-  public class Order {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+/**
+ * Represents an order placed by a buyer for an item.
+ * <p>
+ * This entity captures the details of an order, including the item being ordered, the buyer placing the order,
+ * and the date and time the order was created. Orders are placed when a buyer decides to purchase an item.
+ * </p>
+ */
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "\"Orders\"")
+public class Order {
 
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private Item item;
+  /**
+   * The unique identifier for the order.
+   */
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "buyer_id")
-    private User buyer;
+  /**
+   * The item being purchased in the order.
+   * This is a reference to the `Item` entity, indicating which item has been ordered.
+   */
+  @ManyToOne
+  @JoinColumn(name = "item_id")
+  private Item item;
 
-    private LocalDateTime orderDate;
+  /**
+   * The buyer who placed the order.
+   * This is a reference to the `User` entity, indicating which user made the purchase.
+   */
+  @ManyToOne
+  @JoinColumn(name = "buyer_id")
+  private User buyer;
 
-  }
+  /**
+   * The date and time when the order was placed.
+   * This is set to the timestamp when the order is created.
+   */
+  private LocalDateTime orderDate;
+}

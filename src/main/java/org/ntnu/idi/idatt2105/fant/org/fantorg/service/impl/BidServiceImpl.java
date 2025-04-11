@@ -28,6 +28,9 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ChatMessageService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.NotificationService;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service implementation for managing bids on auctioned items.
+ */
 @Service
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
@@ -37,6 +40,15 @@ public class BidServiceImpl implements BidService {
   private final NotificationService notificationService;
   private final ChatMessageService chatMessageService;
 
+  /**
+   * Places a new bid on an item.
+   *
+   * @param dto    The bid creation data.
+   * @param bidder The user placing the bid.
+   * @return The created bid as a DTO.
+   * @throws EntityNotFoundException If the item is not found.
+   * @throws IllegalArgumentException If the item is not biddable or the bidder is the seller.
+   */
   @Override
   public BidDto placeBid(BidCreateDto dto, User bidder) {
     Item item = itemRepository.findById(dto.getItemId())
@@ -64,6 +76,12 @@ public class BidServiceImpl implements BidService {
     return BidMapper.toDto(savedBid);
   }
 
+  /**
+   * Retrieves all bids for a specific item.
+   *
+   * @param itemId The ID of the item.
+   * @return List of bids in DTO format.
+   */
   @Override
   public List<BidDto> getBidsForItem(Long itemId) {
     List<Bid> bids = bidRepository.findByItem_ItemId(itemId);
@@ -71,14 +89,23 @@ public class BidServiceImpl implements BidService {
         .map(BidMapper::toDto)
         .collect(Collectors.toList());  }
 
+  /**
+   * Accepts a bid and creates an order.
+   *
+   * @param bidId  The ID of the bid to accept.
+   * @param seller The user accepting the bid.
+   * @return The created order as a DTO.
+   * @throws EntityNotFoundException If the bid is not found.
+   * @throws IllegalArgumentException If the user is not authorized to accept the bid.
+   */
   @Override
-  public OrderDto acceptBid(Long bidId, User seller, boolean accept) {
+  public OrderDto acceptBid(Long bidId, User seller) {
     Bid bid = bidRepository.findById(bidId)
         .orElseThrow(() -> new EntityNotFoundException("Bid is not found"));
     if(!bid.getItem().getSeller().getId().equals(seller.getId())) {
       throw new IllegalArgumentException("User is not authorized to accept this bid");
     }
-    bid.setStatus(accept ? BidStatus.ACCEPTED : BidStatus.REJECTED);
+    bid.setStatus(BidStatus.ACCEPTED);
     Bid savedBid = bidRepository.save(bid);
     Order order = buildOrder(bid.getItem(), bid.getBidder());
     Order savedOrder = orderRepository.save(order);
@@ -98,6 +125,47 @@ public class BidServiceImpl implements BidService {
     return OrderMapper.toDto(savedOrder);
   }
 
+  /**
+   * Rejects a bid.
+   *
+   * @param bidId  The ID of the bid to reject.
+   * @param seller The user rejecting the bid.
+   * @throws EntityNotFoundException If the bid is not found.
+   * @throws IllegalArgumentException If the user is not authorized to reject the bid.
+   */
+  @Override
+  public void rejectBid(Long bidId, User seller) {
+    Bid bid = bidRepository.findById(bidId)
+        .orElseThrow(() -> new EntityNotFoundException("Bid is not found"));
+    if(!bid.getItem().getSeller().getId().equals(seller.getId())) {
+      throw new IllegalArgumentException("User is not authorized to accept this bid");
+    }
+    bid.setStatus(BidStatus.REJECTED);
+    Bid savedBid = bidRepository.save(bid);
+    Map<String, String> args = Map.of(
+        "user", seller.getFirstName() + " " + seller.getLastName(),
+        "item", bid.getItem().getTitle()
+    );
+    String link = "/messages?itemId=" + savedBid.getItem().getItemId() + "&recipientId=" + seller.getEmail();
+    notificationService.send(savedBid.getBidder(), args, NotificationType.BID_ACCEPTED, link);
+    chatMessageService.save(ChatMessageCreateDto.builder()
+        .senderId(seller.getEmail())
+        .recipientId(savedBid.getBidder().getEmail())
+        .itemId(savedBid.getItem().getItemId())
+        .type(MessageType.STATUS_CHANGED)
+        .content(savedBid.getId().toString())
+        .build());
+  }
+
+  /**
+   * Retrieves a specific bid if the user is either the bidder or the item's seller.
+   *
+   * @param id   The ID of the bid.
+   * @param user The requesting user.
+   * @return The bid as a DTO.
+   * @throws EntityNotFoundException If the bid does not exist.
+   * @throws SecurityException If the user is not authorized to view the bid.
+   */
   @Override
   public BidDto getBidFromId(Long id, User user) {
     Bid bid = bidRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Bid not found"));
@@ -108,6 +176,13 @@ public class BidServiceImpl implements BidService {
     }
   }
 
+  /**
+   * Helper method for building a new order when a bid is accepted.
+   *
+   * @param item  The item being purchased.
+   * @param buyer The buyer who won the bid.
+   * @return The new order object.
+   */
   private Order buildOrder(Item item, User buyer) {
     Order order = new Order();
     order.setItem(item);

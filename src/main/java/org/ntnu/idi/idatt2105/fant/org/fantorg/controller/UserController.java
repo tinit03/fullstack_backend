@@ -1,6 +1,9 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.Cookie;
@@ -9,6 +12,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageUploadDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UpdatePasswordDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.user.UserNotFoundException;
@@ -53,7 +57,12 @@ public class UserController {
       description = "Retrieves a list of all connected users. Access is restricted to ADMIN users."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Connected users retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "Connected users retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = UserDto.class))
+          }),
   })
   @GetMapping("/users")
   @PreAuthorize("hasRole('ADMIN')")
@@ -72,10 +81,16 @@ public class UserController {
       description = "Retrieves the profile information of the currently authenticated user."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Current user retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "Current user retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = UserDto.class))
+          }),
   })
   @GetMapping("/me")
-  public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal User user) {
+  public ResponseEntity<UserDto> getCurrentUser(
+      @Parameter(description="Authenticated user") @AuthenticationPrincipal User user) {
     return ResponseEntity.ok(userService.findById(user.getId()));
   }
 
@@ -91,12 +106,17 @@ public class UserController {
       description = "Updates the profile picture of the authenticated user using the provided image URL."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Profile picture updated successfully")
+      @ApiResponse(responseCode = "200", description = "Profile picture updated successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = UserDto.class))
+          }),
   })
   @PostMapping("/profilePicture")
   public ResponseEntity<UserDto> uploadProfilePicture(
-      @RequestBody @Validated ImageUploadDto dto,
-      @AuthenticationPrincipal User user
+      @Parameter(description="Image uploading info") @RequestBody @Validated ImageUploadDto dto,
+      @Parameter(description="Authenticated user") @AuthenticationPrincipal User user
   ) {
     User updatedUser = userService.updateProfilePicture(dto.getUrl(), user);
     return ResponseEntity.ok(UserMapper.toDto(updatedUser));
@@ -114,12 +134,18 @@ public class UserController {
       description = "Updates the password for the authenticated user using the provided password details."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Password updated successfully")
+      @ApiResponse(responseCode = "200", description = "Password updated successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = String.class))
+          }),
+
   })
   @PutMapping("/updatePassword")
   public ResponseEntity<String> updatePassword(
-      @RequestBody @Validated UpdatePasswordDto dto,
-      @AuthenticationPrincipal User user
+      @Parameter(description="Update password info") @RequestBody @Validated UpdatePasswordDto dto,
+      @Parameter(description="Authenticated user") @AuthenticationPrincipal User user
   ) {
     userService.updatePassword(user, dto);
     return ResponseEntity.ok("Password changed");
@@ -140,20 +166,27 @@ public class UserController {
       description = "Deletes the currently authenticated user and clears associated session cookies."
   )
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "User deleted successfully"),
-      @ApiResponse(responseCode = "401", description = "User not authenticated"),
-      @ApiResponse(responseCode = "404", description = "User not found"),
-      @ApiResponse(responseCode = "500", description = "Error occurred during deletion")
+      @ApiResponse(responseCode = "200", description = "User deleted successfully", content = {
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = String.class))
+      }),
+      @ApiResponse(responseCode = "401", description = "User not authenticated", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+      @ApiResponse(responseCode = "500", description = "Error occurred during deletion", content = @Content)
   })
   @DeleteMapping("/me")
   public ResponseEntity<String> deleteUser(
-      @AuthenticationPrincipal User user,
+      @Parameter(description="Authenticated user") @AuthenticationPrincipal User user,
       HttpServletResponse response
-  ) {
-    if (user == null) {
+  )
+  {
+    if (user == null)
+    {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
     }
-    try {
+    try
+    {
       userService.deleteUser(user.getId());
 
       Cookie refreshCookie = new Cookie("refreshToken", null);
@@ -164,9 +197,11 @@ public class UserController {
       response.addCookie(refreshCookie);
 
       return ResponseEntity.ok("User deleted successfully");
-    } catch (UserNotFoundException ex) {
+    } catch (UserNotFoundException ex)
+    {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-    } catch (Exception ex) {
+    } catch (Exception ex)
+    {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body("Error deleting user: " + ex.getMessage());
     }

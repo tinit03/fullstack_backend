@@ -165,7 +165,7 @@ public class BidServiceImplTest {
     });
 
     // Execute acceptBid.
-    OrderDto orderDto = bidService.acceptBid(sampleBid.getId(), seller, true);
+    OrderDto orderDto = bidService.acceptBid(sampleBid.getId(), seller);
 
     // the bid status should be updated to ACCEPTED
     assertThat(sampleBid.getStatus()).isEqualTo(BidStatus.ACCEPTED);
@@ -187,20 +187,11 @@ public class BidServiceImplTest {
 
     when(bidRepository.save(any(Bid.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-    when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
-      Order orderArg = invocation.getArgument(0);
-      ReflectionTestUtils.setField(orderArg, "id", 30L);
-      return orderArg;
-    });
-
     // Execute acceptBid.
-    OrderDto orderDto = bidService.acceptBid(sampleBid.getId(), seller, false);
+    bidService.rejectBid(sampleBid.getId(), seller);
 
-    // the bid status should be updated to ACCEPTED
     assertThat(sampleBid.getStatus()).isEqualTo(BidStatus.REJECTED);
     // the order should contain the correct item and buyer
-    assertThat(orderDto).isNotNull();
-    assertThat(orderDto.getBuyerId()).isEqualTo(bidder.getId()); // because OrderMapper maps the buyer info
 
     // Verify that a notification is sent to the bidder for bid acceptance.
     verify(notificationService, times(1))

@@ -24,8 +24,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /**
  * Filter chain for JWT token that is executed for every request
  *
- * @author Harry L.X and Lars M.L.N
- * @since 17.4.24
  */
 @Component
 @RequiredArgsConstructor

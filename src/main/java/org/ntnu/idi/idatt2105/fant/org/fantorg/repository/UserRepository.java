@@ -22,6 +22,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     Optional<User> findByEmail(String email);
 
+    /**
+     * Checks if a user exits by email.
+     * @param email The mail of the user.
+     * @return True, if exits, else returns false.
+     */
     boolean existsByEmail(String email);
 
 }

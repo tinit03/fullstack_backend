@@ -1,11 +1,15 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.bid.BidDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ItemMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
@@ -48,11 +52,12 @@ public class BookmarkController {
   @Operation(summary = "Bookmark Item",
       description = "Adds the specified item to the authenticated user's bookmarks.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Item bookmarked successfully")
+      @ApiResponse(responseCode = "200", description = "Item bookmarked successfully", content=@Content)
   })
   @PostMapping("/{itemId}")
-  public ResponseEntity<Void> bookmarkItem(@PathVariable Long itemId,
-      @AuthenticationPrincipal User user) {
+  public ResponseEntity<Void> bookmarkItem(
+      @Parameter(description = "Identificator of item") @PathVariable Long itemId,
+      @Parameter(description="The authenticated user") @AuthenticationPrincipal User user) {
     bookmarkService.bookmarkItem(user, itemId);
     return ResponseEntity.ok().build();
   }
@@ -61,18 +66,18 @@ public class BookmarkController {
    * Removes the bookmark for the specified item for the authenticated user.
    *
    * @param itemId the ID of the item whose bookmark is to be removed
-   * @param user the authenticated user performing the action
+   * @param user   the authenticated user performing the action
    * @return a ResponseEntity with a no-content status if the bookmark was removed successfully
    */
   @Operation(summary = "Remove Bookmark",
       description = "Removes the bookmark of the specified item for the authenticated user.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "Bookmark removed successfully")
+      @ApiResponse(responseCode = "204", description = "Bookmark removed successfully", content = @Content)
   })
   @DeleteMapping("/{itemId}")
-  public ResponseEntity<Void> removeBookmark(@PathVariable Long itemId,
-      @AuthenticationPrincipal User user) {
-    bookmarkService.removeBookmark(user, itemId);
+  public ResponseEntity<Void> removeBookmark(
+      @Parameter(description = "Identificator of item") @PathVariable Long itemId,
+      @Parameter(description="The authenticated user") @AuthenticationPrincipal User user) {
     return ResponseEntity.noContent().build();
   }
 
@@ -90,15 +95,20 @@ public class BookmarkController {
       description = "Retrieves a paginated list of items bookmarked by the authenticated user, "
           + "sorted by the specified field and direction.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Bookmarked items retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "Bookmarked items retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ItemDto.class))
+          }),
   })
   @GetMapping("/me")
   public ResponseEntity<Page<ItemDto>> getBookmarkedItems(
-      @AuthenticationPrincipal User user,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size,
-      @RequestParam(defaultValue = "bookmarkedAt") String sortField,
-      @RequestParam(defaultValue = "desc") String sortDir
+      @Parameter(description = "The authenticated user") @AuthenticationPrincipal User user,
+      @Parameter(description = "Page number") @RequestParam(defaultValue = "0") int page,
+      @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
+      @Parameter(description = "Sort value") @RequestParam(defaultValue = "bookmarkedAt") String sortField,
+      @Parameter(description = "Sort direction") @RequestParam(defaultValue = "desc") String sortDir
   ) {
     Sort sort = SortUtil.buildSort(sortField, sortDir);
     Pageable pageable = PageRequest.of(page, size, sort);

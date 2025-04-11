@@ -1,6 +1,9 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
@@ -39,12 +42,17 @@ public class BidController {
   @Operation(summary = "Place Bid",
       description = "Places a new bid on an item by the authenticated bidder.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Bid placed successfully")
+      @ApiResponse(responseCode = "200", description = "Bid placed successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = BidDto.class))
+          }),
   })
   @PostMapping
   public ResponseEntity<BidDto> placeBid(
-      @RequestBody BidCreateDto dto,
-      @AuthenticationPrincipal User bidder) {
+      @Parameter(description = "Bid creation info") @RequestBody BidCreateDto dto,
+      @Parameter(description = "The authenticated user") @AuthenticationPrincipal User bidder) {
     BidDto bidDto = bidService.placeBid(dto, bidder);
     return ResponseEntity.ok(bidDto);
   }
@@ -58,10 +66,15 @@ public class BidController {
   @Operation(summary = "Get Bids for Item",
       description = "Retrieves all bids placed on a specified item.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Bids retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "Bids retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = BidDto.class))
+          }),
   })
   @GetMapping("/item/{itemId}")
-  public ResponseEntity<List<BidDto>> getBidsForItem(@PathVariable Long itemId) {
+  public ResponseEntity<List<BidDto>> getBidsForItem(@Parameter(description = "Identification of item") @PathVariable Long itemId) {
     List<BidDto> bids = bidService.getBidsForItem(itemId);
     return ResponseEntity.ok(bids);
   }
@@ -76,10 +89,17 @@ public class BidController {
   @Operation(summary = "Get Bid by ID",
       description = "Retrieves a specific bid based on its ID for the authenticated user.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Bid details retrieved successfully")
+      @ApiResponse(responseCode = "200", description = "Bid details retrieved successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = BidDto.class))
+          }),
   })
-  @GetMapping("/{bidId}")
-  public ResponseEntity<BidDto> getBidById(@PathVariable Long bidId, @AuthenticationPrincipal User user) {
+  @GetMapping("/bid/{bidId}")
+  public ResponseEntity<BidDto> getBidFromId(
+      @Parameter(description = "Bid identificator") @PathVariable Long bidId,
+      @Parameter(description = "The authenticated user") @AuthenticationPrincipal User user){
     BidDto bid = bidService.getBidFromId(bidId, user);
     return ResponseEntity.ok(bid);
   }
@@ -94,19 +114,37 @@ public class BidController {
   @Operation(summary = "Accept Bid",
       description = "Accepts a specific bid and creates an order for the corresponding item.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Bid accepted and order created successfully")
+      @ApiResponse(responseCode = "200", description = "Bid accepted and order created successfully",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = OrderDto.class))
+          }),
   })
   @PostMapping("/{bidId}/accept")
-  public ResponseEntity<OrderDto> acceptBid(@PathVariable Long bidId,
-      @AuthenticationPrincipal User seller) {
-    OrderDto orderDto = bidService.acceptBid(bidId, seller, true);
+  public ResponseEntity<OrderDto> acceptBid(
+      @Parameter(description = "Identificator of bid") @PathVariable Long bidId,
+      @Parameter(description = "Authenticated user") @AuthenticationPrincipal User seller) {
+    OrderDto orderDto = bidService.acceptBid(bidId, seller);
     return ResponseEntity.ok(orderDto);
   }
 
+  /**
+   * Rejects a bid
+   *
+   * @param bidId the ID of the bid to be accepted
+   * @param seller the authenticated seller rejecting the bid
+   * @return a ResponseEntity containing the order details resulting from the accepted bid
+   */
+  @Operation(summary = "Reject Bid",
+      description = "Rejects bid")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Bid rejected", content=@Content)
+  })
   @PostMapping("/{bidId}/reject")
-  public ResponseEntity<OrderDto> rejectBid(@PathVariable Long bidId,
-      @AuthenticationPrincipal User seller) {
-    OrderDto orderDto = bidService.acceptBid(bidId, seller, false);
-    return ResponseEntity.ok(orderDto);
+  public ResponseEntity<Void> rejectBid(@Parameter(description = "Identificator of bid") @PathVariable Long bidId,
+     @AuthenticationPrincipal User seller) {
+    bidService.rejectBid(bidId, seller);
+    return ResponseEntity.ok().build();
   }
 }
