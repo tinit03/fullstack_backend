@@ -34,7 +34,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
   private final ChatRoomServiceImpl chatRoomService;
   private final ItemServiceImpl itemService;
   private final NotificationService notificationService;
-  SimpMessagingTemplate messagingTemplate;
+  private final SimpMessagingTemplate messagingTemplate;
 
   @Override
   public ChatMessageDto save(ChatMessageCreateDto msgDto) {
