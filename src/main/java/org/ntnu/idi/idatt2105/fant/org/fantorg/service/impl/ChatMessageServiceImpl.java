@@ -38,7 +38,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
   private final ChatRoomServiceImpl chatRoomService;
   private final ItemServiceImpl itemService;
   private final NotificationService notificationService;
-  SimpMessagingTemplate messagingTemplate;
+  private final SimpMessagingTemplate messagingTemplate;
 
   /**
    * Saves a new chat message, sends a notification to the recipient, and links it to the correct
