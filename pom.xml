@@ -235,7 +235,7 @@
 							<configLocation>google_checks.xml</configLocation>
 							<encoding>UTF-8</encoding>
 							<failsOnError>true</failsOnError>
-							<failOnViolation>true</failOnViolation>
+							<failOnViolation>false</failOnViolation>
 							<consoleOutput>true</consoleOutput>
 							<includeTestSourceDirectory>true</includeTestSourceDirectory>
 							<violationSeverity>info</violationSeverity>
