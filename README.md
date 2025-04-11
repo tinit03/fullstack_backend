@@ -8,7 +8,6 @@ ShopIT is an application designed for gathering sellers and buyers into a common
 To run the server, you need the following installed:
 - Java 21
 - Maven
-- Make
 - Docker
 
 ### ⚙ Setup
@@ -32,9 +31,18 @@ git clone https://github.com/tinit03/fullstack_backend.git
 ```
 cd fullstack_backend
 ```
-3. Run the server (OBS: Make sure docker is running). Be aware that this will take some time the first you time you run the application.
+3. Build the server image (OBS: Make sure docker is running). This step will take some time.
 ```
-make run
+docker build -t <image-name>:latest .
+```
+4. Run the server (OBS: Make sure docker is running).
+```
+docker run -rm <image-name>:latest -p 8080:8080
+```
+Example: 
+``` 
+docker build -t myapp:latest .
+docker run -rm myapp:latest -p 8080:8080
 ```
 The server is now running on port 8080.
 
@@ -63,6 +71,10 @@ mvn verify
 ```
 This will generate a ```target``` folder with test coverage data. You can now find the report
 by navigating the folder structure: ```target -> site -> jacoco -> index.html```.
+
+This will open a page similar to this:
+![img.png](img.png)
+
 
 To only run unit tests run:
 
