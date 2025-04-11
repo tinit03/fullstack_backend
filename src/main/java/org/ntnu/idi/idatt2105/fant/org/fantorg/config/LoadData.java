@@ -462,7 +462,7 @@ public class LoadData implements CommandLineRunner {
         .content("other message")
         .chatId(otherChatId)
         .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
-        .type(MessageType.BID)
+        .type(MessageType.NORMAL)
         .build();
 
     chatMessageRepository.save(otherChatMessage);
@@ -472,7 +472,7 @@ public class LoadData implements CommandLineRunner {
         .sender(user)
         .recipient(a)
         .item(item1)
-        .content("antother messgae")
+        .content("another messgae")
         .chatId(anotherChatId)
         .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
         .type(MessageType.NORMAL)

@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.notification.NotificationDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderDto;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * REST controller for managing orders.
@@ -28,6 +31,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
  * </p>
  */
 @RestController
+@Slf4j
 @RequestMapping("/order")
 public class OrderController {
 
@@ -88,5 +92,9 @@ public class OrderController {
   @GetMapping
   public ResponseEntity<List<OrderDto>> getOrders() {
     return ResponseEntity.ok(orderService.getAllOrders());
+  }
+  @GetMapping("/{orderId}")
+  public ResponseEntity<OrderDto> getOrderById(@Valid @PathVariable Long orderId, @AuthenticationPrincipal User user){
+    return ResponseEntity.ok(orderService.getOrderWithId(orderId, user));
   }
 }

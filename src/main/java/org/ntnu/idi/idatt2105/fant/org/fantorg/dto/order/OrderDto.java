@@ -1,5 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -78,4 +79,5 @@ public class OrderDto {
    * </p>
    */
   private LocalDateTime orderDate;
+  private BigDecimal price;
 }
