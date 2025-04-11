@@ -91,6 +91,7 @@ public class SecurityConfiguration {
                         "/index.html",
                         "/v3/api-docs*/**",
                         "/h2-console/**",
+                        "/actuator/**",
                         "/webjars/**")
                     .permitAll()
                     .anyRequest()

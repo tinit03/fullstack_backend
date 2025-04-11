@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 
 /**
@@ -27,6 +28,9 @@ public class ChatDto {
 
   /** The content of the last message sent in the chat. */
   private String lastMessageContent;
+
+  /** The type of the last message sent in the chat. */
+  private MessageType lastMessageType;
 
   /** The timestamp of the last message sent in the chat. */
   private LocalDateTime lastMessageTimestamp;

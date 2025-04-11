@@ -12,8 +12,16 @@ spring:
           auth: true
           starttls:
             enable: true
+  profiles:
+    default: test
 
 
 springdoc:
   api-docs:
     path: /api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
