@@ -5,8 +5,8 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.4</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>3.4.1</version>
+		<relativePath/>
 	</parent>
 	<groupId>org.ntnu.idi.idatt2105.fant.org</groupId>
 	<artifactId>fant-org</artifactId>
@@ -89,11 +89,11 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- Swagger -->
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.2.0</version>
-		</dependency>
+			<dependency>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+				<version>2.7.0</version>
+			</dependency>
 		<!-- JWT -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

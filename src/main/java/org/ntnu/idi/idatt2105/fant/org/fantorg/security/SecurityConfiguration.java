@@ -78,18 +78,18 @@ public class SecurityConfiguration {
                         "/forgotPassword/**",
                         "/auth/**",
                         "/categories/**",
+                        "/ws/**",
                         "ws/**",
                         "/items/**",
                         "/swagger-ui/**",
-                        "/v3/api-docs/**",
+                        "/index.html",
+                        "/v3/api-docs*/**",
                         "/h2-console/**",
-                        "/v3/api-docs/",
-                        "swagger-ui.html",
                         "/webjars/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
-        .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.NEVER))
+        .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();

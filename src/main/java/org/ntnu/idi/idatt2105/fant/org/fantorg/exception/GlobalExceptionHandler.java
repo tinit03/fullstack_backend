@@ -1,5 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.exception;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.chat.ChatRoomNotFoundException;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.item.ItemNotFoundException;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  * @author Harry Xu
  */
 @ControllerAdvice
+@Hidden
 @Slf4j
 public class GlobalExceptionHandler {
 

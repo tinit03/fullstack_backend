@@ -32,7 +32,12 @@ spring:
           auth: true
           starttls:
             enable: true
-
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    enabled: true
 
 
 

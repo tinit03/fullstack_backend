@@ -36,9 +36,9 @@ public class OpenApiConfig {
     // Configure general information about the API
     Info information =
         new Info()
-            .title("Fant.org API")
+            .title("ShopIT.org API")
             .version("1.0")
-            .description("This API exposes endpoints for the Fant.org application.")
+            .description("This API exposes endpoints for the ShopIT application.")
             .contact(myContact);
 
     // Return the configured OpenAPI object
