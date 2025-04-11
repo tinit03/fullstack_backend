@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /**
  * Filter chain for JWT token that is executed for every request
  *
- * @author Harry L.X and Lars M.L.N
- * @since 17.4.24
  */
 @Component
 @RequiredArgsConstructor
@@ -46,8 +45,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             @NotNull HttpServletRequest request,
             @NotNull HttpServletResponse response,
             @NotNull FilterChain filterChain)
-            throws IOException {
-        try {
+        throws IOException, ServletException {
             //logger.info("Checking 'Authorization' header");
             final String authHeader = request.getHeader("Authorization");
             final String jwt;
@@ -76,10 +74,5 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response);
-        } catch (JwtException | ServletException e) {
-            String responseMsg = "Error in filter: " + e.getMessage();
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write(responseMsg);
-        }
     }
 }

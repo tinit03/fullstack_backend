@@ -113,7 +113,7 @@ public class BiddingIT {
 
     // Fetch bids for item
     MvcResult getResult = mockMvc
-        .perform(get("/bids/{itemId}", item.getItemId()).with(user(seller)))
+        .perform(get("/bids/item/{itemId}", item.getItemId()).with(user(seller)))
         .andExpect(status().isOk())
         .andReturn();
 

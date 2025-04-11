@@ -25,6 +25,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.BidRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.OrderRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ChatMessageService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.NotificationService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.BidServiceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -48,6 +49,9 @@ public class BidServiceImplTest {
 
   @Mock
   private NotificationService notificationService;
+
+  @Mock
+  private ChatMessageService chatMessageService;
 
   @InjectMocks
   private BidServiceImpl bidService;
@@ -168,6 +172,26 @@ public class BidServiceImplTest {
     // the order should contain the correct item and buyer
     assertThat(orderDto).isNotNull();
     assertThat(orderDto.getBuyerId()).isEqualTo(bidder.getId()); // because OrderMapper maps the buyer info
+
+    // Verify that a notification is sent to the bidder for bid acceptance.
+    verify(notificationService, times(1))
+        .send(eq(bidder), any(Map.class), eq(NotificationType.BID_ACCEPTED), anyString());
+  }
+
+  @Test
+  public void testRejectBid_Success() {
+    // First, ensure that the sample bid exists
+    when(bidRepository.findById(sampleBid.getId())).thenReturn(Optional.of(sampleBid));
+
+    sampleBid.getItem().setSeller(seller);
+
+    when(bidRepository.save(any(Bid.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+    // Execute acceptBid.
+    bidService.rejectBid(sampleBid.getId(), seller);
+
+    assertThat(sampleBid.getStatus()).isEqualTo(BidStatus.REJECTED);
+    // the order should contain the correct item and buyer
 
     // Verify that a notification is sent to the bidder for bid acceptance.
     verify(notificationService, times(1))

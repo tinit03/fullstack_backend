@@ -18,24 +18,49 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+/**
+ * Utility class for obtaining facet counts for the Item entity.
+ * This class contains various methods to generate facet counts based on different field types (Enum, String, Long, Boolean).
+ *
+ * <p>The facet counts are based on a Specification which allows the use of complex queries with criteria filtering.</p>
+ *
+ * <p>Facet counts are often used for filtering or grouping data based on certain attributes. This utility supports counting
+ * items based on different field types, such as Enums, Strings, Longs, Booleans, and publication dates (e.g., published today).</p>
+ *
+ * <p>It uses JPA Criteria API to dynamically build queries and fetch results based on provided specifications.</p>
+ *
+ * @version 1.0
+ */
 @Component
 public class ItemFacetCountUtil {
+
   @PersistenceContext
   private EntityManager entityManager;
 
+  /**
+   * Retrieves facet counts for an enum field.
+   *
+   * <p>This method counts the number of distinct items for each enum value in the specified field, using the provided Specification.</p>
+   *
+   * @param spec The Specification used for filtering the items
+   * @param field The field name in the Item entity that contains the Enum values
+   * @param enumClass The class type of the Enum
+   * @param <T> The type of the Enum
+   * @return A map of Enum values and their corresponding counts
+   */
   public <T extends Enum<T>> Map<T, Long> getEnumFacetCounts(Specification<Item> spec, String field, Class<T> enumClass) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Object[]> query = cb.createQuery(Object[].class); // Ønsker å returnere Object[] (som er da value + count)
-    Root<Item> root = query.from(Item.class); // Henter from ITEM
+    CriteriaQuery<Object[]> query = cb.createQuery(Object[].class);
+    Root<Item> root = query.from(Item.class);
 
     Path<T> path = getNestedPath(root, field);
-    query.multiselect(path, cb.countDistinct(root.get("itemId"))); // SELECT DISTINCT COUNT(item_id) FROM ITEM
-    query.where(spec.toPredicate(root, query, cb)); // WHERE-betingelsene blir fylt av specification
-    query.groupBy(path); // GROUP BY field
+    query.multiselect(path, cb.countDistinct(root.get("itemId")));
+    query.where(spec.toPredicate(root, query, cb));
+    query.groupBy(path);
 
-    List<Object[]> results = entityManager.createQuery(query).getResultList(); //Kjør queryen
+    List<Object[]> results = entityManager.createQuery(query).getResultList();
 
-    Map<T, Long> result = new EnumMap<>(enumClass); //Bruker enum map for å mappe count og value
+    Map<T, Long> result = new EnumMap<>(enumClass);
     for (Object[] row : results) {
       if (row[0] != null) {
         result.put((T) row[0], (Long) row[1]);
@@ -44,6 +69,15 @@ public class ItemFacetCountUtil {
     return result;
   }
 
+  /**
+   * Retrieves facet counts for a string field.
+   *
+   * <p>This method counts the number of distinct items for each string value in the specified field, using the provided Specification.</p>
+   *
+   * @param spec The Specification used for filtering the items
+   * @param field The field name in the Item entity that contains the String values
+   * @return A map of String values and their corresponding counts
+   */
   public Map<String, Long> getStringFacetCounts(Specification<Item> spec, String field) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<Object[]> query = cb.createQuery(Object[].class);
@@ -64,6 +98,15 @@ public class ItemFacetCountUtil {
     return result;
   }
 
+  /**
+   * Retrieves facet counts for a long field.
+   *
+   * <p>This method counts the number of distinct items for each long value in the specified field, using the provided Specification.</p>
+   *
+   * @param spec The Specification used for filtering the items
+   * @param field The field name in the Item entity that contains the Long values
+   * @return A map of Long values and their corresponding counts
+   */
   public Map<Long, Long> getLongFacetCounts(Specification<Item> spec, String field) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<Object[]> query = cb.createQuery(Object[].class);
@@ -84,6 +127,15 @@ public class ItemFacetCountUtil {
     return result;
   }
 
+  /**
+   * Retrieves facet counts for a boolean field.
+   *
+   * <p>This method counts the number of distinct items for true and false values in the specified boolean field, using the provided Specification.</p>
+   *
+   * @param spec The Specification used for filtering the items
+   * @param field The field name in the Item entity that contains the Boolean values
+   * @return A map of "true" and "false" values with their corresponding counts
+   */
   public Map<String, Long> getBooleanFacetCounts(Specification<Item> spec, String field) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<Tuple> query = cb.createTupleQuery();
@@ -104,6 +156,15 @@ public class ItemFacetCountUtil {
             t -> t.get("count", Long.class)
         ));
   }
+
+  /**
+   * Retrieves facet counts for items published today.
+   *
+   * <p>This method counts the number of distinct items that were published today, based on the "publishedAt" field, using the provided Specification.</p>
+   *
+   * @param spec The Specification used for filtering the items
+   * @return A map with "true" and "false" keys representing whether the item was published today or not, with their corresponding counts
+   */
   public Map<String, Long> getPublishedTodayFacetCounts(Specification<Item> spec) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<Tuple> query = cb.createTupleQuery();
@@ -129,6 +190,14 @@ public class ItemFacetCountUtil {
         ));
   }
 
+  /**
+   * Utility method for extracting a nested path from an entity based on a field name.
+   *
+   * @param root The root of the Criteria query
+   * @param field The field name (possibly with nested properties, e.g., "category.name")
+   * @param <T> The type of the field
+   * @return The path corresponding to the specified field
+   */
   private <T> Path<T> getNestedPath(Root<?> root, String field) {
     String[] parts = field.split("\\.");
     Path<?> path = root;
@@ -137,5 +206,4 @@ public class ItemFacetCountUtil {
     }
     return (Path<T>) path;
   }
-
 }

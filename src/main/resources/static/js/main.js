@@ -34,7 +34,7 @@ function connect(event) {
 
 // todo: Connect to ws at the start of the application of the login page
 function onConnected() {
-  stompClient.subscribe(`/user/${nickname}/queue/messages/${fullname}`, onMessageReceived);
+  stompClient.subscribe(`/user/${nickname}/queue/messages`, onMessageReceived);
 
   console.log("Connected")
   document.querySelector('#connected-user-fullname').textContent = nickname;
@@ -125,14 +125,18 @@ function displayMessage(senderId, content) {
 }
 
 async function fetchAndDisplayUserChat() {
-  const userChatResponse = await fetch(`/messages/${fullname}/${nickname}/${selectedUserId}`);
-  const userChat = await userChatResponse.json();
-  console.log("userchat", userChat)
-  chatArea.innerHTML = '';
-  userChat.forEach(chat => {
-    displayMessage(chat.senderId, chat.content);
-  });
-  chatArea.scrollTop = chatArea.scrollHeight;
+  try {
+    const userChatResponse = await fetch(`/messages/${fullname}/${nickname}/${selectedUserId}`);
+    const userChat = await userChatResponse.json();
+    console.log("userchat", userChat)
+    chatArea.innerHTML = '';
+    userChat.forEach(chat => {
+      displayMessage(chat.senderId, chat.content);
+    });
+    chatArea.scrollTop = chatArea.scrollHeight;
+  } catch(error) {
+    chatArea.innerHTML = '';
+  }
 }
 
 

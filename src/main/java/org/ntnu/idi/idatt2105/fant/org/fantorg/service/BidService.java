@@ -10,4 +10,6 @@ public interface BidService {
   BidDto placeBid(BidCreateDto dto, User bidder);
   List<BidDto> getBidsForItem(Long itemId);
   OrderDto acceptBid(Long bidId, User seller);
+  void rejectBid(Long bidId, User seller);
+  BidDto getBidFromId(Long id, User user);
 }
