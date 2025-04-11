@@ -17,12 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * Service implementation for sending emails.
- * Implements {@link EmailService} to handle email-related operations.
- * <p>
- * This service is responsible for sending password reset emails to users. It constructs the reset password URL,
- * loads the HTML email template, and sends the email using {@link JavaMailSender}.
- * </p>
+ * Service implementation for sending emails. Implements {@link EmailService} to handle
+ * email-related operations.
+ *
+ * <p>This service is responsible for sending password reset emails to users. It constructs the
+ * reset password URL, loads the HTML email template, and sends the email using {@link
+ * JavaMailSender}.
  */
 @Service
 @RequiredArgsConstructor
@@ -30,18 +30,18 @@ public class EmailServiceImpl implements EmailService {
 
   private final Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
   private final JavaMailSender mailSender;
+
   @Value("${spring.mail.username}")
   private String fromEmail;
+
   @Value("${app.frontend.reset-url}")
   private String frontendResetUrl;
 
   /**
    * Sends a password reset email to the specified recipient.
    *
-   * <p>
-   * This method constructs a reset link using the provided token and email address, loads an HTML email template,
-   * and sends the password reset email to the user.
-   * </p>
+   * <p>This method constructs a reset link using the provided token and email address, loads an
+   * HTML email template, and sends the password reset email to the user.
    *
    * @param to The recipient's email address.
    * @param token The password reset token.
@@ -50,15 +50,19 @@ public class EmailServiceImpl implements EmailService {
   @Override
   public void sendPasswordResetEmail(String to, String token) {
 
-    String resetLink = UriComponentsBuilder
-        .fromUriString(frontendResetUrl)
-        .queryParam("token",token)
-        .queryParam("email",to)
-        .toUriString();
+    String resetLink =
+        UriComponentsBuilder.fromUriString(frontendResetUrl)
+            .queryParam("token", token)
+            .queryParam("email", to)
+            .toUriString();
     String content = loadResetPasswordEmailTemplate(resetLink);
     MimeMessage message = mailSender.createMimeMessage();
     try {
-      MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
+      MimeMessageHelper helper =
+          new MimeMessageHelper(
+              message,
+              MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+              StandardCharsets.UTF_8.name());
       helper.setTo(to);
       helper.setSubject("Reset your Shop-it password");
       helper.setFrom(fromEmail);
@@ -72,7 +76,8 @@ public class EmailServiceImpl implements EmailService {
   }
 
   /**
-   * Loads the HTML template for the password reset email and replaces the placeholder with the actual reset link.
+   * Loads the HTML template for the password reset email and replaces the placeholder with the
+   * actual reset link.
    *
    * @param resetLink The password reset link to be embedded in the email.
    * @return The populated HTML email content.
@@ -87,7 +92,4 @@ public class EmailServiceImpl implements EmailService {
       throw new RuntimeException("Failed to load email template", e);
     }
   }
-
-
-
 }

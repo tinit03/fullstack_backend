@@ -14,17 +14,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Entity representing a bookmark created by a user on an item.
- * A bookmark allows a user to save an item for later reference or interest.
- * <p>
- * This entity maps to the "bookmark" table in the database and contains the following attributes:
+ * Entity representing a bookmark created by a user on an item. A bookmark allows a user to save an
+ * item for later reference or interest.
+ *
+ * <p>This entity maps to the "bookmark" table in the database and contains the following
+ * attributes:
+ *
  * <ul>
- *   <li><b>id</b>: The unique identifier for the bookmark (auto-generated).</li>
- *   <li><b>user</b>: The user who created the bookmark (many-to-one relationship with the {@link User} entity).</li>
- *   <li><b>item</b>: The item that has been bookmarked (many-to-one relationship with the {@link Item} entity).</li>
- *   <li><b>bookmarkedAt</b>: The timestamp when the bookmark was created.</li>
+ *   <li><b>id</b>: The unique identifier for the bookmark (auto-generated).
+ *   <li><b>user</b>: The user who created the bookmark (many-to-one relationship with the {@link
+ *       User} entity).
+ *   <li><b>item</b>: The item that has been bookmarked (many-to-one relationship with the {@link
+ *       Item} entity).
+ *   <li><b>bookmarkedAt</b>: The timestamp when the bookmark was created.
  * </ul>
- * </p>
  */
 @Entity
 @Table(name = "bookmark")
@@ -35,29 +38,25 @@ import lombok.Setter;
 @Builder
 public class Bookmark {
 
-  /**
-   * The unique identifier of the bookmark.
-   */
+  /** The unique identifier of the bookmark. */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   /**
-   * The user who created the bookmark.
-   * This is a many-to-one relationship with the {@link User} entity.
+   * The user who created the bookmark. This is a many-to-one relationship with the {@link User}
+   * entity.
    */
   @ManyToOne(optional = false)
   private User user;
 
   /**
-   * The item that has been bookmarked.
-   * This is a many-to-one relationship with the {@link Item} entity.
+   * The item that has been bookmarked. This is a many-to-one relationship with the {@link Item}
+   * entity.
    */
   @ManyToOne(optional = false)
   private Item item;
 
-  /**
-   * The timestamp when the bookmark was created.
-   */
+  /** The timestamp when the bookmark was created. */
   private LocalDateTime bookmarkedAt;
 }

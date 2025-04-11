@@ -11,8 +11,11 @@ import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageItemUploadDto;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageEditDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageItemUploadDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemEditDto;
@@ -29,16 +32,13 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.BookmarkRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BookmarkService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.BringService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.CloudinaryService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ItemServiceImpl;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.specification.ItemFacetCountUtil;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -48,37 +48,28 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceImplTest {
 
-  @Mock
-  private ItemRepository itemRepository;
+  @Mock private ItemRepository itemRepository;
 
-  @Mock
-  private CategoryRepository categoryRepository;
+  @Mock private CategoryRepository categoryRepository;
 
-  @Mock
-  private CloudinaryService cloudinaryService;
+  @Mock private CloudinaryService cloudinaryService;
 
-  @Mock
-  private BookmarkRepository bookmarkRepository;
+  @Mock private BookmarkRepository bookmarkRepository;
 
-  @Mock
-  private BookmarkService bookmarkService;
+  @Mock private BookmarkService bookmarkService;
 
-  @Mock
-  private ImageRepository imageRepository;
+  @Mock private ImageRepository imageRepository;
 
-  @Mock
-  private BringService bringService;
+  @Mock private BringService bringService;
 
-  @Mock
-  private ItemFacetCountUtil facetUtil;
+  @Mock private ItemFacetCountUtil facetUtil;
 
-  @InjectMocks
-  private ItemServiceImpl itemService;
+  @InjectMocks private ItemServiceImpl itemService;
 
   private User seller;
   private User buyer;
   private Category parentCategory; // Parent for the subcategory.
-  private Category subCategory;    // Subcategory with a non-null parent.
+  private Category subCategory; // Subcategory with a non-null parent.
   private Item sampleItem;
   private final String validImageUrl = "https://example.com/image.jpg";
 
@@ -119,7 +110,7 @@ public class ItemServiceImplTest {
   }
 
   @Test
-  public void testCreateItem_NoImages()  {
+  public void testCreateItem_NoImages() {
 
     ItemCreateDto createDto = new ItemCreateDto();
     createDto.setItemName("Test Item");
@@ -135,11 +126,13 @@ public class ItemServiceImplTest {
     when(bringService.getLocationDetails("1234"))
         .thenReturn(new Location("1234", "TestCounty", "TestCity", "0.0", "0.0"));
 
-    when(itemRepository.save(any(Item.class))).thenAnswer(invocation -> {
-      Item i = invocation.getArgument(0);
-      ReflectionTestUtils.setField(i, "itemId", 10L);
-      return i;
-    });
+    when(itemRepository.save(any(Item.class)))
+        .thenAnswer(
+            invocation -> {
+              Item i = invocation.getArgument(0);
+              ReflectionTestUtils.setField(i, "itemId", 10L);
+              return i;
+            });
 
     Item created = itemService.createItem(createDto, seller);
 
@@ -169,17 +162,16 @@ public class ItemServiceImplTest {
         .thenReturn(Optional.of(subCategory));
     when(bringService.getLocationDetails("1234"))
         .thenReturn(new Location("1234", "TestCounty", "TestCity", "0.0", "0.0"));
-    when(itemRepository.save(any(Item.class))).thenAnswer(invocation -> {
-      Item i = invocation.getArgument(0);
-      ReflectionTestUtils.setField(i, "itemId", 11L);
-      return i;
-    });
+    when(itemRepository.save(any(Item.class)))
+        .thenAnswer(
+            invocation -> {
+              Item i = invocation.getArgument(0);
+              ReflectionTestUtils.setField(i, "itemId", 11L);
+              return i;
+            });
 
     // We want to simulate cloudinary upload too.
-    Map<String, String> uploadResult = Map.of(
-        "url", validImageUrl,
-        "public_id", "image_public_id"
-    );
+    Map<String, String> uploadResult = Map.of("url", validImageUrl, "public_id", "image_public_id");
     when(cloudinaryService.uploadBase64Image(validImageUrl)).thenReturn(uploadResult);
 
     when(imageRepository.saveAll(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -223,10 +215,8 @@ public class ItemServiceImplTest {
     updateDto.setImages(List.of(imageEditDto));
 
     // Stub cloudinaryService.uploadBase64Image
-    Map<String, String> uploadResult = Map.of(
-        "url", validImageUrl,
-        "public_id", "new_image_public_id"
-    );
+    Map<String, String> uploadResult =
+        Map.of("url", validImageUrl, "public_id", "new_image_public_id");
     when(cloudinaryService.uploadBase64Image(validImageUrl)).thenReturn(uploadResult);
     when(imageRepository.saveAll(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -244,7 +234,7 @@ public class ItemServiceImplTest {
     sampleItem.setSeller(seller);
     when(itemRepository.findById(30L)).thenReturn(Optional.of(sampleItem));
     when(itemRepository.save(any(Item.class))).thenAnswer(invocation -> invocation.getArgument(0));
-    //Check if the status has changed.
+    // Check if the status has changed.
     Item changed = itemService.changeStatus(30L, Status.SOLD, seller);
     assertThat(changed.getStatus()).isEqualTo(Status.SOLD);
   }
@@ -306,16 +296,14 @@ public class ItemServiceImplTest {
     // Stub the facet counts to return empty maps.
     when(facetUtil.getEnumFacetCounts(any(), eq("condition"), any(Class.class)))
         .thenReturn(Collections.emptyMap());
-    when(facetUtil.getBooleanFacetCounts(any(), eq("forSale")))
-        .thenReturn(Collections.emptyMap());
+    when(facetUtil.getBooleanFacetCounts(any(), eq("forSale"))).thenReturn(Collections.emptyMap());
     when(facetUtil.getStringFacetCounts(any(), eq("location.county")))
         .thenReturn(Collections.emptyMap());
     when(facetUtil.getLongFacetCounts(any(), eq("subCategory.parentCategory.id")))
         .thenReturn(Collections.emptyMap());
     when(facetUtil.getLongFacetCounts(any(), eq("subCategory.id")))
         .thenReturn(Collections.emptyMap());
-    when(facetUtil.getPublishedTodayFacetCounts(any()))
-        .thenReturn(Collections.emptyMap());
+    when(facetUtil.getPublishedTodayFacetCounts(any())).thenReturn(Collections.emptyMap());
 
     ItemSearchFilter filter = new ItemSearchFilter();
     ItemSearchResponse response = itemService.searchItems(filter, Pageable.unpaged(), buyer);
@@ -333,6 +321,7 @@ public class ItemServiceImplTest {
     Page<ItemDto> dtoPage = itemService.getItemsBySeller(seller, Status.ACTIVE, Pageable.unpaged());
     assertThat(dtoPage.getTotalElements()).isEqualTo(1);
   }
+
   @Test
   public void testSearchItems_WithAllFilters() {
     ItemSearchFilter filter = new ItemSearchFilter();
@@ -353,16 +342,14 @@ public class ItemServiceImplTest {
 
     when(facetUtil.getEnumFacetCounts(any(), eq("condition"), eq(Condition.class)))
         .thenReturn(Collections.emptyMap());
-    when(facetUtil.getBooleanFacetCounts(any(), eq("forSale")))
-        .thenReturn(Collections.emptyMap());
+    when(facetUtil.getBooleanFacetCounts(any(), eq("forSale"))).thenReturn(Collections.emptyMap());
     when(facetUtil.getStringFacetCounts(any(), eq("location.county")))
         .thenReturn(Collections.emptyMap());
     when(facetUtil.getLongFacetCounts(any(), eq("subCategory.parentCategory.id")))
         .thenReturn(Collections.emptyMap());
     when(facetUtil.getLongFacetCounts(any(), eq("subCategory.id")))
         .thenReturn(Collections.emptyMap());
-    when(facetUtil.getPublishedTodayFacetCounts(any()))
-        .thenReturn(Collections.emptyMap());
+    when(facetUtil.getPublishedTodayFacetCounts(any())).thenReturn(Collections.emptyMap());
 
     ItemSearchResponse response = itemService.searchItems(filter, Pageable.unpaged(), buyer);
     assertThat(response.getItems().getTotalElements()).isEqualTo(1);

@@ -6,10 +6,10 @@ import lombok.Setter;
 
 /**
  * Data Transfer Object (DTO) for encapsulating the authentication response.
- * <p>
- * This class holds the access and refresh tokens generated after a successful
- * authentication process.
- * </p>
+ *
+ * <p>This class holds the access and refresh tokens generated after a successful authentication
+ * process.
+ *
  * @author Tini Tran
  */
 @Getter
@@ -17,13 +17,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AuthenticationResponse {
 
-  /**
-   * The JWT access token issued after successful authentication.
-   */
+  /** The JWT access token issued after successful authentication. */
   private String accessToken;
 
-  /**
-   * The JWT refresh token used to obtain a new access token when the current one expires.
-   */
+  /** The JWT refresh token used to obtain a new access token when the current one expires. */
   private String refreshToken;
 }

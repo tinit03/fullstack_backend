@@ -13,6 +13,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.review.ReviewCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.review.ReviewDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ReviewMapper;
@@ -23,9 +26,6 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.OrderRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ReviewRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ReviewServiceImpl;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -34,14 +34,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 public class ReviewServiceImplTest {
 
-  @Mock
-  private OrderRepository orderRepository;
+  @Mock private OrderRepository orderRepository;
 
-  @Mock
-  private ReviewRepository reviewRepository;
+  @Mock private ReviewRepository reviewRepository;
 
-  @InjectMocks
-  private ReviewServiceImpl reviewService;
+  @InjectMocks private ReviewServiceImpl reviewService;
 
   private User buyer;
   private User seller;
@@ -85,21 +82,19 @@ public class ReviewServiceImplTest {
     reviewCreateDto.setComment("Excellent service");
   }
 
-
   @Test
   public void testCreateReview_Success() {
-    when(orderRepository.findById(eq(sampleOrder.getId())))
-        .thenReturn(Optional.of(sampleOrder));
+    when(orderRepository.findById(eq(sampleOrder.getId()))).thenReturn(Optional.of(sampleOrder));
 
     when(reviewRepository.existsByOrder(sampleOrder)).thenReturn(false);
 
     Review reviewEntity = ReviewMapper.toEntity(reviewCreateDto);
     reviewEntity.setOrder(sampleOrder);
 
-    when(reviewRepository.save(any(Review.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    when(reviewRepository.save(any(Review.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
 
     reviewService.createReview(buyer, sampleOrder.getId(), reviewCreateDto);
-
 
     verify(orderRepository).findById(eq(sampleOrder.getId()));
     verify(reviewRepository).save(any(Review.class));
@@ -109,37 +104,36 @@ public class ReviewServiceImplTest {
   public void testCreateReview_OrderNotFound() {
     when(orderRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-    EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-        reviewService.createReview(buyer, 999L, reviewCreateDto)
-    );
+    EntityNotFoundException exception =
+        assertThrows(
+            EntityNotFoundException.class,
+            () -> reviewService.createReview(buyer, 999L, reviewCreateDto));
     assertThat(exception.getMessage()).contains("Order not found");
   }
 
   @Test
   public void testCreateReview_NotBuyer() {
     sampleOrder.setBuyer(seller);
-    when(orderRepository.findById(eq(sampleOrder.getId())))
-        .thenReturn(Optional.of(sampleOrder));
+    when(orderRepository.findById(eq(sampleOrder.getId()))).thenReturn(Optional.of(sampleOrder));
 
-    SecurityException exception = assertThrows(SecurityException.class, () ->
-        reviewService.createReview(buyer, sampleOrder.getId(), reviewCreateDto)
-    );
+    SecurityException exception =
+        assertThrows(
+            SecurityException.class,
+            () -> reviewService.createReview(buyer, sampleOrder.getId(), reviewCreateDto));
     assertThat(exception.getMessage()).contains("You are not allowed to review");
   }
 
   @Test
   public void testCreateReview_DuplicateReview() {
-    when(orderRepository.findById(eq(sampleOrder.getId())))
-        .thenReturn(Optional.of(sampleOrder));
+    when(orderRepository.findById(eq(sampleOrder.getId()))).thenReturn(Optional.of(sampleOrder));
     when(reviewRepository.existsByOrder(sampleOrder)).thenReturn(true);
 
-    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-        reviewService.createReview(buyer, sampleOrder.getId(), reviewCreateDto)
-    );
+    IllegalArgumentException exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> reviewService.createReview(buyer, sampleOrder.getId(), reviewCreateDto));
     assertThat(exception.getMessage()).contains("already has a review");
   }
-
-
 
   @Test
   public void testGetReviewsForSeller() {
@@ -152,7 +146,6 @@ public class ReviewServiceImplTest {
     Page<ReviewDto> dtoPage = reviewService.getReviewsForSeller(seller.getId(), pageable);
 
     assertThat(dtoPage.getTotalElements()).isEqualTo(1);
-
   }
 
   @Test
@@ -181,8 +174,7 @@ public class ReviewServiceImplTest {
 
   @Test
   public void testGetReviewCountForSeller() {
-    when(reviewRepository.countByOrder_Item_Seller(eq(seller)))
-        .thenReturn(3L);
+    when(reviewRepository.countByOrder_Item_Seller(eq(seller))).thenReturn(3L);
 
     long count = reviewService.getReviewCountForSeller(seller);
     assertThat(count).isEqualTo(3L);

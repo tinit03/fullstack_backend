@@ -7,9 +7,8 @@ import lombok.Setter;
 
 /**
  * Data Transfer Object (DTO) representing a JWT (JSON Web Token).
- * <p>
- * This class is used to transfer the JWT token used for authentication and authorization.
- * </p>
+ *
+ * <p>This class is used to transfer the JWT token used for authentication and authorization.
  */
 @AllArgsConstructor
 @Setter
@@ -19,9 +18,9 @@ public class JwtTokenDto {
 
   /**
    * The JWT token as a string.
-   * <p>
-   * This field contains the token that is used to authenticate the user and grant access to protected resources.
-   * </p>
+   *
+   * <p>This field contains the token that is used to authenticate the user and grant access to
+   * protected resources.
    */
   private String token;
 }

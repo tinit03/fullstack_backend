@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Service class for handling user authentication and registration. */
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -23,8 +24,16 @@ public class AuthenticationService {
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
   private final RefreshTokenService refreshTokenService;
+
+  /**
+   * Registers a new user with the provided details.
+   *
+   * @param dto The registration data transfer object containing user info
+   * @return An {@link AuthenticationResponse} containing access and refresh tokens
+   * @throws IllegalArgumentException if the email is already registered
+   */
   public AuthenticationResponse registerUser(UserRegisterDto dto) {
-    if(userRepository.existsByEmail(dto.getEmail())){
+    if (userRepository.existsByEmail(dto.getEmail())) {
       throw new IllegalArgumentException("Email already in use!");
     }
     User user = new User();
@@ -34,19 +43,31 @@ public class AuthenticationService {
     user.setFirstName(dto.getFirstName());
     user.setLastName(dto.getLastName());
     userRepository.save(user);
-    return authenticateAndGenerateToken(new UserLoginDto(dto.getEmail(),dto.getPassword()));
+    return authenticateAndGenerateToken(new UserLoginDto(dto.getEmail(), dto.getPassword()));
   }
+
+  /**
+   * Authenticates a user and generates an access token and refresh token.
+   *
+   * @param loginRequest The login data transfer object with credentials
+   * @return An {@link AuthenticationResponse} containing access and refresh tokens
+   */
   public AuthenticationResponse authenticateAndGenerateToken(UserLoginDto loginRequest) {
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-            loginRequest.getEmail(), loginRequest.getPassword()
-        )
-    );
+    Authentication authentication =
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getEmail(), loginRequest.getPassword()));
     User user = (User) authentication.getPrincipal();
-    String accessToken = jwtService.generateToken(user,30);
+    String accessToken = jwtService.generateToken(user, 30);
     String refreshToken = refreshTokenService.createToken(user).getToken();
-    return new AuthenticationResponse(accessToken,refreshToken);
+    return new AuthenticationResponse(accessToken, refreshToken);
   }
+
+  /**
+   * Logs out a user by revoking their refresh token.
+   *
+   * @param user The user to log out
+   */
   @Transactional
   public void logout(User user) {
     refreshTokenService.revokeToken(user);

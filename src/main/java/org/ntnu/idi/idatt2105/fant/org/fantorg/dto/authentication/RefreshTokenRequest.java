@@ -12,8 +12,6 @@ import lombok.Setter;
 @Setter
 public class RefreshTokenRequest {
 
-  /**
-   * Refresh token for renewing accessing token.c
-   */
+  /** Refresh token for renewing accessing token. */
   private String refreshToken;
 }

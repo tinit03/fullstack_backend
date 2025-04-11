@@ -5,9 +5,8 @@ import lombok.Setter;
 
 /**
  * Data Transfer Object (DTO) for representing image details.
- * <p>
- * This DTO encapsulates the details of an image, including its URL and public identifier.
- * </p>
+ *
+ * <p>This DTO encapsulates the details of an image, including its URL and public identifier.
  */
 @Getter
 @Setter
@@ -15,17 +14,15 @@ public class ImageDto {
 
   /**
    * The URL of the image.
-   * <p>
-   * This field contains the URL that points to the image resource.
-   * </p>
+   *
+   * <p>This field contains the URL that points to the image resource.
    */
   private String url;
 
   /**
    * The public identifier of the image.
-   * <p>
-   * This field holds the unique identifier for the image in the cloud storage system.
-   * </p>
+   *
+   * <p>This field holds the unique identifier for the image in the cloud storage system.
    */
   private String publicId;
 }

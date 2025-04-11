@@ -10,19 +10,18 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
 
 /**
  * Utility class for converting between ChatMessage entities and their corresponding DTOs.
- * <p>
- * The ChatMessageMapper class provides methods to map ChatMessage entities to ChatMessageDto objects
- * and vice versa. It also handles the conversion between the ChatMessageCreateDto and ChatMessage entities.
- * </p>
+ *
+ * <p>The ChatMessageMapper class provides methods to map ChatMessage entities to ChatMessageDto
+ * objects and vice versa. It also handles the conversion between the ChatMessageCreateDto and
+ * ChatMessage entities.
  */
 public class ChatMessageMapper {
 
   /**
    * Converts a ChatMessage entity to its corresponding ChatMessageDto.
-   * <p>
-   * This method maps the relevant fields from the ChatMessage entity, including sender and recipient emails,
-   * item ID, chat ID, message content, timestamp, and message type.
-   * </p>
+   *
+   * <p>This method maps the relevant fields from the ChatMessage entity, including sender and
+   * recipient emails, item ID, chat ID, message content, timestamp, and message type.
    *
    * @param chatMessage The ChatMessage entity to be converted.
    * @return The ChatMessageDto containing message details.
@@ -41,11 +40,10 @@ public class ChatMessageMapper {
 
   /**
    * Converts a ChatMessageCreateDto to a ChatMessage entity.
-   * <p>
-   * This method creates a new ChatMessage entity using the provided ChatMessageCreateDto, sender, recipient,
-   * item, and chatId. It sets the message timestamp to the current time and the message type to 'NORMAL'
-   * if not provided in the DTO.
-   * </p>
+   *
+   * <p>This method creates a new ChatMessage entity using the provided ChatMessageCreateDto,
+   * sender, recipient, item, and chatId. It sets the message timestamp to the current time and the
+   * message type to 'NORMAL' if not provided in the DTO.
    *
    * @param chatMessageDto The ChatMessageCreateDto containing the content and message type.
    * @param sender The User entity representing the sender of the message.
@@ -54,7 +52,8 @@ public class ChatMessageMapper {
    * @param chatId The ID of the chat where the message is being sent.
    * @return The ChatMessage entity created from the provided data.
    */
-  public static ChatMessage toEntity(ChatMessageCreateDto chatMessageDto, User sender, User recipient, Item item, String chatId) {
+  public static ChatMessage toEntity(
+      ChatMessageCreateDto chatMessageDto, User sender, User recipient, Item item, String chatId) {
     return ChatMessage.builder()
         .sender(sender)
         .recipient(recipient)

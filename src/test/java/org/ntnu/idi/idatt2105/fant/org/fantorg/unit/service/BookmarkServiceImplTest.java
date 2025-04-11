@@ -12,6 +12,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Bookmark;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
@@ -20,9 +23,6 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.BookmarkRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.BookmarkServiceImpl;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -31,17 +31,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 public class BookmarkServiceImplTest {
 
-  @Mock
-  private UserRepository userRepository;
+  @Mock private UserRepository userRepository;
 
-  @Mock
-  private ItemRepository itemRepository;
+  @Mock private ItemRepository itemRepository;
 
-  @Mock
-  private BookmarkRepository bookmarkRepository;
+  @Mock private BookmarkRepository bookmarkRepository;
 
-  @InjectMocks
-  private BookmarkServiceImpl bookmarkService;
+  @InjectMocks private BookmarkServiceImpl bookmarkService;
 
   // Sample entities for testing.
   private User seller;
@@ -72,17 +68,17 @@ public class BookmarkServiceImplTest {
 
   @Test
   public void testBookmarkItem_Success() {
-    when(userRepository.findById(eq(buyer.getId())))
-        .thenReturn(Optional.of(buyer));
+    when(userRepository.findById(eq(buyer.getId()))).thenReturn(Optional.of(buyer));
 
-    when(itemRepository.findById(eq(item.getItemId())))
-        .thenReturn(Optional.of(item));
+    when(itemRepository.findById(eq(item.getItemId()))).thenReturn(Optional.of(item));
     when(bookmarkRepository.existsByUserAndItem(eq(buyer), eq(item))).thenReturn(false);
 
-    when(bookmarkRepository.save(any(Bookmark.class))).thenAnswer(invocation -> {
-      Bookmark bm = invocation.getArgument(0);
-      return bm;
-    });
+    when(bookmarkRepository.save(any(Bookmark.class)))
+        .thenAnswer(
+            invocation -> {
+              Bookmark bm = invocation.getArgument(0);
+              return bm;
+            });
 
     bookmarkService.bookmarkItem(buyer, item.getItemId());
 
@@ -93,32 +89,31 @@ public class BookmarkServiceImplTest {
   public void testBookmarkItem_CannotBookmarkOwnItem() {
     item.setSeller(buyer);
 
-    when(itemRepository.findById(eq(item.getItemId())))
-        .thenReturn(Optional.of(item));
-    assertThrows(IllegalArgumentException.class, () -> {
-      bookmarkService.bookmarkItem(buyer, item.getItemId());
-    });
+    when(itemRepository.findById(eq(item.getItemId()))).thenReturn(Optional.of(item));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          bookmarkService.bookmarkItem(buyer, item.getItemId());
+        });
   }
 
   @Test
   public void testBookmarkItem_AlreadyBookmarked() {
-    when(userRepository.findById(eq(buyer.getId())))
-        .thenReturn(Optional.of(buyer));
-    when(itemRepository.findById(eq(item.getItemId())))
-        .thenReturn(Optional.of(item));
+    when(userRepository.findById(eq(buyer.getId()))).thenReturn(Optional.of(buyer));
+    when(itemRepository.findById(eq(item.getItemId()))).thenReturn(Optional.of(item));
     when(bookmarkRepository.existsByUserAndItem(eq(buyer), eq(item))).thenReturn(true);
 
-    assertThrows(IllegalArgumentException.class, () -> {
-      bookmarkService.bookmarkItem(buyer, item.getItemId());
-    });
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          bookmarkService.bookmarkItem(buyer, item.getItemId());
+        });
   }
 
   @Test
   public void testRemoveBookmark_Success() {
-    when(userRepository.findById(eq(buyer.getId())))
-        .thenReturn(Optional.of(buyer));
-    when(itemRepository.findById(eq(item.getItemId())))
-        .thenReturn(Optional.of(item));
+    when(userRepository.findById(eq(buyer.getId()))).thenReturn(Optional.of(buyer));
+    when(itemRepository.findById(eq(item.getItemId()))).thenReturn(Optional.of(item));
 
     bookmarkService.removeBookmark(buyer, item.getItemId());
 
@@ -127,10 +122,8 @@ public class BookmarkServiceImplTest {
 
   @Test
   public void testIsBookmarked_ReturnsTrue() {
-    when(userRepository.findById(eq(buyer.getId())))
-        .thenReturn(Optional.of(buyer));
-    when(itemRepository.findById(eq(item.getItemId())))
-        .thenReturn(Optional.of(item));
+    when(userRepository.findById(eq(buyer.getId()))).thenReturn(Optional.of(buyer));
+    when(itemRepository.findById(eq(item.getItemId()))).thenReturn(Optional.of(item));
     when(bookmarkRepository.existsByUserAndItem(eq(buyer), eq(item))).thenReturn(true);
 
     boolean result = bookmarkService.isBookmarked(buyer, item.getItemId());
@@ -139,14 +132,12 @@ public class BookmarkServiceImplTest {
 
   @Test
   public void testGetBookmarkedItems() {
-    Bookmark bookmark = Bookmark.builder()
-        .user(buyer)
-        .item(item)
-        .bookmarkedAt(LocalDateTime.now())
-        .build();
+    Bookmark bookmark =
+        Bookmark.builder().user(buyer).item(item).bookmarkedAt(LocalDateTime.now()).build();
 
     Page<Bookmark> page = new PageImpl<>(Collections.singletonList(bookmark));
-    when(bookmarkRepository.findByUserAndItem_Status(eq(buyer), eq(Status.ACTIVE), any(Pageable.class)))
+    when(bookmarkRepository.findByUserAndItem_Status(
+            eq(buyer), eq(Status.ACTIVE), any(Pageable.class)))
         .thenReturn(page);
 
     Page<Item> itemsPage = bookmarkService.getBookmarkedItems(buyer, Pageable.unpaged());

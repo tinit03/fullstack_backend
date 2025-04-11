@@ -7,10 +7,9 @@ import lombok.Setter;
 
 /**
  * Data Transfer Object (DTO) for representing a subcategory.
- * <p>
- * This DTO encapsulates the details of a subcategory, including its unique identifier,
- * name, and the identifier of its parent category.
- * </p>
+ *
+ * <p>This DTO encapsulates the details of a subcategory, including its unique identifier, name, and
+ * the identifier of its parent category.
  *
  * @author Tini Tran
  */
@@ -18,25 +17,21 @@ import lombok.Setter;
 @Setter
 public class SubCategoryDto {
 
-  /**
-   * The unique identifier of the subcategory.
-   */
+  /** The unique identifier of the subcategory. */
   private Long id;
 
   /**
    * The name of the subcategory.
-   * <p>
-   * This field is required and must not be blank.
-   * </p>
+   *
+   * <p>This field is required and must not be blank.
    */
   @NotBlank(message = "Subcategory name is required")
   private String name;
 
   /**
    * The identifier of the parent category to which this subcategory belongs.
-   * <p>
-   * This field is required and must not be null.
-   * </p>
+   *
+   * <p>This field is required and must not be null.
    */
   @NotNull(message = "Parent category ID is required")
   private Long parentCategoryId;

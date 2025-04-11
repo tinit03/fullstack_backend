@@ -5,32 +5,23 @@ import lombok.Setter;
 
 /**
  * Data Transfer Object (DTO) used for registering a new user.
- * <p>
- * This DTO encapsulates the information required to create a new user account,
- * including email address, first name, last name, and password.
- * </p>
+ *
+ * <p>This DTO encapsulates the information required to create a new user account, including email
+ * address, first name, last name, and password.
  */
 @Getter
 @Setter
 public class UserRegisterDto {
 
-  /**
-   * The email address of the user.
-   */
+  /** The email address of the user. */
   private String email;
 
-  /**
-   * The first name of the user.
-   */
+  /** The first name of the user. */
   private String firstName;
 
-  /**
-   * The last name of the user.
-   */
+  /** The last name of the user. */
   private String lastName;
 
-  /**
-   * The password for the user account.
-   */
+  /** The password for the user account. */
   private String password;
 }

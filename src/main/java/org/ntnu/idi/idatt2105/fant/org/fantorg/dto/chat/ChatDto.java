@@ -7,15 +7,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 
 /**
  * Data Transfer Object (DTO) for representing a chat.
- * <p>
- * This DTO is used to encapsulate the data related to a chat, including the last message,
- * the sender, recipient, item details, status, and profile image details.
- * </p>
+ *
+ * <p>This DTO is used to encapsulate the data related to a chat, including the last message, the
+ * sender, recipient, item details, status, and profile image details.
  *
  * @author Harry Xu
  */
@@ -27,53 +26,38 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 @Builder
 public class ChatDto {
 
-    /**
-     * The content of the last message sent in the chat.
-     */
-    private String lastMessageContent;
+  /** The content of the last message sent in the chat. */
+  private String lastMessageContent;
 
-    /**
-     * The timestamp of the last message sent in the chat.
-     */
-    private LocalDateTime lastMessageTimestamp;
+  /** The type of the last message sent in the chat. */
+  private MessageType lastMessageType;
 
-    /**
-     * The identifier of the last sender of the message.
-     */
-    private String lastSenderId;
+  /** The timestamp of the last message sent in the chat. */
+  private LocalDateTime lastMessageTimestamp;
 
-    /**
-     * The identifier of the current sender of the message.
-     */
-    private String senderId;
+  /** The identifier of the last sender of the message. */
+  private String lastSenderId;
 
-    /**
-     * The identifier of the recipient of the message.
-     */
-    private String recipientId;
+  /** The identifier of the current sender of the message. */
+  private String senderId;
 
-    /**
-     * The unique identifier of the item associated with the chat.
-     */
-    private long itemId;
+  /** The identifier of the recipient of the message. */
+  private String recipientId;
 
-    /**
-     * The status of the chat, represented by an enum {@link Status}.
-     */
-    private Status status;
+  /** The unique identifier of the item associated with the chat. */
+  private long itemId;
 
-    /**
-     * The image associated with the chat (could be the profile picture of the sender or recipient).
-     */
-    private String image;
+  /** The status of the chat, represented by an enum {@link Status}. */
+  private Status status;
 
-    /**
-     * The title of the item associated with the chat.
-     */
-    private String itemTitle;
+  /**
+   * The image associated with the chat (could be the profile picture of the sender or recipient).
+   */
+  private String image;
 
-    /**
-     * The profile picture of the recipient of the message.
-     */
-    private String recipientProfilePic;
+  /** The title of the item associated with the chat. */
+  private String itemTitle;
+
+  /** The profile picture of the recipient of the message. */
+  private String recipientProfilePic;
 }

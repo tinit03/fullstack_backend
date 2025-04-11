@@ -1,5 +1,6 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.exception;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.chat.ChatRoomNotFoundException;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.item.ItemNotFoundException;
@@ -17,25 +18,24 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 /**
- * Global exception handler to handle different types of exceptions across the application. It provides centralized
- * exception handling for various types of exceptions that may occur during the execution of the application.
+ * Global exception handler to handle different types of exceptions across the application. It
+ * provides centralized exception handling for various types of exceptions that may occur during the
+ * execution of the application.
  *
  * @author Harry Xu
  */
 @ControllerAdvice
+@Hidden
 @Slf4j
 public class GlobalExceptionHandler {
 
-  /**
-   * Default constructor
-   */
+  /** Default constructor. */
   public GlobalExceptionHandler() {}
 
   /**
    * Log the error to the log.
    *
-   * @param ex
-   *            The exception to be logged.
+   * @param ex The exception to be logged.
    */
   private void logError(Exception ex) {
     log.error("{}: {}", ex.getClass().getSimpleName(), ex.getMessage());
@@ -48,13 +48,10 @@ public class GlobalExceptionHandler {
   /**
    * Handle exceptions related to existing objects.
    *
-   * @param ex
-   *            The exception indicating that an object already exists.
+   * @param ex The exception indicating that an object already exists.
    * @return ResponseEntity with an appropriate HTTP status code and error message.
    */
-  @ExceptionHandler(
-      value = {
-      })
+  @ExceptionHandler()
   public ResponseEntity<String> handleObjectAlreadyExistException(Exception ex) {
     logError(ex);
     String msg = createErrorResponseMsg(ex);
@@ -64,15 +61,14 @@ public class GlobalExceptionHandler {
   /**
    * Handle exceptions related to non-existing objects.
    *
-   * @param ex
-   *            The exception indicating that an object does not exist.
+   * @param ex The exception indicating that an object does not exist.
    * @return ResponseEntity with an appropriate HTTP status code and error message.
    */
   @ExceptionHandler(
       value = {
-          UserNotFoundException.class,
-          ChatRoomNotFoundException.class,
-          ItemNotFoundException.class
+        UserNotFoundException.class,
+        ChatRoomNotFoundException.class,
+        ItemNotFoundException.class
       })
   public ResponseEntity<String> handleObjectNotFoundException(Exception ex) {
     logError(ex);
@@ -83,20 +79,19 @@ public class GlobalExceptionHandler {
   /**
    * Handle exceptions related to bad input or invalid requests.
    *
-   * @param ex
-   *            The exception indicating bad input or invalid request.
+   * @param ex The exception indicating bad input or invalid request.
    * @return ResponseEntity with an appropriate HTTP status code and error message.
    */
   @ExceptionHandler(
       value = {
-          IllegalArgumentException.class,
-          HttpMessageNotReadableException.class,
-          NullPointerException.class,
-          MissingServletRequestParameterException.class,
-          HttpRequestMethodNotSupportedException.class,
-          MessagingException.class,
-          MethodArgumentNotValidException.class,
-          DataIntegrityViolationException.class,
+        IllegalArgumentException.class,
+        HttpMessageNotReadableException.class,
+        NullPointerException.class,
+        MissingServletRequestParameterException.class,
+        HttpRequestMethodNotSupportedException.class,
+        MessagingException.class,
+        MethodArgumentNotValidException.class,
+        DataIntegrityViolationException.class,
       })
   public ResponseEntity<String> handleBadInputException(Exception ex) {
     logError(ex);
@@ -104,24 +99,31 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
   }
 
+  /**
+   * Handler for when authorization is denied.
+   *
+   * @param ex The cause.
+   * @return Response entity of type forbidden.
+   */
   @ExceptionHandler(AuthorizationDeniedException.class)
-  public ResponseEntity<String> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+  public ResponseEntity<String> handleAuthorizationDeniedException(
+      AuthorizationDeniedException ex) {
     logError(ex);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
   }
 
-    /*
-    /**
-     * Handle any remaining exceptions that are not explicitly handled.
-     *
-     * @param ex
-     *            The exception that is not explicitly handled.
-     * @return ResponseEntity with an appropriate HTTP status code and error message.
+  /*
+  /**
+   * Handle any remaining exceptions that are not explicitly handled.
+   *
+   * @param ex
+   *            The exception that is not explicitly handled.
+   * @return ResponseEntity with an appropriate HTTP status code and error message.
 
-    @ExceptionHandler(value = { Exception.class })
-    public ResponseEntity<String> handleRemainderExceptions(Exception ex) {
-      logError(ex);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getClass().getSimpleName());
-    }
-    */
+  @ExceptionHandler(value = { Exception.class })
+  public ResponseEntity<String> handleRemainderExceptions(Exception ex) {
+    logError(ex);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getClass().getSimpleName());
+  }
+  */
 }

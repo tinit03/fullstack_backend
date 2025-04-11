@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageItemUploadDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageItemDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.image.ImageItemUploadDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ImageMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
@@ -16,15 +16,14 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.service.CloudinaryService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ImageService;
 import org.springframework.stereotype.Service;
 
-/**
- * Service implementation for managing images associated with items.
- */
+/** Service implementation for managing images associated with items. */
 @Service
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
-private final ImageRepository imageRepository;
-private final ItemRepository itemRepository;
-private final CloudinaryService cloudinaryService;
+  private final ImageRepository imageRepository;
+  private final ItemRepository itemRepository;
+  private final CloudinaryService cloudinaryService;
+
   /**
    * Saves a new image and links it to an existing item.
    *
@@ -35,14 +34,17 @@ private final CloudinaryService cloudinaryService;
    */
   @Override
   public ImageItemDto saveImage(ImageItemUploadDto dto, Long itemId) {
-    Item item = itemRepository.findById(itemId)
-        .orElseThrow(() -> new EntityNotFoundException("Item not found"));
+    Item item =
+        itemRepository
+            .findById(itemId)
+            .orElseThrow(() -> new EntityNotFoundException("Item not found"));
     Image image = ImageMapper.fromCreateDto(dto);
     image.setItem(item);
     Image savedImage = imageRepository.save(image);
 
     return ImageMapper.toItemImageDto(savedImage);
   }
+
   /**
    * Retrieves all images associated with a given item ID.
    *
@@ -57,9 +59,8 @@ private final CloudinaryService cloudinaryService;
 
     List<Image> images = imageRepository.findByItem_ItemId(itemId);
     return ImageMapper.toDtoList(images);
-
-
   }
+
   /**
    * Deletes an image by its ID.
    *
@@ -69,7 +70,7 @@ private final CloudinaryService cloudinaryService;
   @Override
   public void deleteImage(Image image) {
     if (image == null) return;
-    try{
+    try {
       String publicId = image.getPublicId();
       if (publicId != null && !publicId.isBlank()) {
         cloudinaryService.deleteImage(publicId);
@@ -79,14 +80,14 @@ private final CloudinaryService cloudinaryService;
     } catch (IOException ex) {
       throw new IllegalArgumentException("Something happened");
     }
-
   }
 
   /**
    * Updates the image given an url and image.
+   *
    * @param url The image url.
    * @param currentImage Current image.
-   * @return
+   * @return The updated image.
    */
   @Override
   public Image updateImage(String url, Image currentImage) {

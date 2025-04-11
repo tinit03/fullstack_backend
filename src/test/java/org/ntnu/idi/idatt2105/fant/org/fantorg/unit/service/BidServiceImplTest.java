@@ -1,5 +1,10 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.unit.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -30,31 +35,20 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.service.NotificationService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.BidServiceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 public class BidServiceImplTest {
 
-  @Mock
-  private BidRepository bidRepository;
+  @Mock private BidRepository bidRepository;
 
-  @Mock
-  private ItemRepository itemRepository;
+  @Mock private ItemRepository itemRepository;
 
-  @Mock
-  private OrderRepository orderRepository;
+  @Mock private OrderRepository orderRepository;
 
-  @Mock
-  private NotificationService notificationService;
+  @Mock private NotificationService notificationService;
 
-  @Mock
-  private ChatMessageService chatMessageService;
+  @Mock private ChatMessageService chatMessageService;
 
-  @InjectMocks
-  private BidServiceImpl bidService;
+  @InjectMocks private BidServiceImpl bidService;
 
   private User seller;
   private User bidder;
@@ -75,7 +69,6 @@ public class BidServiceImplTest {
     bidder.setFirstName("Bidder");
     bidder.setLastName("User");
     bidder.setEmail("bidder@example.com");
-
 
     sampleItem = new Item();
     org.springframework.test.util.ReflectionTestUtils.setField(sampleItem, "itemId", 10L);
@@ -104,15 +97,16 @@ public class BidServiceImplTest {
     createDto.setItemId(sampleItem.getItemId());
     createDto.setAmount(new java.math.BigDecimal("110.00"));
 
-    when(itemRepository.findById(sampleItem.getItemId()))
-        .thenReturn(Optional.of(sampleItem));
+    when(itemRepository.findById(sampleItem.getItemId())).thenReturn(Optional.of(sampleItem));
 
     // The seller should be the owner of the item, so bidder is placing a bid
-    when(bidRepository.save(any(Bid.class))).thenAnswer(invocation -> {
-      Bid bidArg = invocation.getArgument(0);
-      ReflectionTestUtils.setField(bidArg, "id", 20L);
-      return bidArg;
-    });
+    when(bidRepository.save(any(Bid.class)))
+        .thenAnswer(
+            invocation -> {
+              Bid bidArg = invocation.getArgument(0);
+              ReflectionTestUtils.setField(bidArg, "id", 20L);
+              return bidArg;
+            });
 
     BidDto returnedDto = bidService.placeBid(createDto, bidder);
 
@@ -120,7 +114,8 @@ public class BidServiceImplTest {
     assertThat(returnedDto.getAmount()).isEqualByComparingTo(createDto.getAmount());
 
     verify(notificationService, times(1))
-        .send(eq(sampleItem.getSeller()), any(Map.class), eq(NotificationType.NEW_BID), anyString());
+        .send(
+            eq(sampleItem.getSeller()), any(Map.class), eq(NotificationType.NEW_BID), anyString());
   }
 
   @Test
@@ -131,8 +126,7 @@ public class BidServiceImplTest {
 
     sampleItem.setListingType(ListingType.DIRECT);
 
-    when(itemRepository.findById(sampleItem.getItemId()))
-        .thenReturn(Optional.of(sampleItem));
+    when(itemRepository.findById(sampleItem.getItemId())).thenReturn(Optional.of(sampleItem));
 
     // Expect an IllegalArgumentException
     assertThrows(IllegalArgumentException.class, () -> bidService.placeBid(createDto, bidder));
@@ -158,11 +152,13 @@ public class BidServiceImplTest {
 
     when(bidRepository.save(any(Bid.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-    when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
-      Order orderArg = invocation.getArgument(0);
-      ReflectionTestUtils.setField(orderArg, "id", 30L);
-      return orderArg;
-    });
+    when(orderRepository.save(any(Order.class)))
+        .thenAnswer(
+            invocation -> {
+              Order orderArg = invocation.getArgument(0);
+              ReflectionTestUtils.setField(orderArg, "id", 30L);
+              return orderArg;
+            });
 
     // Execute acceptBid.
     OrderDto orderDto = bidService.acceptBid(sampleBid.getId(), seller);
@@ -171,7 +167,8 @@ public class BidServiceImplTest {
     assertThat(sampleBid.getStatus()).isEqualTo(BidStatus.ACCEPTED);
     // the order should contain the correct item and buyer
     assertThat(orderDto).isNotNull();
-    assertThat(orderDto.getBuyerId()).isEqualTo(bidder.getId()); // because OrderMapper maps the buyer info
+    assertThat(orderDto.getBuyerId())
+        .isEqualTo(bidder.getId()); // because OrderMapper maps the buyer info
 
     // Verify that a notification is sent to the bidder for bid acceptance.
     verify(notificationService, times(1))
