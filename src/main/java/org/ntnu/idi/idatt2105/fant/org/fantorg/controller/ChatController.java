@@ -10,13 +10,12 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageCreateDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatNotification;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatProfileDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.*;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatMessage;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatRoomRepository;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ItemService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatMessageServiceImpl;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatRoomServiceImpl;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.UserServiceImpl;
@@ -56,6 +55,7 @@ public class ChatController {
   private final ChatRoomRepository chatRoomRepository;
   private final UserServiceImpl userServiceImpl;
   private final ChatRoomServiceImpl chatRoomService;
+  private final ItemService itemService;
 
   /**
    * Retrieves a paginated list of chats for the authenticated user.
@@ -224,12 +224,21 @@ public class ChatController {
                   schema = @Schema(implementation = ChatMessageDto.class))
             }),
       })
-  @PostMapping("/chat")
+  @PostMapping("/chat/{itemId}")
   public ResponseEntity<ChatMessageDto> contactSeller(
       @Parameter(description = "Chat message info") @RequestBody
-          ChatMessageCreateDto chatMessageCreateDto,
+      ChatMessageNewDto messageNewDto,
+      @Parameter(description =  "Item id") @PathVariable
+          Long itemId,
       @Parameter(description = "Authenticated user") @AuthenticationPrincipal User user) {
+
+    ChatMessageCreateDto chatMessageCreateDto = new ChatMessageCreateDto();
+    chatMessageCreateDto.setType(MessageType.NORMAL);
+    chatMessageCreateDto.setContent(messageNewDto.getMessage());
+    chatMessageCreateDto.setRecipientId(itemService.getItemById(itemId).getSeller().getEmail());
+    chatMessageCreateDto.setItemId(itemId);
     chatMessageCreateDto.setSenderId(user.getEmail());
+
     ChatMessageDto savedMsgDto = chatMessageService.save(chatMessageCreateDto);
     messagingTemplate.convertAndSendToUser(
         savedMsgDto.getRecipientId(),
