@@ -20,6 +20,37 @@ jobs:
           distribution: 'oracle'
           java-version: 21
 
+      - name: Create application-secret.yml
+        run: |
+          mkdir -p src/main/resources
+          cat <<EOF > src/main/resources/application-secret.yml
+          spring:
+            mail:
+              username: "${{ secrets.MAIL_USERNAME }}"
+              password: "${{ secrets.MAIL_PASSWORD }}"
+            datasource:
+              username: "${{ secrets.DB_USERNAME }}"
+              password: "${{ secrets.DB_PASSWORD }}"
+
+          jwt:
+            secret: "${{ secrets.JWT_SECRET }}"
+
+          cloudinary:
+            cloud-name: "${{ secrets.CLOUDINARY_CLOUD_NAME }}"
+            api-key: "${{ secrets.CLOUDINARY_API_KEY }}"
+            api-secret: "${{ secrets.CLOUDINARY_API_SECRET }}"
+
+          bring:
+            api:
+              url: "${{ secrets.BRING_API_URL }}"
+              uid: "${{ secrets.BRING_API_UID }}"
+              key: "${{ secrets.BRING_API_KEY }}"
+
+          app:
+            frontend:
+              reset-url: "${{ secrets.APP_FRONTEND_RESET_URL }}"
+          EOF
+
       - name: Unit Tests
         run: mvn -B verify --file pom.xml
 
