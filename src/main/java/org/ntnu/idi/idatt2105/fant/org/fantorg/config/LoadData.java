@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
  *   <li>Preconfigured item listings, including contact, bid, and direct sale types
  * </ul>
  *
- *<p>This class helps ensure that the system has sample data to test and visualize the core
+ * <p>This class helps ensure that the system has sample data to test and visualize the core
  * functionalities like item listing, category browsing, and user interactions.
  *
  * <p>Dependencies such as repositories and services are injected using constructor injection
@@ -75,8 +75,8 @@ public class LoadData implements CommandLineRunner {
    *   <li>Images: Assigned to both categories and items for visual representation
    * </ul>
    *
-   *<p>This method is only invoked when the Spring Boot application is run with the "test" profile. It
-   * uses JPA repositories to persist entities to the database.
+   * <p>This method is only invoked when the Spring Boot application is run with the "test" profile.
+   * It uses JPA repositories to persist entities to the database.
    *
    * @param args Application arguments (unused)
    */
