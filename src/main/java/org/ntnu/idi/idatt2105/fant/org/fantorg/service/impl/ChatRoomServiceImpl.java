@@ -138,6 +138,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
               ChatDto chat =
                   ChatDto.builder()
+                      .lastMessageType(lastMessage.getType())
                       .lastMessageContent(lastMessage.getContent())
                       .lastMessageTimestamp(lastMessage.getTimestamp())
                       .lastSenderId(lastMessage.getSender().getEmail())
