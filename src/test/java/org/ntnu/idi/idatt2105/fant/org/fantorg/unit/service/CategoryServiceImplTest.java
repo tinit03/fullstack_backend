@@ -8,10 +8,12 @@ import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.CategoryCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.CategoryDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.SubCategoryCreateDto;
@@ -23,21 +25,15 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ImageService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.CategoryServiceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceImplTest {
 
-  @Mock
-  private CategoryRepository categoryRepository;
+  @Mock private CategoryRepository categoryRepository;
 
-  @Mock
-  private ImageService imageService;
+  @Mock private ImageService imageService;
 
-  @InjectMocks
-  private CategoryServiceImpl categoryService;
+  @InjectMocks private CategoryServiceImpl categoryService;
 
   // Sample values for tests.
   private final String validImageUrl = "https://example.com/image.jpg";
@@ -67,11 +63,13 @@ public class CategoryServiceImplTest {
     // Simulate the image service response
     when(imageService.updateImage(eq(validImageUrl), any())).thenReturn(newImage);
 
-    when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> {
-      Category c = invocation.getArgument(0);
-      ReflectionTestUtils.setField(c, "categoryId", 1L);
-      return c;
-    });
+    when(categoryRepository.save(any(Category.class)))
+        .thenAnswer(
+            invocation -> {
+              Category c = invocation.getArgument(0);
+              ReflectionTestUtils.setField(c, "categoryId", 1L);
+              return c;
+            });
 
     Category created = categoryService.createCategory(dto);
     verify(imageService, times(1)).updateImage(eq(validImageUrl), any());
@@ -91,11 +89,13 @@ public class CategoryServiceImplTest {
 
     // In this branch, the service checks and sets the image to null
     // We simulate repository.save without calling the imageService
-    when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> {
-      Category c = invocation.getArgument(0);
-      ReflectionTestUtils.setField(c, "categoryId", 2L);
-      return c;
-    });
+    when(categoryRepository.save(any(Category.class)))
+        .thenAnswer(
+            invocation -> {
+              Category c = invocation.getArgument(0);
+              ReflectionTestUtils.setField(c, "categoryId", 2L);
+              return c;
+            });
 
     Category created = categoryService.createCategory(dto);
 
@@ -117,12 +117,13 @@ public class CategoryServiceImplTest {
     dto.setName("Child Category");
     dto.setParentCategoryId(10L);
 
-
-    when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> {
-      Category c = invocation.getArgument(0);
-      ReflectionTestUtils.setField(c, "categoryId", 20L);
-      return c;
-    });
+    when(categoryRepository.save(any(Category.class)))
+        .thenAnswer(
+            invocation -> {
+              Category c = invocation.getArgument(0);
+              ReflectionTestUtils.setField(c, "categoryId", 20L);
+              return c;
+            });
 
     Category createdSub = categoryService.createSubCategory(dto);
 
@@ -139,7 +140,8 @@ public class CategoryServiceImplTest {
     ReflectionTestUtils.setField(existing, "categoryId", 30L);
     existing.setImage(null);
     when(categoryRepository.findById(30L)).thenReturn(Optional.of(existing));
-    when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    when(categoryRepository.save(any(Category.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
 
     CategoryCreateDto dto = new CategoryCreateDto();
     dto.setName("Updated Category");
@@ -186,7 +188,8 @@ public class CategoryServiceImplTest {
     updateDto.setName("Updated Subcategory");
     updateDto.setParentCategoryId(60L);
 
-    when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    when(categoryRepository.save(any(Category.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
 
     // When updateSubCategory is called
     Category updatedSub = categoryService.updateSubCategory(40L, updateDto);
@@ -245,9 +248,8 @@ public class CategoryServiceImplTest {
         .thenReturn(Arrays.asList(sub1, sub2));
 
     // When getSubCategoriesByParentId is called
-    List<SubCategoryDto> subDtos =
-        categoryService.getSubCategoriesByParentId(90L);
-    //Check if the size of the list and the names are correct
+    List<SubCategoryDto> subDtos = categoryService.getSubCategoriesByParentId(90L);
+    // Check if the size of the list and the names are correct
     assertThat(subDtos).hasSize(2);
     assertThat(subDtos.get(0).getName()).isEqualTo("Subcategory 1");
     assertThat(subDtos.get(1).getName()).isEqualTo("Subcategory 2");

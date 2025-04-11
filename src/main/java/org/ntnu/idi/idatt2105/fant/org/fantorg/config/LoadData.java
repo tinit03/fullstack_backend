@@ -12,10 +12,10 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Condition;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Role;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.CategoryRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ChatMessageRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ImageRepository;
@@ -27,6 +27,32 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class is a Spring component that loads initial test data into the application when the
+ * application starts with the {@code test} profile.
+ *
+ * <p>It populates the database with:
+ *
+ * <ul>
+ *   <li>Users
+ *   <li>Categories and subcategories
+ *   <li>Items with metadata such as price, status, condition, etc.
+ *   <li>Images associated with categories and items
+ *   <li>Preconfigured item listings, including contact, bid, and direct sale types
+ * </ul>
+ *
+ *<p>This class helps ensure that the system has sample data to test and visualize the core
+ * functionalities like item listing, category browsing, and user interactions.
+ *
+ * <p>Dependencies such as repositories and services are injected using constructor injection
+ * (enabled by {@link lombok.RequiredArgsConstructor}).
+ *
+ * <p>This component is only active when the {@code test} profile is active.
+ *
+ * @see org.springframework.boot.CommandLineRunner
+ * @see org.springframework.context.annotation.Profile
+ * @author Tini Tran and Harry Xu
+ */
 @Component
 @RequiredArgsConstructor
 public class LoadData implements CommandLineRunner {
@@ -39,16 +65,24 @@ public class LoadData implements CommandLineRunner {
   private final ChatRoomServiceImpl chatRoomServiceImpl;
   private final ChatMessageRepository chatMessageRepository;
 
-
   /**
-   * Callback used to run the bean.
+   * Populates the application with test data including:
    *
-   * @param args incoming main method arguments
-   * @throws Exception on error
+   * <ul>
+   *   <li>Users: test user, John Doe, Alice Smith
+   *   <li>Categories: Parent and subcategories like Clothes, Electronics, Sports, etc.
+   *   <li>Items: Example items under various categories, with various conditions and listing types
+   *   <li>Images: Assigned to both categories and items for visual representation
+   * </ul>
+   *
+   *<p>This method is only invoked when the Spring Boot application is run with the "test" profile. It
+   * uses JPA repositories to persist entities to the database.
+   *
+   * @param args Application arguments (unused)
    */
   @Override
   @Profile("test")
-  public void run(String... args) throws Exception {
+  public void run(String... args) {
 
     // 1. Create test user
     User user = new User();
@@ -78,7 +112,8 @@ public class LoadData implements CommandLineRunner {
     // 2. Create parent category
     Category parentCategory = new Category();
     Image clothesImage = new Image();
-    clothesImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1743697236/clothes-hanger-svgrepo-com_lnddra.svg");
+    clothesImage.setUrl(
+        "https://res.cloudinary.com/desnhobcx/image/upload/v1743697236/clothes-hanger-svgrepo-com_lnddra.svg");
     clothesImage.setPublicId("clothes-hanger-svgrepo-com_lnddra");
     parentCategory.setImage(clothesImage);
     parentCategory.setCategoryName("Clothes");
@@ -98,7 +133,8 @@ public class LoadData implements CommandLineRunner {
     Category electronics = new Category();
     Image imageElectronics = new Image();
     imageElectronics.setPublicId("computer-svgrepo-com_gz7m1c");
-    imageElectronics.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1743697442/computer-svgrepo-com_gz7m1c.svg");
+    imageElectronics.setUrl(
+        "https://res.cloudinary.com/desnhobcx/image/upload/v1743697442/computer-svgrepo-com_gz7m1c.svg");
     electronics.setImage(imageElectronics);
     electronics.setCategoryName("Electronics");
     categoryRepository.save(electronics);
@@ -116,7 +152,8 @@ public class LoadData implements CommandLineRunner {
     // === PARENT CATEGORY: Sports ===
     Category sports = new Category();
     Image imageSport = new Image();
-    imageSport.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1743698155/ymlpxut6wpax101shhqw.svg");
+    imageSport.setUrl(
+        "https://res.cloudinary.com/desnhobcx/image/upload/v1743698155/ymlpxut6wpax101shhqw.svg");
     imageSport.setPublicId("ymlpxut6wpax101shhqw");
     sports.setImage(imageSport);
     sports.setCategoryName("Sports");
@@ -133,7 +170,8 @@ public class LoadData implements CommandLineRunner {
     categoryRepository.save(balls);
 
     Image booksImage = new Image();
-    booksImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1744108933/ctxhoaldixtbr7jlsnwg.svg");
+    booksImage.setUrl(
+        "https://res.cloudinary.com/desnhobcx/image/upload/v1744108933/ctxhoaldixtbr7jlsnwg.svg");
     booksImage.setPublicId("ctxhoaldixtbr7jlsnwg");
     Category books = new Category();
     books.setCategoryName("Books");
@@ -146,7 +184,8 @@ public class LoadData implements CommandLineRunner {
     categoryRepository.save(fiction);
 
     Image furnitureImage = new Image();
-    furnitureImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1744108930/uhdqgdilcpgrojap0nor.svg");
+    furnitureImage.setUrl(
+        "https://res.cloudinary.com/desnhobcx/image/upload/v1744108930/uhdqgdilcpgrojap0nor.svg");
     furnitureImage.setPublicId("uhdqgdilcpgrojap0nor");
     Category furniture = new Category();
     furniture.setCategoryName("Furniture");
@@ -159,7 +198,8 @@ public class LoadData implements CommandLineRunner {
     categoryRepository.save(chairs);
 
     Image toysImage = new Image();
-    toysImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1744109544/uuaa9dnsdsvyoedrncrt.svg");
+    toysImage.setUrl(
+        "https://res.cloudinary.com/desnhobcx/image/upload/v1744109544/uuaa9dnsdsvyoedrncrt.svg");
     toysImage.setPublicId("uuaa9dnsdsvyoedrncrt");
     Category toys = new Category();
     toys.setCategoryName("Toys");
@@ -172,7 +212,8 @@ public class LoadData implements CommandLineRunner {
     categoryRepository.save(actionFigures);
 
     Image appliancesImage = new Image();
-    appliancesImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1744109547/dnhcpvfffwih5vk1rrg4.svg");
+    appliancesImage.setUrl(
+        "https://res.cloudinary.com/desnhobcx/image/upload/v1744109547/dnhcpvfffwih5vk1rrg4.svg");
     appliancesImage.setPublicId("dnhcpvfffwih5vk1rrg4");
     Category appliances = new Category();
     appliances.setCategoryName("Home Appliances");
@@ -185,7 +226,8 @@ public class LoadData implements CommandLineRunner {
     categoryRepository.save(fridges);
 
     Image vehiclesImage = new Image();
-    vehiclesImage.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1744109550/folw0fsqqyqs5pnrkp9y.svg");
+    vehiclesImage.setUrl(
+        "https://res.cloudinary.com/desnhobcx/image/upload/v1744109550/folw0fsqqyqs5pnrkp9y.svg");
     vehiclesImage.setPublicId("folw0fsqqyqs5pnrkp9y");
     Category vehicles = new Category();
     vehicles.setCategoryName("Vehicles");
@@ -197,14 +239,13 @@ public class LoadData implements CommandLineRunner {
     cars.setParentCategory(vehicles);
     categoryRepository.save(cars);
 
-
     Item item = new Item();
     item.setTitle("Winter Jacket");
     item.setDescription("Insulated winter jacket in great condition");
     item.setSubCategory(subCategory); // Set to subcategory
     item.setPrice(new BigDecimal("0"));
     item.setPublishedAt(LocalDateTime.now());
-    item.setLocation(new Location("7010", "Trøndelag","Trondheim", "63.4305", "10.3951"));
+    item.setLocation(new Location("7010", "Trøndelag", "Trondheim", "63.4305", "10.3951"));
     item.setTags(List.of("jacket", "winter", "clothes"));
     item.setSeller(user);
     item.setListingType(ListingType.CONTACT);
@@ -219,7 +260,7 @@ public class LoadData implements CommandLineRunner {
     item1.setSubCategory(balls); // Set to subcategory
     item1.setPrice(new BigDecimal("0"));
     item1.setPublishedAt(LocalDateTime.now());
-    item1.setLocation(new Location("7010", "Trøndelag","Trondheim", "63.4305", "10.3951"));
+    item1.setLocation(new Location("7010", "Trøndelag", "Trondheim", "63.4305", "10.3951"));
     item1.setTags(List.of("animal", "cat", "feline"));
     item1.setSeller(user);
     item1.setListingType(ListingType.CONTACT);
@@ -228,9 +269,10 @@ public class LoadData implements CommandLineRunner {
     item1.setForSale(false);
     itemRepository.save(item1);
 
-    List<Image> images = new ArrayList<>();
-    Image image = new Image();
-    image.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1742651144/samples/people/boy-snow-hoodie.jpg");
+    final List<Image> images = new ArrayList<>();
+    final Image image = new Image();
+    image.setUrl(
+        "https://res.cloudinary.com/desnhobcx/image/upload/v1742651144/samples/people/boy-snow-hoodie.jpg");
     image.setPublicId("samples/people/boy-snow-hoodie");
     image.setCaption("winter jacket");
     image.setItem(item);
@@ -238,15 +280,15 @@ public class LoadData implements CommandLineRunner {
     imageRepository.saveAll(images);
     item.setImages(images);
     List<Image> images1 = new ArrayList<>();
-    Image image1 = new Image();
-    image1.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1744336023/ldimjznnujezfn6i3aji.jpg");
+    final Image image1 = new Image();
+    image1.setUrl(
+        "https://res.cloudinary.com/desnhobcx/image/upload/v1744336023/ldimjznnujezfn6i3aji.jpg");
     image1.setPublicId("ldimjznnujezfn6i3aji");
     image1.setCaption("cool cat");
     image1.setItem(item1);
     images1.add(image1);
     imageRepository.saveAll(images1);
     item1.setImages(images1);
-
 
     // === Additional Items ===
     Item dessertItem = new Item();
@@ -386,15 +428,69 @@ public class LoadData implements CommandLineRunner {
 
     // === Images for new items ===
     List<Image> newImages = new ArrayList<>();
-    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1742651143/samples/food/dessert.jpg", "samples/food/dessert", "Yummy dessert", dessertItem));
-    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1742651143/samples/sheep.jpg", "samples/sheep", "Wooly sheep", sheepItem));
-    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1742651144/samples/ecommerce/shoes.png", "samples/ecommerce/shoes", "Sporty shoes", shoesItem));
-    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1742651144/samples/bike.jpg", "samples/bike", "Mountain bike", bikeItem));
-    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744111775/llyfzr98jt9os9xjfk9e.jpg", "llyfzr98jt9os9xjfk9e", "Catcher in the rye", book));
-    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744111895/iexwpih72nkt0j89qvvu.jpg", "iexwpih72nkt0j89qvvu", "Black ergonomic Chair", chair));
-    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744112006/ybrvxvud75ok5z1ped0l.png", "ybrvxvud75ok5z1ped0l", "Cool action figure", figures));
-    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744336212/xasglz6fbrudmic1hnke.jpg", "xasglz6fbrudmic1hnke", "Modern Refrigerator", fridge));
-    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744112263/rmxgjymbt92xbfmq8doq.png", "rmxgjymbt92xbfmq8doq", "Electric Car Image", car));
+    newImages.add(
+        new Image(
+            null,
+            "https://res.cloudinary.com/desnhobcx/image/upload/v1742651143/samples/food/dessert.jpg",
+            "samples/food/dessert",
+            "Yummy dessert",
+            dessertItem));
+    newImages.add(
+        new Image(
+            null,
+            "https://res.cloudinary.com/desnhobcx/image/upload/v1742651143/samples/sheep.jpg",
+            "samples/sheep",
+            "Wooly sheep",
+            sheepItem));
+    newImages.add(
+        new Image(
+            null,
+            "https://res.cloudinary.com/desnhobcx/image/upload/v1742651144/samples/ecommerce/shoes.png",
+            "samples/ecommerce/shoes",
+            "Sporty shoes",
+            shoesItem));
+    newImages.add(
+        new Image(
+            null,
+            "https://res.cloudinary.com/desnhobcx/image/upload/v1742651144/samples/bike.jpg",
+            "samples/bike",
+            "Mountain bike",
+            bikeItem));
+    newImages.add(
+        new Image(
+            null,
+            "https://res.cloudinary.com/desnhobcx/image/upload/v1744111775/llyfzr98jt9os9xjfk9e.jpg",
+            "llyfzr98jt9os9xjfk9e",
+            "Catcher in the rye",
+            book));
+    newImages.add(
+        new Image(
+            null,
+            "https://res.cloudinary.com/desnhobcx/image/upload/v1744111895/iexwpih72nkt0j89qvvu.jpg",
+            "iexwpih72nkt0j89qvvu",
+            "Black ergonomic Chair",
+            chair));
+    newImages.add(
+        new Image(
+            null,
+            "https://res.cloudinary.com/desnhobcx/image/upload/v1744112006/ybrvxvud75ok5z1ped0l.png",
+            "ybrvxvud75ok5z1ped0l",
+            "Cool action figure",
+            figures));
+    newImages.add(
+        new Image(
+            null,
+            "https://res.cloudinary.com/desnhobcx/image/upload/v1744336212/xasglz6fbrudmic1hnke.jpg",
+            "xasglz6fbrudmic1hnke",
+            "Modern Refrigerator",
+            fridge));
+    newImages.add(
+        new Image(
+            null,
+            "https://res.cloudinary.com/desnhobcx/image/upload/v1744112263/rmxgjymbt92xbfmq8doq.png",
+            "rmxgjymbt92xbfmq8doq",
+            "Electric Car Image",
+            car));
     imageRepository.saveAll(newImages);
 
     dessertItem.setImages(List.of(newImages.get(0)));
@@ -408,42 +504,54 @@ public class LoadData implements CommandLineRunner {
 
     itemRepository.saveAll(List.of(dessertItem, sheepItem, shoesItem, bikeItem));
     // 5: Create test chat room
-    String chatId = chatRoomServiceImpl.getChatRoomId(a.getEmail(), otherUser.getEmail(), item.getItemId(), true).orElseThrow();
-    ChatMessage chatMessage = ChatMessage.builder()
-        .sender(a)
-        .recipient(otherUser)
-        .item(item)
-        .content("first message")
-        .chatId(chatId)
-        .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
-        .type(MessageType.NORMAL)
-        .build();
+    String chatId =
+        chatRoomServiceImpl
+            .getChatRoomId(a.getEmail(), otherUser.getEmail(), item.getItemId(), true)
+            .orElseThrow();
+    ChatMessage chatMessage =
+        ChatMessage.builder()
+            .sender(a)
+            .recipient(otherUser)
+            .item(item)
+            .content("first message")
+            .chatId(chatId)
+            .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+            .type(MessageType.NORMAL)
+            .build();
 
     chatMessageRepository.save(chatMessage);
 
-    String otherChatId = chatRoomServiceImpl.getChatRoomId(a.getEmail(), user.getEmail(), item1.getItemId(), true).orElseThrow();
-    ChatMessage otherChatMessage = ChatMessage.builder()
-        .sender(a)
-        .recipient(user)
-        .item(item1)
-        .content("other message")
-        .chatId(otherChatId)
-        .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
-        .type(MessageType.NORMAL)
-        .build();
+    String otherChatId =
+        chatRoomServiceImpl
+            .getChatRoomId(a.getEmail(), user.getEmail(), item1.getItemId(), true)
+            .orElseThrow();
+    ChatMessage otherChatMessage =
+        ChatMessage.builder()
+            .sender(a)
+            .recipient(user)
+            .item(item1)
+            .content("other message")
+            .chatId(otherChatId)
+            .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+            .type(MessageType.NORMAL)
+            .build();
 
     chatMessageRepository.save(otherChatMessage);
 
-    String anotherChatId = chatRoomServiceImpl.getChatRoomId(user.getEmail(), a.getEmail(), item1.getItemId(), true).orElseThrow();
-    ChatMessage antotherChatMessage = ChatMessage.builder()
-        .sender(user)
-        .recipient(a)
-        .item(item1)
-        .content("another messgae")
-        .chatId(anotherChatId)
-        .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
-        .type(MessageType.NORMAL)
-        .build();
+    String anotherChatId =
+        chatRoomServiceImpl
+            .getChatRoomId(user.getEmail(), a.getEmail(), item1.getItemId(), true)
+            .orElseThrow();
+    ChatMessage antotherChatMessage =
+        ChatMessage.builder()
+            .sender(user)
+            .recipient(a)
+            .item(item1)
+            .content("another messgae")
+            .chatId(anotherChatId)
+            .timestamp(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+            .type(MessageType.NORMAL)
+            .build();
 
     chatMessageRepository.save(antotherChatMessage);
 

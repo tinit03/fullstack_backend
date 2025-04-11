@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/** Config file for image upload service. */
 @Configuration
 public class CloudinaryConfig {
 
@@ -18,13 +19,18 @@ public class CloudinaryConfig {
   @Value("${cloudinary.api-secret}")
   private String apiSecret;
 
+  /**
+   * Creates a bean for the cloudinary service.
+   *
+   * @return Service bean.
+   */
   @Bean
   public Cloudinary cloudinary() {
-    return new Cloudinary(ObjectUtils.asMap(
-        "cloud_name", cloudName,
-        "api_key", apiKey,
-        "api_secret", apiSecret,
-        "secure", true
-    ));
+    return new Cloudinary(
+        ObjectUtils.asMap(
+            "cloud_name", cloudName,
+            "api_key", apiKey,
+            "api_secret", apiSecret,
+            "secure", true));
   }
 }

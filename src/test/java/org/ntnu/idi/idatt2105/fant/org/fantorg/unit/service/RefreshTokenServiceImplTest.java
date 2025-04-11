@@ -14,24 +14,22 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.RefreshToken;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Role;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.RefreshTokenRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.RefreshTokenServiceImpl;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class RefreshTokenServiceImplTest {
 
-  @Mock
-  private RefreshTokenRepository refreshTokenRepository;
+  @Mock private RefreshTokenRepository refreshTokenRepository;
 
-  @InjectMocks
-  private RefreshTokenServiceImpl refreshTokenService;
+  @InjectMocks private RefreshTokenServiceImpl refreshTokenService;
 
   private User sampleUser;
   private RefreshToken sampleToken;
@@ -40,7 +38,6 @@ public class RefreshTokenServiceImplTest {
   public void setUp() {
     // Set up a sample user.
     sampleUser = new User();
-
 
     sampleUser.setEmail("john.doe@example.com");
     sampleUser.setPassword("old_password");
@@ -63,7 +60,7 @@ public class RefreshTokenServiceImplTest {
     String oldToken = sampleToken.getToken();
     RefreshToken result = refreshTokenService.createToken(sampleUser);
 
-    //Check if the existing token is updated (new token string, new expiry, and not used).
+    // Check if the existing token is updated (new token string, new expiry, and not used).
     assertThat(result.getToken()).isNotEqualTo(oldToken);
     assertThat(result.getExpiryDate()).isAfter(LocalDateTime.now().plusDays(6));
     assertThat(result.isUsed()).isFalse();
@@ -76,12 +73,13 @@ public class RefreshTokenServiceImplTest {
     // Simulate that there is no existing token for the user
     when(refreshTokenRepository.findByUser(eq(sampleUser))).thenReturn(Optional.empty());
     when(refreshTokenRepository.save(any(RefreshToken.class)))
-        .thenAnswer(invocation -> {
-          RefreshToken token = invocation.getArgument(0);
-          // Simulate setting an id after save
-          token.setToken(token.getToken()); // token remains same
-          return token;
-        });
+        .thenAnswer(
+            invocation -> {
+              RefreshToken token = invocation.getArgument(0);
+              // Simulate setting an id after save
+              token.setToken(token.getToken()); // token remains same
+              return token;
+            });
 
     // Create a new token
     RefreshToken result = refreshTokenService.createToken(sampleUser);
@@ -96,7 +94,8 @@ public class RefreshTokenServiceImplTest {
 
   @Test
   public void testGetByToken_Success() {
-    when(refreshTokenRepository.findByToken(eq(sampleToken.getToken()))).thenReturn(Optional.of(sampleToken));
+    when(refreshTokenRepository.findByToken(eq(sampleToken.getToken())))
+        .thenReturn(Optional.of(sampleToken));
 
     RefreshToken result = refreshTokenService.getByToken(sampleToken.getToken());
 
@@ -108,14 +107,16 @@ public class RefreshTokenServiceImplTest {
   public void testGetByToken_TokenNotFound() {
     when(refreshTokenRepository.findByToken(any(String.class))).thenReturn(Optional.empty());
 
-    assertThrows(EntityNotFoundException.class, () -> refreshTokenService.getByToken("nonexistent"));
+    assertThrows(
+        EntityNotFoundException.class, () -> refreshTokenService.getByToken("nonexistent"));
 
     verify(refreshTokenRepository).findByToken("nonexistent");
   }
 
   @Test
   public void testValidateToken_Success() {
-    when(refreshTokenRepository.findByToken(eq(sampleToken.getToken()))).thenReturn(Optional.of(sampleToken));
+    when(refreshTokenRepository.findByToken(eq(sampleToken.getToken())))
+        .thenReturn(Optional.of(sampleToken));
 
     RefreshToken result = refreshTokenService.validateToken(sampleToken.getToken());
 
@@ -127,7 +128,8 @@ public class RefreshTokenServiceImplTest {
   public void testValidateToken_Expired() {
     // Simulate an expired token
     sampleToken.setExpiryDate(LocalDateTime.now().minusMinutes(1));
-    when(refreshTokenRepository.findByToken(eq(sampleToken.getToken()))).thenReturn(Optional.of(sampleToken));
+    when(refreshTokenRepository.findByToken(eq(sampleToken.getToken())))
+        .thenReturn(Optional.of(sampleToken));
 
     // When the token is validated, then it should delete the token and throw an exception.
     assertThatThrownBy(() -> refreshTokenService.validateToken(sampleToken.getToken()))
@@ -140,7 +142,7 @@ public class RefreshTokenServiceImplTest {
 
   @Test
   public void testRevokeToken() {
-    //When revokeToken is called.
+    // When revokeToken is called.
     refreshTokenService.revokeToken(sampleUser);
 
     // Then we should expect the repository to delete by user and then flush
@@ -148,10 +150,9 @@ public class RefreshTokenServiceImplTest {
     verify(refreshTokenRepository).flush();
   }
 
-
   @Test
   public void testPurgeExpiredTokens() {
-    //We don't need to do anything, because it will call upon itself in any time
+    // We don't need to do anything, because it will call upon itself in any time
     doNothing().when(refreshTokenRepository).deleteAllByExpiryDateBefore(any(LocalDateTime.class));
     refreshTokenService.purgeExpiredTokens();
     verify(refreshTokenRepository).deleteAllByExpiryDateBefore(any(LocalDateTime.class));
