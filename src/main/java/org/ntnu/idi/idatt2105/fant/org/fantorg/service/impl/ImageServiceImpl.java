@@ -86,7 +86,7 @@ private final CloudinaryService cloudinaryService;
    * Updates the image given an url and image.
    * @param url The image url.
    * @param currentImage Current image.
-   * @return
+   * @return The updated image.
    */
   @Override
   public Image updateImage(String url, Image currentImage) {

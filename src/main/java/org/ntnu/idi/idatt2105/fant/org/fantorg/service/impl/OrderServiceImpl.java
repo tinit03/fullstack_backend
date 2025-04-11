@@ -51,8 +51,7 @@ public class OrderServiceImpl implements OrderService {
 
     String link = "/messages?itemId=" + item.getItemId() + "&recipientId=" + order.getBuyer().getEmail();
     notificationService.send(item.getSeller(),args, NotificationType.ITEM_SOLD,link);
-
-    chatMessageService.save(ChatMessageCreateDto.builder()
+    chatMessageService.send(ChatMessageCreateDto.builder()
         .senderId(savedOrder.getBuyer().getEmail())
         .recipientId(item.getSeller().getEmail())
         .itemId(item.getItemId())

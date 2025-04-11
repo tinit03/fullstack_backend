@@ -1,11 +1,13 @@
 package org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageDto;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatNotification;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.chat.ChatRoomNotFoundException;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.mapper.ChatMessageMapper;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.ChatMessage;
@@ -19,6 +21,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.service.NotificationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 /**
@@ -35,6 +38,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
   private final ChatRoomServiceImpl chatRoomService;
   private final ItemServiceImpl itemService;
   private final NotificationService notificationService;
+  SimpMessagingTemplate messagingTemplate;
 
   /**
    * Saves a new chat message, sends a notification to the recipient, and links it to the correct chat room.
@@ -111,5 +115,19 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     }
 
     return save(chatMessageCreateDto);
+ }
+
+ @Override
+  public void send(ChatMessageCreateDto dto) {
+    ChatMessageDto savedMsgDto = save(dto);
+   messagingTemplate.convertAndSendToUser(savedMsgDto.getRecipientId(), "/queue/messages",
+       ChatNotification.builder()
+           .senderId(savedMsgDto.getSenderId())
+           .recipientId(savedMsgDto.getRecipientId())
+           .itemId(savedMsgDto.getItemId())
+           .content(savedMsgDto.getContent())
+           .timestamp(LocalDateTime.now())
+           .build()
+   );
  }
 }

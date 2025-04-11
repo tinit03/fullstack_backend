@@ -86,7 +86,9 @@ public class JwtService {
         final Claims claims = extractAllClaims(token);
         return claimsTFunction.apply(claims);
     }
-
+    public String getUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
     /**
      * Gets all claims
      * @param token Token

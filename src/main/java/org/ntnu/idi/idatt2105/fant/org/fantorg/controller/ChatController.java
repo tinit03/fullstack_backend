@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.category.SubCategoryDto;
@@ -137,7 +138,12 @@ public class ChatController {
    * @param messageDto the chat message creation DTO containing the message details
    */
   @MessageMapping("/chat")
-  public void processMessage(@Payload ChatMessageCreateDto messageDto) {
+  public void processMessage(@Payload ChatMessageCreateDto messageDto, @AuthenticationPrincipal User user) {
+    System.out.println(user.getEmail());
+    if (!Objects.equals(messageDto.getSenderId(), user.getEmail())) {
+      System.out.println("bad");
+      return;
+    }
     log.info("Received message for /chat");
     log.info("Received chat msg: '{}'", messageDto.getContent());
     log.info("Saving chat msg: '{}'...", messageDto.getContent());
