@@ -10,6 +10,7 @@ public class OrderMapper {
     User seller = order.getItem().getSeller();
     dto.setId(order.getId());
     dto.setOrderDate(order.getOrderDate());
+    dto.setPrice(order.getPrice());
 
     if (order.getItem() != null) {
       dto.setItemId(order.getItem().getItemId());

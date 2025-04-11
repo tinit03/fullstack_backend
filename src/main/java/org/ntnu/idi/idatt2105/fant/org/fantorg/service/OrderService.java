@@ -7,6 +7,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 
 public interface OrderService {
   OrderDto createOrder(OrderCreateDto createOrder, User user);
+  OrderDto getOrderWithId(long orderId, User user);
 
   List<OrderDto> getAllOrders();
 }
