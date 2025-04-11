@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+/** Service for handling image uploads and deletions using Cloudinary. */
 @Service
 @RequiredArgsConstructor
 public class CloudinaryService {
@@ -22,24 +22,15 @@ public class CloudinaryService {
   private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
 
   // Allowed MIME types for images
-  private static final List<String> ALLOWED_MIME_TYPES = List.of("image/png", "image/jpeg", "image/jpg");
-
-//  public String uploadImage(MultipartFile file) throws IOException {
-////    if (file.getSize() > MAX_FILE_SIZE) {
-////      throw new IllegalArgumentException("File size exceeds maximum allowed limit of 5MB.");
-////    }
-////
-////    String contentType = file.getContentType();
-////    if (!ALLOWED_MIME_TYPES.contains(contentType)) {
-////      throw new IllegalArgumentException("Invalid file type. Only PNG and JPG images are allowed.");
-////    }
-////    Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
-////    return result.get("secure_url").toString();
-////  }
-
+  private static final List<String> ALLOWED_MIME_TYPES =
+      List.of("image/png", "image/jpeg", "image/jpg");
 
   /**
    * Uploads a base64-encoded image string to Cloudinary.
+   *
+   * @param base64Image The base64-encoded image string (with or without MIME prefix).
+   * @return A map containing the uploaded image URL and public ID.
+   * @throws IOException if the upload to Cloudinary fails.
    */
   public Map<String, String> uploadBase64Image(String base64Image) throws IOException {
     // Add MIME prefix if missing
@@ -54,19 +45,25 @@ public class CloudinaryService {
 
   /**
    * Deletes an image from Cloudinary using its public ID.
+   *
+   * @param publicId The public ID of the image to be deleted.
+   * @throws IOException if the deletion request to Cloudinary fails.
    */
   public void deleteImage(String publicId) throws IOException {
     cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
   }
 
   /**
-   * Helper to extract useful fields from Cloudinary upload response.
+   * Extracts useful information from the Cloudinary upload response.
+   *
+   * @param result The raw response from Cloudinary.
+   * @return A simplified map containing only the URL and public ID.
    */
   private Map<String, String> extractUploadResponse(Map<?, ?> result) {
     Map<String, String> response = new HashMap<>();
     response.put("url", result.get("secure_url").toString());
     response.put("public_id", result.get("public_id").toString());
-    logger.info("RESPONSE {}",response);
+    logger.info("RESPONSE {}", response);
     return response;
   }
 }

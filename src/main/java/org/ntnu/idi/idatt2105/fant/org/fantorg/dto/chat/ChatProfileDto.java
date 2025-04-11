@@ -8,10 +8,9 @@ import lombok.Setter;
 
 /**
  * Data Transfer Object (DTO) for representing the profile information of a user in a chat.
- * <p>
- * This DTO encapsulates the profile details of a user such as the URL to the profile picture
- * and the user's full name.
- * </p>
+ *
+ * <p>This DTO encapsulates the profile details of a user such as the URL to the profile picture and
+ * the user's full name.
  *
  * @author Harry Xu
  */
@@ -24,17 +23,15 @@ public class ChatProfileDto {
 
   /**
    * The URL of the user's profile picture.
-   * <p>
-   * This field holds the link to the image that represents the user's profile in the chat.
-   * </p>
+   *
+   * <p>This field holds the link to the image that represents the user's profile in the chat.
    */
   private String url;
 
   /**
    * The full name of the user.
-   * <p>
-   * This field holds the full name of the user associated with the profile.
-   * </p>
+   *
+   * <p>This field holds the full name of the user associated with the profile.
    */
   private String fullName;
 }

@@ -16,9 +16,9 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 /**
  * Configuration class for setting up WebSocket messaging using STOMP protocol.
  *
- * <p>This class enables the use of WebSocket message broker, defines the endpoint for
- * WebSocket communication, configures the message broker, and sets up message converters
- * for JSON serialization and deserialization.
+ * <p>This class enables the use of WebSocket message broker, defines the endpoint for WebSocket
+ * communication, configures the message broker, and sets up message converters for JSON
+ * serialization and deserialization.
  */
 @Configuration
 @EnableWebSocketMessageBroker
@@ -31,8 +31,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
    */
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
-    registry.addEndpoint("/ws")
-        .setAllowedOriginPatterns("http://localhost:5173");
+    registry.addEndpoint("/ws").setAllowedOriginPatterns("http://localhost:5173");
   }
 
   /**
@@ -48,8 +47,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   }
 
   /**
-   * Configures the message converters for use in WebSocket messaging.
-   * This method sets up a Jackson-based message converter for JSON content.
+   * Configures the message converters for use in WebSocket messaging. This method sets up a
+   * Jackson-based message converter for JSON content.
    *
    * @param messageConverters the list of configured {@link MessageConverter}s
    * @return {@code false} to indicate that default converters should be added as well

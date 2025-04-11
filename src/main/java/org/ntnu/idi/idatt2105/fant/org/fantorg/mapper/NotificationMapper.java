@@ -5,19 +5,17 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Notification;
 
 /**
  * Utility class for converting between Notification entities and their corresponding DTOs.
- * <p>
- * The NotificationMapper class provides methods to map Notification entities to NotificationDto
+ *
+ * <p>The NotificationMapper class provides methods to map Notification entities to NotificationDto
  * objects for reading notifications.
- * </p>
  */
 public class NotificationMapper {
 
   /**
    * Converts a Notification entity to a NotificationDto.
-   * <p>
-   * This method maps all relevant fields from the Notification entity to a NotificationDto,
+   *
+   * <p>This method maps all relevant fields from the Notification entity to a NotificationDto,
    * which is used to represent the notification details in a response.
-   * </p>
    *
    * @param notification The Notification entity to be converted.
    * @return The NotificationDto containing the notification details.

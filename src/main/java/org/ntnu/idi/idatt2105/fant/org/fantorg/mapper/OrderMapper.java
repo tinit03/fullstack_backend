@@ -6,26 +6,24 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 
 /**
  * Utility class for converting between Order entities and their corresponding DTOs.
- * <p>
- * The OrderMapper class provides methods to map Order entities to OrderDto objects
- * for reading order details in the system.
- * </p>
+ *
+ * <p>The OrderMapper class provides methods to map Order entities to OrderDto objects for reading
+ * order details in the system.
  */
 public class OrderMapper {
 
   /**
    * Converts an Order entity to an OrderDto.
-   * <p>
-   * This method maps all relevant fields from the Order entity to an OrderDto,
-   * which is used to represent order details in a response.
-   * </p>
+   *
+   * <p>This method maps all relevant fields from the Order entity to an OrderDto, which is used to
+   * represent order details in a response.
    *
    * @param order The Order entity to be converted.
    * @return The OrderDto containing the order details.
    */
   public static OrderDto toDto(Order order) {
     OrderDto dto = new OrderDto();
-    User seller = order.getItem().getSeller();
+    final User seller = order.getItem().getSeller();
     dto.setId(order.getId());
     dto.setOrderDate(order.getOrderDate());
     dto.setPrice(order.getPrice());

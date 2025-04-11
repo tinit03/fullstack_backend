@@ -4,26 +4,21 @@ import java.util.List;
 import java.util.Optional;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.item.ItemDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Image;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Location;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.Status;
 
 /**
  * Utility class for converting between Item entities and their corresponding DTOs.
- * <p>
- * The ItemMapper class provides methods to map Item entities to ItemDto objects for
- * reading operations and ItemCreateDto objects for creating or updating Item entities.
- * </p>
+ *
+ * <p>The ItemMapper class provides methods to map Item entities to ItemDto objects for reading
+ * operations and ItemCreateDto objects for creating or updating Item entities.
  */
 public class ItemMapper {
 
   /**
    * Converts an Item entity to an ItemDto.
-   * <p>
-   * This method maps all relevant fields from the Item entity to an ItemDto, including
-   * the item details, associated user and images, as well as category information.
-   * </p>
+   *
+   * <p>This method maps all relevant fields from the Item entity to an ItemDto, including the item
+   * details, associated user and images, as well as category information.
    *
    * @param item The Item entity to be converted.
    * @return The ItemDto containing item details.
@@ -47,20 +42,22 @@ public class ItemMapper {
 
     // Set location if available
     Optional.ofNullable(item.getLocation())
-        .ifPresent(location -> {
-          dto.setLocation(item.getLocation());
-        });
+        .ifPresent(
+            location -> {
+              dto.setLocation(item.getLocation());
+            });
 
     // Set seller details if available
     Optional.ofNullable(item.getSeller())
         .map(UserMapper::toDto)
-        .ifPresent(userDto -> {
-          dto.setSellerFullName(userDto.getFullName());
-          dto.setSellerId(userDto.getId());
-          if (userDto.getProfilePicture() != null) {
-            dto.setSellerPicture(userDto.getProfilePicture().getUrl());
-          }
-        });
+        .ifPresent(
+            userDto -> {
+              dto.setSellerFullName(userDto.getFullName());
+              dto.setSellerId(userDto.getId());
+              if (userDto.getProfilePicture() != null) {
+                dto.setSellerPicture(userDto.getProfilePicture().getUrl());
+              }
+            });
 
     // Set images related to the item
     dto.setImages(ImageMapper.toDtoList(item.getImages()));
@@ -70,9 +67,8 @@ public class ItemMapper {
 
   /**
    * Converts an ItemCreateDto to an Item entity.
-   * <p>
-   * This method maps the fields from the ItemCreateDto to create a new Item entity.
-   * </p>
+   *
+   * <p>This method maps the fields from the ItemCreateDto to create a new Item entity.
    *
    * @param dto The ItemCreateDto containing the data for creating a new Item.
    * @return The Item entity created from the DTO.

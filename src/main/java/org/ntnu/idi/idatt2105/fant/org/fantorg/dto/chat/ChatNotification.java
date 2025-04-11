@@ -10,10 +10,9 @@ import lombok.ToString;
 
 /**
  * Data Transfer Object (DTO) for representing a chat notification.
- * <p>
- * This DTO encapsulates the details of a chat notification, including sender, recipient,
- * item, content, and the timestamp of when the notification was generated.
- * </p>
+ *
+ * <p>This DTO encapsulates the details of a chat notification, including sender, recipient, item,
+ * content, and the timestamp of when the notification was generated.
  *
  * @author Harry Xu
  */
@@ -27,41 +26,36 @@ public class ChatNotification {
 
   /**
    * The identifier of the sender of the notification.
-   * <p>
-   * This field represents the sender's user ID.
-   * </p>
+   *
+   * <p>This field represents the sender's user ID.
    */
   private String senderId;
 
   /**
    * The identifier of the recipient of the notification.
-   * <p>
-   * This field represents the recipient's user ID.
-   * </p>
+   *
+   * <p>This field represents the recipient's user ID.
    */
   private String recipientId;
 
   /**
    * The unique identifier of the item related to the notification.
-   * <p>
-   * This field represents the ID of the item associated with the notification.
-   * </p>
+   *
+   * <p>This field represents the ID of the item associated with the notification.
    */
   private Long itemId;
 
   /**
    * The content of the chat notification.
-   * <p>
-   * This field represents the message or notification content being sent.
-   * </p>
+   *
+   * <p>This field represents the message or notification content being sent.
    */
   private String content;
 
   /**
    * The timestamp of when the notification was generated.
-   * <p>
-   * This field represents the date and time when the notification was created.
-   * </p>
+   *
+   * <p>This field represents the date and time when the notification was created.
    */
   private LocalDateTime timestamp;
 }

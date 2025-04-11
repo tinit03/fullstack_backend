@@ -2,13 +2,12 @@ package org.ntnu.idi.idatt2105.fant.org.fantorg.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.bid.BidCreateDto;
@@ -97,13 +96,15 @@ public class BiddingIT {
     dto.setAmount(new BigDecimal("1100"));
 
     // Place bid
-    MvcResult bidResult = mockMvc
-        .perform(post("/bids")
-            .with(user(buyer))
-            .contentType("application/json")
-            .content(objectMapper.writeValueAsString(dto)))
-        .andExpect(status().isOk())
-        .andReturn();
+    MvcResult bidResult =
+        mockMvc
+            .perform(
+                post("/bids")
+                    .with(user(buyer))
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isOk())
+            .andReturn();
 
     String json = bidResult.getResponse().getContentAsString();
     BidDto bidDto = objectMapper.readValue(json, BidDto.class);
@@ -112,10 +113,11 @@ public class BiddingIT {
     assertThat(bidDto.getItemId()).isEqualTo(item.getItemId());
 
     // Fetch bids for item
-    MvcResult getResult = mockMvc
-        .perform(get("/bids/item/{itemId}", item.getItemId()).with(user(seller)))
-        .andExpect(status().isOk())
-        .andReturn();
+    MvcResult getResult =
+        mockMvc
+            .perform(get("/bids/item/{itemId}", item.getItemId()).with(user(seller)))
+            .andExpect(status().isOk())
+            .andReturn();
 
     String getJson = getResult.getResponse().getContentAsString();
     assertThat(getJson).contains("1100");
@@ -128,21 +130,25 @@ public class BiddingIT {
     dto.setItemId(item.getItemId());
     dto.setAmount(new BigDecimal("900"));
 
-    MvcResult bidResult = mockMvc
-        .perform(post("/bids")
-            .with(user(buyer))
-            .contentType("application/json")
-            .content(objectMapper.writeValueAsString(dto)))
-        .andExpect(status().isOk())
-        .andReturn();
+    MvcResult bidResult =
+        mockMvc
+            .perform(
+                post("/bids")
+                    .with(user(buyer))
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isOk())
+            .andReturn();
 
-    BidDto bidDto = objectMapper.readValue(bidResult.getResponse().getContentAsString(), BidDto.class);
+    BidDto bidDto =
+        objectMapper.readValue(bidResult.getResponse().getContentAsString(), BidDto.class);
 
     // Accept the bid as seller
-    MvcResult acceptResult = mockMvc
-        .perform(post("/bids/" + bidDto.getId() + "/accept").with(user(seller)))
-        .andExpect(status().isOk())
-        .andReturn();
+    MvcResult acceptResult =
+        mockMvc
+            .perform(post("/bids/" + bidDto.getId() + "/accept").with(user(seller)))
+            .andExpect(status().isOk())
+            .andReturn();
 
     String response = acceptResult.getResponse().getContentAsString();
     assertThat(response).contains("\"itemId\":" + item.getItemId());

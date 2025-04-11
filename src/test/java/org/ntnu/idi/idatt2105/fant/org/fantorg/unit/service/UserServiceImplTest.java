@@ -12,6 +12,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UpdatePasswordDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.user.UserDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.user.UserNotFoundException;
@@ -23,32 +26,23 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ImageService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.RefreshTokenService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ReviewService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.UserServiceImpl;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTest {
 
-  @Mock
-  private UserRepository userRepository;
+  @Mock private UserRepository userRepository;
 
-  @Mock
-  private RefreshTokenService refreshTokenService;
+  @Mock private RefreshTokenService refreshTokenService;
 
-  @Mock
-  private PasswordEncoder passwordEncoder;
+  @Mock private PasswordEncoder passwordEncoder;
 
-  @Mock
-  private ReviewService reviewService;
+  @Mock private ReviewService reviewService;
 
-  @Mock
-  private ImageService imageService;
+  @Mock private ImageService imageService;
 
-  @InjectMocks
-  private UserServiceImpl userService;
+  @InjectMocks private UserServiceImpl userService;
 
   private User user;
   private User anotherUser;
@@ -63,7 +57,6 @@ public class UserServiceImplTest {
     user.setPassword("hashedPassword");
 
     user.setRole(Role.USER);
-
 
     anotherUser = new User();
     ReflectionTestUtils.setField(anotherUser, "id", 2L);
@@ -86,7 +79,8 @@ public class UserServiceImplTest {
   @Test
   public void testFindByEmail_NotFound() {
     when(userRepository.findByEmail("notfound@example.com")).thenReturn(Optional.empty());
-    assertThrows(UserNotFoundException.class, () -> userService.findByEmail("notfound@example.com"));
+    assertThrows(
+        UserNotFoundException.class, () -> userService.findByEmail("notfound@example.com"));
   }
 
   @Test
