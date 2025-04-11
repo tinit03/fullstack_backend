@@ -239,8 +239,8 @@ public class LoadData implements CommandLineRunner {
     item.setImages(images);
     List<Image> images1 = new ArrayList<>();
     Image image1 = new Image();
-    image1.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1742651143/samples/animals/cat.jpg");
-    image1.setPublicId("samples/animals/cat");
+    image1.setUrl("https://res.cloudinary.com/desnhobcx/image/upload/v1744336023/ldimjznnujezfn6i3aji.jpg");
+    image1.setPublicId("ldimjznnujezfn6i3aji");
     image1.setCaption("cool cat");
     image1.setItem(item1);
     images1.add(image1);
@@ -255,7 +255,7 @@ public class LoadData implements CommandLineRunner {
     dessertItem.setSubCategory(laptops); // Place under an existing subcategory
     dessertItem.setPrice(new BigDecimal("99.99"));
     dessertItem.setPublishedAt(LocalDateTime.now().minusDays(2));
-    dessertItem.setLocation(new Location("0150", "Oslo", "Oslo", "59.9139", "10.7522"));
+    dessertItem.setLocation(new Location("0111", "Oslo", "Oslo", "59.9139", "10.7522"));
     dessertItem.setTags(List.of("dessert", "sweet", "food"));
     dessertItem.setSeller(user);
     dessertItem.setListingType(ListingType.DIRECT);
@@ -270,7 +270,7 @@ public class LoadData implements CommandLineRunner {
     sheepItem.setSubCategory(balls); // Example category
     sheepItem.setPrice(new BigDecimal("3000"));
     sheepItem.setPublishedAt(LocalDateTime.now().minusDays(1));
-    sheepItem.setLocation(new Location("5000", "Vestland", "Bergen", "60.39299", "5.32415"));
+    sheepItem.setLocation(new Location("5003", "Vestland", "Bergen", "60.39299", "5.32415"));
     sheepItem.setTags(List.of("sheep", "wool", "animal"));
     sheepItem.setSeller(otherUser);
     sheepItem.setListingType(ListingType.BID);
@@ -285,7 +285,7 @@ public class LoadData implements CommandLineRunner {
     shoesItem.setSubCategory(shoes);
     shoesItem.setPrice(new BigDecimal("399.99"));
     shoesItem.setPublishedAt(LocalDateTime.now().minusHours(5));
-    shoesItem.setLocation(new Location("6000", "Møre og Romsdal", "Ålesund", "62.4722", "6.1499"));
+    shoesItem.setLocation(new Location("6003", "Møre og Romsdal", "Ålesund", "62.4722", "6.1499"));
     shoesItem.setTags(List.of("shoes", "sports", "running"));
     shoesItem.setSeller(a);
     shoesItem.setListingType(ListingType.DIRECT);
@@ -300,7 +300,7 @@ public class LoadData implements CommandLineRunner {
     bikeItem.setSubCategory(bikes);
     bikeItem.setPrice(new BigDecimal("1200"));
     bikeItem.setPublishedAt(LocalDateTime.now().minusDays(4));
-    bikeItem.setLocation(new Location("7000", "Trøndelag", "Trondheim", "63.4305", "10.3951"));
+    bikeItem.setLocation(new Location("7010", "Trøndelag", "Trondheim", "63.4305", "10.3951"));
     bikeItem.setTags(List.of("bike", "mountain", "cycling"));
     bikeItem.setSeller(a);
     bikeItem.setListingType(ListingType.BID);
@@ -315,7 +315,7 @@ public class LoadData implements CommandLineRunner {
     book.setSubCategory(fiction);
     book.setPrice(new BigDecimal("19.99"));
     book.setPublishedAt(LocalDateTime.now().minusHours(1));
-    book.setLocation(new Location("0000", "Oslo", "Oslo", "59.9139", "10.7522"));
+    book.setLocation(new Location("0111", "Oslo", "Oslo", "59.9139", "10.7522"));
     book.setTags(List.of("book", "fiction", "novel"));
     book.setSeller(user);
     book.setListingType(ListingType.DIRECT);
@@ -330,7 +330,7 @@ public class LoadData implements CommandLineRunner {
     chair.setSubCategory(chairs);
     chair.setPrice(new BigDecimal("89.99"));
     chair.setPublishedAt(LocalDateTime.now().minusHours(2));
-    chair.setLocation(new Location("1111", "Oslo", "Oslo", "59.9139", "10.7522"));
+    chair.setLocation(new Location("0111", "Oslo", "Oslo", "59.9139", "10.7522"));
     chair.setTags(List.of("chair", "furniture", "comfort"));
     chair.setSeller(otherUser);
     chair.setListingType(ListingType.DIRECT);
@@ -345,7 +345,7 @@ public class LoadData implements CommandLineRunner {
     figures.setSubCategory(actionFigures);
     figures.setPrice(new BigDecimal("59.99"));
     figures.setPublishedAt(LocalDateTime.now().minusHours(3));
-    figures.setLocation(new Location("2222", "Oslo", "Oslo", "59.9139", "10.7522"));
+    figures.setLocation(new Location("0111", "Oslo", "Oslo", "59.9139", "10.7522"));
     figures.setTags(List.of("action", "toys", "figures"));
     figures.setSeller(a);
     figures.setListingType(ListingType.DIRECT);
@@ -360,7 +360,7 @@ public class LoadData implements CommandLineRunner {
     fridge.setSubCategory(fridges);
     fridge.setPrice(new BigDecimal("799.99"));
     fridge.setPublishedAt(LocalDateTime.now().minusDays(1));
-    fridge.setLocation(new Location("3333", "Oslo", "Oslo", "59.9139", "10.7522"));
+    fridge.setLocation(new Location("0111", "Oslo", "Oslo", "59.9139", "10.7522"));
     fridge.setTags(List.of("fridge", "appliance", "kitchen"));
     fridge.setSeller(otherUser);
     fridge.setListingType(ListingType.DIRECT);
@@ -375,7 +375,7 @@ public class LoadData implements CommandLineRunner {
     car.setSubCategory(cars);
     car.setPrice(new BigDecimal("29999.99"));
     car.setPublishedAt(LocalDateTime.now().minusDays(2));
-    car.setLocation(new Location("4444", "Oslo", "Oslo", "59.9139", "10.7522"));
+    car.setLocation(new Location("0111", "Oslo", "Oslo", "59.9139", "10.7522"));
     car.setTags(List.of("car", "electric", "vehicle"));
     car.setSeller(user);
     car.setListingType(ListingType.BID);
@@ -393,7 +393,7 @@ public class LoadData implements CommandLineRunner {
     newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744111775/llyfzr98jt9os9xjfk9e.jpg", "llyfzr98jt9os9xjfk9e", "Catcher in the rye", book));
     newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744111895/iexwpih72nkt0j89qvvu.jpg", "iexwpih72nkt0j89qvvu", "Black ergonomic Chair", chair));
     newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744112006/ybrvxvud75ok5z1ped0l.png", "ybrvxvud75ok5z1ped0l", "Cool action figure", figures));
-    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744112148/qfvpj9qafdqtjnffskwf.jpg", "qfvpj9qafdqtjnffskwf", "Modern Refrigerator", fridge));
+    newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744336212/xasglz6fbrudmic1hnke.jpg", "xasglz6fbrudmic1hnke", "Modern Refrigerator", fridge));
     newImages.add(new Image(null, "https://res.cloudinary.com/desnhobcx/image/upload/v1744112263/rmxgjymbt92xbfmq8doq.png", "rmxgjymbt92xbfmq8doq", "Electric Car Image", car));
     imageRepository.saveAll(newImages);
 
