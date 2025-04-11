@@ -150,7 +150,6 @@ public class ChatController {
   @MessageMapping("/chat")
   public void processMessage(
       @Payload ChatMessageCreateDto messageDto, @AuthenticationPrincipal User user) {
-    System.out.println(user.getEmail());
     log.info("Received message for /chat");
     log.info("Received chat msg: '{}'", messageDto.getContent());
     log.info("Saving chat msg: '{}'...", messageDto.getContent());
