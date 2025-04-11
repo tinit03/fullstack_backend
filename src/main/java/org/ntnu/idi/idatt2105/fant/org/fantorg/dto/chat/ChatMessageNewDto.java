@@ -6,5 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ChatMessageNewDto {
-    private String message;
+  private String message;
 }
