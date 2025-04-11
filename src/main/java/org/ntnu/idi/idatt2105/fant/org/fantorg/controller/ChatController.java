@@ -151,10 +151,6 @@ public class ChatController {
   public void processMessage(
       @Payload ChatMessageCreateDto messageDto, @AuthenticationPrincipal User user) {
     System.out.println(user.getEmail());
-    if (!Objects.equals(messageDto.getSenderId(), user.getEmail())) {
-      System.out.println("bad");
-      return;
-    }
     log.info("Received message for /chat");
     log.info("Received chat msg: '{}'", messageDto.getContent());
     log.info("Saving chat msg: '{}'...", messageDto.getContent());
