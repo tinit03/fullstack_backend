@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -56,4 +58,7 @@ public class Order {
    * This is set to the timestamp when the order is created.
    */
   private LocalDateTime orderDate;
-}
+
+private BigDecimal price;
+
+  }

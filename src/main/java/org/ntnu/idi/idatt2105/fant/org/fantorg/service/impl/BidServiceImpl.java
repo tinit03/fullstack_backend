@@ -16,10 +16,7 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Bid;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Order;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.BidStatus;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.ListingType;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.MessageType;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.NotificationType;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.*;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.BidRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.OrderRepository;
@@ -105,10 +102,16 @@ public class BidServiceImpl implements BidService {
     if(!bid.getItem().getSeller().getId().equals(seller.getId())) {
       throw new IllegalArgumentException("User is not authorized to accept this bid");
     }
+    Item item = bid.getItem();
+    item.setStatus(Status.SOLD);
+    itemRepository.save(item);
     bid.setStatus(BidStatus.ACCEPTED);
     Bid savedBid = bidRepository.save(bid);
-    Order order = buildOrder(bid.getItem(), bid.getBidder());
+
+    Order order = buildOrder(bid.getItem(), bid.getBidder(), savedBid);
     Order savedOrder = orderRepository.save(order);
+
+
     Map<String, String> args = Map.of(
         "user", seller.getFirstName() + " " + seller.getLastName(),
         "item", bid.getItem().getTitle()
@@ -181,13 +184,15 @@ public class BidServiceImpl implements BidService {
    *
    * @param item  The item being purchased.
    * @param buyer The buyer who won the bid.
+   * @param bid The bid
    * @return The new order object.
    */
-  private Order buildOrder(Item item, User buyer) {
+  private Order buildOrder(Item item, User buyer, Bid bid) {
     Order order = new Order();
     order.setItem(item);
     order.setBuyer(buyer);
     order.setOrderDate(LocalDateTime.now());
+    order.setPrice(bid.getAmount());
     return order;
   }
 }

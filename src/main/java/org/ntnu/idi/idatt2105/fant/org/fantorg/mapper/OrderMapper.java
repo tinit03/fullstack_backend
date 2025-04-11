@@ -25,7 +25,10 @@ public class OrderMapper {
    */
   public static OrderDto toDto(Order order) {
     OrderDto dto = new OrderDto();
-    User seller = order.getItem().getSeller(); // Get the seller associated with the order's item
+    User seller = order.getItem().getSeller();
+    dto.setId(order.getId());
+    dto.setOrderDate(order.getOrderDate());
+    dto.setPrice(order.getPrice());
 
     dto.setId(order.getId()); // Set the order ID
     dto.setOrderDate(order.getOrderDate()); // Set the order date
