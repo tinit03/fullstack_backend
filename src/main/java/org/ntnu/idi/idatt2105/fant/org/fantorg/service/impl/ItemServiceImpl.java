@@ -66,7 +66,13 @@ public class ItemServiceImpl implements ItemService {
   private final Logger logger = LoggerFactory.getLogger(ItemServiceImpl.class);
   private final ItemFacetCountUtil facetUtil;
 
-
+  /**
+   * Creates a new item based on the provided data transfer object and seller information.
+   *
+   * @param dto    the data transfer object containing item details
+   * @param seller the user who is selling the item
+   * @return the created item
+   */
   @Override
   public Item createItem(ItemCreateDto dto, User seller) {
     //Map the item details from the dto to entity
@@ -106,6 +112,15 @@ public class ItemServiceImpl implements ItemService {
     savedItem.setImages(imageEntities);
     return savedItem;
   }
+
+  /**
+   * Updates an existing item with the provided details.
+   *
+   * @param id          the ID of the item to update
+   * @param updatedItem the data transfer object containing updated item details
+   * @param seller      the user who is selling the item
+   * @return the updated item
+   */
   @Override
   public Item updateItem(Long id, ItemEditDto updatedItem, User seller) {
     Item existing = itemRepository.findById(id)
