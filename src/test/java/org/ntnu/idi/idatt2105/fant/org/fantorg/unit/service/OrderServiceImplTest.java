@@ -12,8 +12,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageCreateDto;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.chat.ChatMessageDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderCreateDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.order.OrderDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.Item;
@@ -24,30 +26,21 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.ItemRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.OrderRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.ChatMessageService;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.NotificationService;
-import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.ChatMessageServiceImpl;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.OrderServiceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceImplTest {
 
-  @Mock
-  private OrderRepository orderRepository;
+  @Mock private OrderRepository orderRepository;
 
-  @Mock
-  private ItemRepository itemRepository;
+  @Mock private ItemRepository itemRepository;
 
-  @Mock
-  private NotificationService notificationService;
+  @Mock private NotificationService notificationService;
 
-  @Mock
-  private ChatMessageService chatMessageService;
+  @Mock private ChatMessageService chatMessageService;
 
-  @InjectMocks
-  private OrderServiceImpl orderService;
+  @InjectMocks private OrderServiceImpl orderService;
 
   private User buyer;
   private User seller;
@@ -80,23 +73,26 @@ public class OrderServiceImplTest {
 
     when(itemRepository.findById(10L)).thenReturn(Optional.of(sampleItem));
 
-    when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
-      Order order = invocation.getArgument(0);
-      ReflectionTestUtils.setField(order, "id", 100L);
+    when(orderRepository.save(any(Order.class)))
+        .thenAnswer(
+            invocation -> {
+              Order order = invocation.getArgument(0);
+              ReflectionTestUtils.setField(order, "id", 100L);
 
-      if (order.getOrderDate() == null) {
-        order.setOrderDate(LocalDateTime.now());
-      }
-      return order;
-    });
+              if (order.getOrderDate() == null) {
+                order.setOrderDate(LocalDateTime.now());
+              }
+              return order;
+            });
 
-    ChatMessageCreateDto chatMessageCreateDto = ChatMessageCreateDto.builder()
-        .senderId(buyer.getEmail())
-        .recipientId(seller.getEmail())
-        .itemId(sampleItem.getItemId())
-        .type(MessageType.PURCHASE)
-        .content(null)
-        .build();
+    ChatMessageCreateDto chatMessageCreateDto =
+        ChatMessageCreateDto.builder()
+            .senderId(buyer.getEmail())
+            .recipientId(seller.getEmail())
+            .itemId(sampleItem.getItemId())
+            .type(MessageType.PURCHASE)
+            .content(null)
+            .build();
 
     when(chatMessageService.save(any(chatMessageCreateDto.getClass()))).thenReturn(null);
 
@@ -116,8 +112,10 @@ public class OrderServiceImplTest {
 
     when(itemRepository.findById(99L)).thenReturn(Optional.empty());
 
-    assertThrows(EntityNotFoundException.class, () -> {
-      orderService.createOrder(orderCreateDto, buyer);
-    });
+    assertThrows(
+        EntityNotFoundException.class,
+        () -> {
+          orderService.createOrder(orderCreateDto, buyer);
+        });
   }
 }

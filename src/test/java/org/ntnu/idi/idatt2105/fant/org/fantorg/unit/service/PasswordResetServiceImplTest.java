@@ -12,6 +12,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.authentication.ForgotPasswordDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.authentication.ResetPasswordDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.exception.user.UserNotFoundException;
@@ -20,26 +23,19 @@ import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.PasswordResetTokenRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.repository.UserRepository;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.impl.PasswordResetServiceImpl;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class PasswordResetServiceImplTest {
 
-  @Mock
-  private PasswordResetTokenRepository tokenRepository;
+  @Mock private PasswordResetTokenRepository tokenRepository;
 
-  @Mock
-  private UserRepository userRepository;
+  @Mock private UserRepository userRepository;
 
-  @Mock
-  private PasswordEncoder passwordEncoder;
+  @Mock private PasswordEncoder passwordEncoder;
 
-  @InjectMocks
-  private PasswordResetServiceImpl passwordResetService;
+  @InjectMocks private PasswordResetServiceImpl passwordResetService;
 
   private User sampleUser;
   private PasswordResetToken sampleToken;
@@ -54,7 +50,6 @@ public class PasswordResetServiceImplTest {
     sampleUser.setEmail("john.doe@example.com");
     sampleUser.setPassword("old_hashed_password"); // raw value not used because we stub the encoder
 
-
     sampleToken = new PasswordResetToken();
     sampleToken.setToken(UUID.randomUUID().toString());
     sampleToken.setUser(sampleUser);
@@ -68,12 +63,12 @@ public class PasswordResetServiceImplTest {
     ForgotPasswordDto forgotDto = new ForgotPasswordDto();
     forgotDto.setEmail("john.doe@example.com");
 
-
     when(userRepository.findByEmail("john.doe@example.com")).thenReturn(Optional.of(sampleUser));
 
     when(tokenRepository.findByUser(sampleUser)).thenReturn(Optional.empty());
 
-    when(tokenRepository.save(any(PasswordResetToken.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    when(tokenRepository.save(any(PasswordResetToken.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
 
     PasswordResetToken createdToken = passwordResetService.createTokenForUser(forgotDto);
 
@@ -91,7 +86,8 @@ public class PasswordResetServiceImplTest {
 
     when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
 
-    assertThrows(UserNotFoundException.class, () -> passwordResetService.createTokenForUser(forgotDto));
+    assertThrows(
+        UserNotFoundException.class, () -> passwordResetService.createTokenForUser(forgotDto));
   }
 
   @Test
@@ -102,13 +98,16 @@ public class PasswordResetServiceImplTest {
     resetDto.setNewPassword("new_secure_password");
 
     when(tokenRepository.findByToken(sampleToken.getToken())).thenReturn(Optional.of(sampleToken));
-    when(passwordEncoder.matches("new_secure_password", sampleUser.getPassword())).thenReturn(false);
+    when(passwordEncoder.matches("new_secure_password", sampleUser.getPassword()))
+        .thenReturn(false);
     when(passwordEncoder.encode("new_secure_password")).thenReturn("hashed_new_password");
     when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-    when(tokenRepository.save(any(PasswordResetToken.class))).thenAnswer(invocation -> {
-      PasswordResetToken t = invocation.getArgument(0);
-      return t;
-    });
+    when(tokenRepository.save(any(PasswordResetToken.class)))
+        .thenAnswer(
+            invocation -> {
+              PasswordResetToken t = invocation.getArgument(0);
+              return t;
+            });
 
     passwordResetService.resetPassword(resetDto);
 
@@ -128,7 +127,8 @@ public class PasswordResetServiceImplTest {
     when(passwordEncoder.matches("old_password", sampleUser.getPassword())).thenReturn(true);
 
     IllegalArgumentException exception =
-        assertThrows(IllegalArgumentException.class, () -> passwordResetService.resetPassword(resetDto));
+        assertThrows(
+            IllegalArgumentException.class, () -> passwordResetService.resetPassword(resetDto));
     assertThat(exception.getMessage()).contains("New password must be different");
   }
 
@@ -137,7 +137,8 @@ public class PasswordResetServiceImplTest {
 
     when(tokenRepository.findByToken(sampleToken.getToken())).thenReturn(Optional.of(sampleToken));
 
-    assertDoesNotThrow(() -> passwordResetService.validateToken(sampleToken.getToken(), "john.doe@example.com"));
+    assertDoesNotThrow(
+        () -> passwordResetService.validateToken(sampleToken.getToken(), "john.doe@example.com"));
   }
 
   @Test
@@ -145,7 +146,9 @@ public class PasswordResetServiceImplTest {
     when(tokenRepository.findByToken("invalid_token")).thenReturn(Optional.empty());
 
     IllegalArgumentException exception =
-        assertThrows(IllegalArgumentException.class, () -> passwordResetService.validateToken("invalid_token", "john.doe@example.com"));
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> passwordResetService.validateToken("invalid_token", "john.doe@example.com"));
     assertThat(exception.getMessage()).contains("Invalid reset token");
   }
 
@@ -157,10 +160,15 @@ public class PasswordResetServiceImplTest {
     expiredToken.setExpiryDate(LocalDateTime.now().minusMinutes(5)); // expired 5 minutes ago
     expiredToken.setUsed(false);
 
-    when(tokenRepository.findByToken(expiredToken.getToken())).thenReturn(Optional.of(expiredToken));
+    when(tokenRepository.findByToken(expiredToken.getToken()))
+        .thenReturn(Optional.of(expiredToken));
 
     IllegalStateException exception =
-        assertThrows(IllegalStateException.class, () -> passwordResetService.validateToken(expiredToken.getToken(), "john.doe@example.com"));
+        assertThrows(
+            IllegalStateException.class,
+            () ->
+                passwordResetService.validateToken(
+                    expiredToken.getToken(), "john.doe@example.com"));
     assertThat(exception.getMessage()).contains("Token has expired");
   }
 
@@ -175,7 +183,9 @@ public class PasswordResetServiceImplTest {
     when(tokenRepository.findByToken(usedToken.getToken())).thenReturn(Optional.of(usedToken));
 
     IllegalStateException exception =
-        assertThrows(IllegalStateException.class, () -> passwordResetService.validateToken(usedToken.getToken(), "john.doe@example.com"));
+        assertThrows(
+            IllegalStateException.class,
+            () -> passwordResetService.validateToken(usedToken.getToken(), "john.doe@example.com"));
     assertThat(exception.getMessage()).contains("Token has already been used");
   }
 
@@ -185,7 +195,9 @@ public class PasswordResetServiceImplTest {
     when(tokenRepository.findByToken(sampleToken.getToken())).thenReturn(Optional.of(sampleToken));
 
     SecurityException exception =
-        assertThrows(SecurityException.class, () -> passwordResetService.validateToken(sampleToken.getToken(), "other@example.com"));
+        assertThrows(
+            SecurityException.class,
+            () -> passwordResetService.validateToken(sampleToken.getToken(), "other@example.com"));
     assertThat(exception.getMessage()).contains("Token does not belong");
   }
 
@@ -200,7 +212,8 @@ public class PasswordResetServiceImplTest {
   public void testGetUserByToken_InvalidOrExpired() {
     // Given no token is found
     when(tokenRepository.findByToken("nonexistent")).thenReturn(Optional.empty());
-    assertThrows(EntityNotFoundException.class, () -> passwordResetService.getUserByToken("nonexistent"));
+    assertThrows(
+        EntityNotFoundException.class, () -> passwordResetService.getUserByToken("nonexistent"));
 
     // Also simulate expired token
     PasswordResetToken expiredToken = new PasswordResetToken();
@@ -208,8 +221,11 @@ public class PasswordResetServiceImplTest {
     expiredToken.setUser(sampleUser);
     expiredToken.setExpiryDate(LocalDateTime.now().minusMinutes(1));
     expiredToken.setUsed(false);
-    when(tokenRepository.findByToken(expiredToken.getToken())).thenReturn(Optional.of(expiredToken));
-    assertThrows(EntityNotFoundException.class, () -> passwordResetService.getUserByToken(expiredToken.getToken()));
+    when(tokenRepository.findByToken(expiredToken.getToken()))
+        .thenReturn(Optional.of(expiredToken));
+    assertThrows(
+        EntityNotFoundException.class,
+        () -> passwordResetService.getUserByToken(expiredToken.getToken()));
   }
 
   @Test
@@ -223,7 +239,8 @@ public class PasswordResetServiceImplTest {
   @Test
   public void testMarkTokenAsUsed_Success() {
     when(tokenRepository.findByToken(sampleToken.getToken())).thenReturn(Optional.of(sampleToken));
-    when(tokenRepository.save(any(PasswordResetToken.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    when(tokenRepository.save(any(PasswordResetToken.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
 
     passwordResetService.markTokenAsUsed(sampleToken.getToken());
     assertTrue(sampleToken.isUsed());

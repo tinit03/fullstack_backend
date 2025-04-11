@@ -18,33 +18,65 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.enums.BidStatus;
 
-  @Entity
-  @Getter
-  @Setter
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @Table(name = "\"Bids\"")
-  public class Bid {
+/**
+ * Entity representing a bid in the marketplace. A bid is placed by a user on an item, with a
+ * specific amount and time. The status of the bid is tracked, indicating whether it's pending,
+ * accepted, or rejected.
+ *
+ * <p>This entity maps to the "Bids" table in the database and contains the following attributes:
+ *
+ * <ul>
+ *   <li><b>id</b>: The unique identifier of the bid (auto-generated).
+ *   <li><b>item</b>: The item the bid is placed on (many-to-one relationship with the {@link Item}
+ *       entity).
+ *   <li><b>bidder</b>: The user placing the bid (many-to-one relationship with the {@link User}
+ *       entity).
+ *   <li><b>amount</b>: The amount of money offered in the bid.
+ *   <li><b>bidTime</b>: The timestamp of when the bid was placed.
+ *   <li><b>status</b>: The status of the bid (e.g., pending, accepted, rejected) defined by {@link
+ *       BidStatus} enum.
+ * </ul>
+ */
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "\"Bids\"")
+public class Bid {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  /** The unique identifier of the bid. */
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "item_id")
-    private Item item;
+  /**
+   * The item the bid is placed on. This is a many-to-one relationship with the {@link Item} entity.
+   */
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "item_id")
+  private Item item;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "bidder_id")
-    private User bidder;
+  /**
+   * The user who placed the bid. This is a many-to-one relationship with the {@link User} entity.
+   */
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "bidder_id")
+  private User bidder;
 
-    @Column(nullable = false)
-    private BigDecimal amount;
+  /** The amount of money offered in the bid. */
+  @Column(nullable = false)
+  private BigDecimal amount;
 
-    @Column(nullable = false)
-    private LocalDateTime bidTime;
+  /** The timestamp of when the bid was placed. */
+  @Column(nullable = false)
+  private LocalDateTime bidTime;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private BidStatus status;
+  /**
+   * The status of the bid. This is an enumerated field that can be {@link BidStatus#PENDING},
+   * {@link BidStatus#ACCEPTED}, or {@link BidStatus#REJECTED}.
+   */
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private BidStatus status;
 }
