@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.dto.notification.NotificationDto;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.model.User;
 import org.ntnu.idi.idatt2105.fant.org.fantorg.service.NotificationService;
+import org.ntnu.idi.idatt2105.fant.org.fantorg.specification.SortUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -52,9 +54,12 @@ public class NotificationController {
   public ResponseEntity<Page<NotificationDto>> getMyNotifications(
       @AuthenticationPrincipal User user,
       @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(defaultValue = "createdAt") String sortField,
+      @RequestParam(defaultValue = "desc") String sortDir
   ) {
-    Pageable pageable = PageRequest.of(page, size);
+    Sort sort = SortUtil.buildSort(sortField,sortDir);
+    Pageable pageable = PageRequest.of(page, size, sort);
     return ResponseEntity.ok(notificationService.getNotifications(user, pageable));
   }
 
