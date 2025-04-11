@@ -68,7 +68,8 @@ public class SecurityConfiguration {
                                             "/h2-console/**",
                                             "/v3/api-docs/",
                                             "swagger-ui.html",
-                                            "/webjars/**"
+                                            "/webjars/**",
+                                            "/actuator/**"
                                             )
                                         .permitAll()
                                         .anyRequest()

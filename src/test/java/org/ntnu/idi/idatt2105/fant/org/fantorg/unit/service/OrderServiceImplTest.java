@@ -98,7 +98,6 @@ public class OrderServiceImplTest {
         .content(null)
         .build();
 
-    when(chatMessageService.save(any(chatMessageCreateDto.getClass()))).thenReturn(null);
 
     OrderDto result = orderService.createOrder(orderCreateDto, buyer);
 
