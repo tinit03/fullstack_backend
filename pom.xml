@@ -233,7 +233,6 @@
 						<phase>test</phase>
 						<configuration>
 							<configLocation>google_checks.xml</configLocation>
-							<configLocation>config/checkstyle-additions.xml</configLocation>
 							<encoding>UTF-8</encoding>
 							<failsOnError>true</failsOnError>
 							<failOnViolation>true</failOnViolation>

@@ -51,7 +51,8 @@ The server is now running on port 8080.
 To exit the application, use CTRL+C.
 
 ### 🧪 Test data
-The database is populated with three pre-configured users. You can log in with the following credentials:
+The database is populated with three pre-configured users in [LoadData.java](src/main/java/org/ntnu/idi/idatt2105/fant/org/fantorg/config/LoadData.java)
+. You can log in with the following credentials:
 
 **User 1**
 - Email: ```test@fant.org```
@@ -103,3 +104,10 @@ The REST endpoints are documented using [Swagger UI](https://swagger.io/tools/sw
 
 #### Source code
 The entire backend source code has been documented with Javadoc.
+
+### Group members
+ShopIT was developed by a team of three students:
+
+- Tini Tran
+- Vilde Min Vikan
+- Harry Xu
